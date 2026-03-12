@@ -53,16 +53,6 @@ https://irvinezhao.github.io/beauty-app/
 - 风格：Soft UI 柔和现代风
 - 底部导航栏
 
-## Firebase 配置
-
-```javascript
-const firebaseConfig = {
-    apiKey: "AIzaSyBOPa-J7SpDyOSdWiy7gsA5re01Xd-FuvI",
-    authDomain: "beauty-app-6527c.firebaseapp.com",
-    projectId: "beauty-app-6527c",
-    databaseURL: "https://beauty-app-6527c-default-rtdb.asia-southeast1.firebasedatabase.app"
-};
-```
 
 ---
 
