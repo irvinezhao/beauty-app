@@ -328,7 +328,9 @@ function syncData() {
     </div>
     
     <div class="page" id="profile">
-        <div id="profileContent"></div>
+        <div class="stat-grid" id="profileStats"></div>
+        <div class="section" id="myBookings"></div>
+        <div class="section" id="myCoupons"></div>
         <button class="btn" style="background:#f44336" onclick="userLogout()">退出登录</button>
     </div>
     
@@ -617,7 +619,7 @@ function syncData() {
         // Profile
         function renderProfile() {
             if(!currentUser) {
-                document.getElementById('profileContent').innerHTML = '<div class="empty">请先登录</div>';
+                document.getElementById('profileStats').innerHTML = '<div class="empty">请先登录</div>';
                 return;
             }
             const myBooks = bookings.filter(b => b.phone === currentUser.phone);
@@ -813,6 +815,5 @@ function syncData() {
         
         function closeModal(id) { document.getElementById(id).classList.remove('active'); }
     </script>
-<div class="modal" id="rechargeModal"><div class="modal-content"><div class="modal-header"><h3>💰 充值</h3><span class="modal-close" onclick="closeRechargeModal()">×</span></div><div id="rechargeList"></div></div></div>
 </body>
 </html>
