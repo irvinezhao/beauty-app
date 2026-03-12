@@ -301,6 +301,33 @@
             object-fit: cover;
             border-radius: 8px;
         }
+        
+        .sync-status {
+            position: fixed;
+            top: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            z-index: 200;
+            display: none;
+        }
+        
+        .sync-status.show { display: block; }
+        
+        .delete-btn {
+            background: #ff5252;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+            margin-left: 8px;
+        }
     </style>
 </head>
 <body>
@@ -308,6 +335,8 @@
         <h1>✨ 美丽小站</h1>
         <p>美容项目管理 · 预约 · 记录</p>
     </div>
+    
+    <div class="sync-status" id="syncStatus">☁️ 同步中...</div>
     
     <div class="tabs">
         <div class="tab active" data-tab="projects">项目</div>
@@ -352,22 +381,86 @@
         </div>
     </div>
     
-    <script>
-        // 数据存储
-        const store = {
-            projects: JSON.parse(localStorage.getItem('beauty_projects') || '[]'),
-            bookings: JSON.parse(localStorage.getItem('beauty_bookings') || '[]'),
-            photos: JSON.parse(localStorage.getItem('beauty_photos') || '[]'),
-            posts: JSON.parse(localStorage.getItem('beauty_posts') || '[]')
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        
+        // Firebase配置
+        const firebaseConfig = {
+            apiKey: "AIzaSyBOPa-J7SpDyOSdWiy7gsA5re01Xd-FuvI",
+            authDomain: "beauty-app-6527c.firebaseapp.com",
+            projectId: "beauty-app-6527c",
+            storageBucket: "beauty-app-6527c.firebasestorage.app",
+            messagingSenderId: "396685995260",
+            appId: "1:396685995260:web:0bb1a0676b339378a5bb79"
         };
         
-        function save() {
-            localStorage.setItem('beauty_projects', JSON.stringify(store.projects));
-            localStorage.setItem('beauty_bookings', JSON.stringify(store.bookings));
-            localStorage.setItem('beauty_photos', JSON.stringify(store.photos));
-            localStorage.setItem('beauty_posts', JSON.stringify(store.posts));
-        }
+        // 初始化Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
         
+        // 全局数据存储
+        window.store = {
+            projects: [],
+            bookings: [],
+            photos: [],
+            posts: []
+        };
+        
+        // 同步状态显示
+        window.showSync = (show) => {
+            document.getElementById('syncStatus').classList.toggle('show', show);
+        };
+        
+        // 实时监听数据变化
+        const collections = ['projects', 'bookings', 'photos', 'posts'];
+        
+        collections.forEach(col => {
+            const q = query(collection(db, col), orderBy('createdAt', 'desc'));
+            onSnapshot(q, (snapshot) => {
+                window.store[col] = [];
+                snapshot.forEach(doc => {
+                    window.store[col].push({ id: doc.id, ...doc.data() });
+                });
+                window.renderAll && window.renderAll();
+                window.showSync(false);
+            }, (error) => {
+                console.error('Error fetching', col, error);
+                window.showSync(false);
+            });
+        });
+        
+        // 保存到Firestore
+        window.saveToFirestore = async (collectionName, data) => {
+            window.showSync(true);
+            try {
+                await addDoc(collection(db, collectionName), {
+                    ...data,
+                    createdAt: new Date().toISOString()
+                });
+            } catch (e) {
+                console.error('Error adding document: ', e);
+                alert('保存失败: ' + e.message);
+            }
+        };
+        
+        // 删除从Firestore
+        window.deleteFromFirestore = async (collectionName, docId) => {
+            if (!confirm('确定删除?')) return;
+            window.showSync(true);
+            try {
+                await deleteDoc(doc(db, collectionName, docId));
+            } catch (e) {
+                console.error('Error deleting document: ', e);
+                alert('删除失败: ' + e.message);
+            }
+        };
+        
+        window.showSync(true);
+    </script>
+    
+    <script>
         // Tab切换
         document.querySelectorAll('.tab').forEach(tab => {
             tab.addEventListener('click', () => {
@@ -381,18 +474,22 @@
         // 渲染项目
         function renderProjects() {
             const container = document.getElementById('projectList');
-            if (store.projects.length === 0) {
+            const projects = window.store.projects || [];
+            if (projects.length === 0) {
                 container.innerHTML = '<div class="empty"><div class="empty-icon">📋</div><p>暂无项目<br>点击+添加</p></div>';
                 return;
             }
-            container.innerHTML = store.projects.map((p, i) => `
+            container.innerHTML = projects.map((p, i) => `
                 <div class="card">
                     <div class="project-item">
                         <div>
                             <span class="project-name">${p.name}</span>
                             <span class="project-category">${p.category}</span>
                         </div>
-                        <span class="project-price">¥${p.price}</span>
+                        <div>
+                            <span class="project-price">¥${p.price}</span>
+                            <button class="delete-btn" onclick="deleteFromFirestore('projects', '${p.id}')">删除</button>
+                        </div>
                     </div>
                     ${p.notes ? `<p style="font-size:12px;color:#666;margin-top:8px">${p.notes}</p>` : ''}
                 </div>
@@ -402,17 +499,19 @@
         // 渲染预约
         function renderBookings() {
             const container = document.getElementById('bookingList');
-            if (store.bookings.length === 0) {
+            const bookings = window.store.bookings || [];
+            if (bookings.length === 0) {
                 container.innerHTML = '<div class="empty"><div class="empty-icon">📅</div><p>暂无预约<br>点击+添加</p></div>';
                 return;
             }
-            container.innerHTML = store.bookings.map(b => `
+            container.innerHTML = bookings.map(b => `
                 <div class="card booking-card">
                     <div class="project-item">
                         <div>
                             <span class="project-name">${b.project}</span>
                             <span class="booking-status status-${b.status}">${b.status === 'pending' ? '待确认' : b.status === 'confirmed' ? '已确认' : '已完成'}</span>
                         </div>
+                        <button class="delete-btn" onclick="deleteFromFirestore('bookings', '${b.id}')">删除</button>
                     </div>
                     <p style="font-size:13px;color:#666;margin-top:8px">📅 ${b.date} ${b.time}</p>
                     <p style="font-size:13px;color:#666">📍 ${b.location}</p>
@@ -423,14 +522,18 @@
         // 渲染拍照
         function renderPhotos() {
             const container = document.getElementById('photoList');
-            if (store.photos.length === 0) {
+            const photos = window.store.photos || [];
+            if (photos.length === 0) {
                 container.innerHTML = '<div class="empty"><div class="empty-icon">📸</div><p>暂无记录<br>点击+添加</p></div>';
                 return;
             }
-            container.innerHTML = store.photos.map(p => `
+            container.innerHTML = photos.map(p => `
                 <div class="card">
-                    <div class="project-name">${p.project}</div>
-                    <p style="font-size:12px;color:#666;margin:8px 0">${p.description}</p>
+                    <div class="project-item">
+                        <span class="project-name">${p.project}</span>
+                        <button class="delete-btn" onclick="deleteFromFirestore('photos', '${p.id}')">删除</button>
+                    </div>
+                    ${p.description ? `<p style="font-size:12px;color:#666;margin:8px 0">${p.description}</p>` : ''}
                     <div class="photo-grid">
                         ${p.before ? `<div class="photo-item"><img src="${p.before}" alt="before"></div>` : ''}
                         ${p.after ? `<div class="photo-item"><img src="${p.after}" alt="after"></div>` : ''}
@@ -443,13 +546,17 @@
         // 渲染动态
         function renderPosts() {
             const container = document.getElementById('postList');
-            if (store.posts.length === 0) {
+            const posts = window.store.posts || [];
+            if (posts.length === 0) {
                 container.innerHTML = '<div class="empty"><div class="empty-icon">💬</div><p>暂无动态<br>点击+发布</p></div>';
                 return;
             }
-            container.innerHTML = store.posts.map(p => `
+            container.innerHTML = posts.map(p => `
                 <div class="card">
-                    <div class="post-time">${p.date}</div>
+                    <div class="project-item">
+                        <span class="post-time">${p.date}</span>
+                        <button class="delete-btn" onclick="deleteFromFirestore('posts', '${p.id}')">删除</button>
+                    </div>
                     <div class="post-content">${p.content}</div>
                     ${p.images && p.images.length ? `
                         <div class="post-images">
@@ -460,6 +567,14 @@
             `).join('');
         }
         
+        // 渲染所有
+        window.renderAll = function() {
+            renderProjects();
+            renderBookings();
+            renderPhotos();
+            renderPosts();
+        };
+        
         // Modal
         let currentModal = '';
         
@@ -468,6 +583,8 @@
             const modal = document.getElementById('modal');
             const title = document.getElementById('modalTitle');
             const body = document.getElementById('modalBody');
+            
+            const projects = window.store.projects || [];
             
             if (type === 'project') {
                 title.textContent = '添加项目';
@@ -502,7 +619,7 @@
                     <div class="form-group">
                         <label>选择项目</label>
                         <select id="bookingProject">
-                            ${store.projects.map(p => `<option value="${p.name}">${p.name}</option>`).join('')}
+                            ${projects.length ? projects.map(p => `<option value="${p.name}">${p.name}</option>`).join('') : '<option value="">请先添加项目</option>'}
                         </select>
                     </div>
                     <div class="form-group">
@@ -525,7 +642,7 @@
                     <div class="form-group">
                         <label>选择项目</label>
                         <select id="photoProject">
-                            ${store.projects.map(p => `<option value="${p.name}">${p.name}</option>`).join('')}
+                            ${projects.length ? projects.map(p => `<option value="${p.name}">${p.name}</option>`).join('') : '<option value="">请先添加项目</option>'}
                         </select>
                     </div>
                     <div class="form-group">
@@ -611,9 +728,7 @@
             
             if (!name || !price) return alert('请填写名称和价格');
             
-            store.projects.push({ name, category, price, notes });
-            save();
-            renderProjects();
+            window.saveToFirestore('projects', { name, category, price, notes });
             closeModal();
         }
         
@@ -626,9 +741,7 @@
             
             if (!project || !date || !time || !location) return alert('请填写完整信息');
             
-            store.bookings.push({ project, date, time, location, status: 'pending' });
-            save();
-            renderBookings();
+            window.saveToFirestore('bookings', { project, date, time, location, status: 'pending' });
             closeModal();
         }
         
@@ -639,7 +752,7 @@
             
             if (!project) return alert('请选择项目');
             
-            store.photos.push({
+            window.saveToFirestore('photos', {
                 project,
                 description,
                 before: beforeData,
@@ -648,8 +761,6 @@
             });
             beforeData = '';
             afterData = '';
-            save();
-            renderPhotos();
             closeModal();
         }
         
@@ -659,22 +770,14 @@
             
             if (!content) return alert('请输入内容');
             
-            store.posts.unshift({
+            window.saveToFirestore('posts', {
                 content,
                 images: postPhotosData,
                 date: new Date().toLocaleString('zh-CN')
             });
             postPhotosData = [];
-            save();
-            renderPosts();
             closeModal();
         }
-        
-        // 初始化
-        renderProjects();
-        renderBookings();
-        renderPhotos();
-        renderPosts();
     </script>
 </body>
 </html>
