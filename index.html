@@ -405,8 +405,8 @@
         initData();
         initDefaultsToFirebase();
         // 路由
-        function getRoute() { return location.hash.slice(1) || 'projects'; }
-        function setRoute(route) { location.hash = route; }
+        window.getRoute = function() { return location.hash.slice(1) || 'projects'; }
+        window.setRoute = function(route) { location.hash = route; }
         function renderRoute() {
             const route = getRoute();
             document.querySelectorAll('.tabs .tab').forEach(t => t.classList.remove('active'));
