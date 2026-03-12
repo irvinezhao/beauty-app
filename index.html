@@ -281,7 +281,10 @@ function syncData() {
     db.ref("projects").on("value", s => { if(s.val()) { projects = Object.values(s.val()); localStorage.setItem("adminProjects", JSON.stringify(projects)); if(typeof renderUserProjects==="function") renderUserProjects(); }});
     db.ref("rechargePlans").on("value", s => { if(s.val()) { rechargePlans = Object.values(s.val()); localStorage.setItem("rechargePlans", JSON.stringify(rechargePlans)); }});
     db.ref("users").on("value", s => { if(s.val()) { users = Object.values(s.val()); localStorage.setItem("users", JSON.stringify(users)); }});
-    db.ref("bookings").on("value", s => { if(s.val()) { adminBookings = Object.values(s.val()); localStorage.setItem("adminBookings", JSON.stringify(adminBookings)); }});
+    db.ref("bookings").on("value", s => { if(s.val()) { bookings = Object.values(s.val()); adminBookings = bookings; localStorage.setItem("bookings", JSON.stringify(bookings)); localStorage.setItem("adminBookings", JSON.stringify(bookings)); if(typeof renderProfile==="function") renderProfile(); }});
+    db.ref("coupons").on("value", s => { if(s.val()) { coupons = Object.values(s.val()); localStorage.setItem("coupons", JSON.stringify(coupons)); }});
+    db.ref("posts").on("value", s => { if(s.val()) { posts = Object.values(s.val()); localStorage.setItem("communityPosts", JSON.stringify(posts)); if(typeof renderPosts==="function") renderPosts(); }});
+    db.ref("settings").on("value", s => { if(s.val()) { if(s.val().bookingSettings) { bookingSettings = s.val().bookingSettings; localStorage.setItem("bookingSettings", JSON.stringify(bookingSettings)); } }});
 }
 </script>
 
@@ -546,7 +549,7 @@ function syncData() {
             if(!name||!phone) return alert('请填写信息');
             const book = {id:Date.now(),date:selectedDate,time:selectedTime,name,phone,note:document.getElementById('bookNote').value};
             bookings.push(book);
-            localStorage.setItem('bookings',JSON.stringify(bookings));
+            localStorage.setItem('bookings',JSON.stringify(bookings)); saveToFirebase('bookings', book);
             closeModal('bookingModal');
             renderTimeSlots();
             alert('预约成功！'); renderProfile(); if(typeof syncData==='function') syncData();
@@ -569,7 +572,7 @@ function syncData() {
             const content = document.getElementById('postContent').value;
             if(!title||!content) return alert('请填写内容');
             posts.unshift({id:Date.now(),title,content,author:currentUser.name||'用户',time:new Date().toLocaleDateString(),comments:[]});
-            localStorage.setItem('posts',JSON.stringify(posts));
+            localStorage.setItem('posts',JSON.stringify(posts)); saveToFirebase('posts', {id:Date.now(),title,content,author:currentUser.name||'用户',time:new Date().toLocaleDateString(),comments:[]});
             closeModal('postModal');
             renderPosts();
             document.getElementById('postTitle').value = '';
@@ -595,7 +598,7 @@ function syncData() {
             if(!input.value) return;
             if(!p.comments) p.comments = [];
             p.comments.push({author:currentUser.name||'用户',content:input.value});
-            localStorage.setItem('posts',JSON.stringify(posts));
+            localStorage.setItem('posts',JSON.stringify(posts)); saveToFirebase('posts', {id:Date.now(),title,content,author:currentUser.name||'用户',time:new Date().toLocaleDateString(),comments:[]});
             viewPost(pid);
         }
         
@@ -690,8 +693,8 @@ function syncData() {
         
         window.doRecharge = function(amount) {
             if(!confirm('确认充值 ¥' + amount + '？')) return;
-            currentUser.balance = (currentUser.balance || 0) + amount;
-            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+            currentUser.balance = (currentUser.balance || 0) + amount; currentUser.totalSpent = (currentUser.totalSpent || 0) + amount;
+            localStorage.setItem('currentUser', JSON.stringify(currentUser)); saveToFirebase('users', currentUser);
             renderProfile();
             alert('充值成功！');
         }
@@ -700,7 +703,7 @@ function syncData() {
             const newName = prompt('请输入新名字:', currentUser.name || '');
             if(newName !== null) {
                 currentUser.name = newName;
-                localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                localStorage.setItem('currentUser', JSON.stringify(currentUser)); saveToFirebase('users', currentUser);
                 const idx = users.findIndex(u => u.id === currentUser.id);
                 if(idx >= 0) { users[idx].name = newName; localStorage.setItem('users', JSON.stringify(users)); }
                 renderProfile();
@@ -722,7 +725,7 @@ function syncData() {
             const code = document.getElementById('userCode').value;
             if(code !== '123456') return alert('验证码错误');
             let user = users.find(u => u.phone === phone);
-            if(!user){ user = {id:Date.now(),phone,name:'用户'+phone.slice(-4),balance:0,tags:[]}; users.push(user); localStorage.setItem('users',JSON.stringify(users)); }
+            if(!user){ user = {id:Date.now(),phone,name:'用户'+phone.slice(-4),balance:0,tags:[]}; users.push(user); localStorage.setItem('users',JSON.stringify(users)); saveToFirebase('users', user); }
             currentUser = user;
             localStorage.setItem('currentUser',JSON.stringify(user));
             closeModal('userLoginModal');
