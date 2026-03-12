@@ -28,6 +28,26 @@
             {id:'6',title:'纹眉',desc:'半永久自然眉形',price:1680,cover:'https://images.unsplash.com/photo-1519699047748-de8e44100de5?w=400',category:'美容'}
         ];
         
+        
+        // 初始化默认数据到Firebase（首次运行）
+        function initDefaultsToFirebase() {
+            db.ref('projects').once('value', (snap) => {
+                if(!snap.val()) {
+                    defaultProjects.forEach(p => saveToFirebase('projects', p));
+                }
+            });
+            db.ref('rechargePlans').once('value', (snap) => {
+                if(!snap.val()) {
+                    const defaults = [
+                        {id:'1',amount:500,bonus:50},
+                        {id:'2',amount:1000,bonus:150},
+                        {id:'3',amount:2000,bonus:400}
+                    ];
+                    defaults.forEach(p => saveToFirebase('rechargePlans', p));
+                }
+            });
+        }
+
         // 初始化数据
         function initData() {
             // 首次运行时从Firebase同步
@@ -383,6 +403,7 @@
         initDarkMode();
         syncRechargePlans();
         initData();
+        initDefaultsToFirebase();
         // 路由
         function getRoute() { return location.hash.slice(1) || 'projects'; }
         function setRoute(route) { location.hash = route; }
