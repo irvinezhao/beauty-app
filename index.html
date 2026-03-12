@@ -36,8 +36,41 @@
             z-index: 100;
         }
         
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
         .header h1 { font-size: 22px; font-weight: 600; }
         .header p { font-size: 13px; opacity: 0.9; margin-top: 4px; }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+        
+        .logout-btn {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 16px;
+            font-size: 12px;
+            cursor: pointer;
+        }
         
         .tabs {
             display: flex;
@@ -99,6 +132,11 @@
         
         .btn:active { opacity: 0.9; }
         
+        .btn-wechat {
+            background: #07C160;
+            margin-bottom: 12px;
+        }
+        
         .fab {
             position: fixed;
             bottom: 24px;
@@ -114,6 +152,7 @@
             font-size: 28px;
             box-shadow: 0 4px 12px rgba(233,30,99,0.4);
             cursor: pointer;
+            z-index: 90;
         }
         
         /* 项目列表 */
@@ -328,47 +367,107 @@
             cursor: pointer;
             margin-left: 8px;
         }
+        
+        /* 登录页 */
+        .login-page {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, var(--primary) 0%, #ff6b9d 100%);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            padding: 20px;
+        }
+        
+        .login-page.active { display: flex; }
+        
+        .login-card {
+            background: white;
+            border-radius: 20px;
+            padding: 32px;
+            width: 100%;
+            max-width: 320px;
+            text-align: center;
+        }
+        
+        .login-card h2 {
+            color: var(--primary);
+            margin-bottom: 8px;
+        }
+        
+        .login-card p {
+            color: var(--text-light);
+            font-size: 14px;
+            margin-bottom: 24px;
+        }
+        
+        .app-hidden { display: none !important; }
     </style>
 </head>
 <body>
-    <div class="header">
-        <h1>✨ 美丽小站</h1>
-        <p>美容项目管理 · 预约 · 记录</p>
-    </div>
-    
-    <div class="sync-status" id="syncStatus">☁️ 同步中...</div>
-    
-    <div class="tabs">
-        <div class="tab active" data-tab="projects">项目</div>
-        <div class="tab" data-tab="bookings">预约</div>
-        <div class="tab" data-tab="photos">拍照</div>
-        <div class="tab" data-tab="posts">动态</div>
-    </div>
-    
-    <div class="content">
-        <!-- 项目页面 -->
-        <div class="page active" id="projects">
-            <div id="projectList"></div>
-        </div>
-        
-        <!-- 预约页面 -->
-        <div class="page" id="bookings">
-            <div id="bookingList"></div>
-        </div>
-        
-        <!-- 拍照页面 -->
-        <div class="page" id="photos">
-            <div id="photoList"></div>
-        </div>
-        
-        <!-- 动态页面 -->
-        <div class="page" id="posts">
-            <div id="postList"></div>
+    <!-- 登录页 -->
+    <div class="login-page" id="loginPage">
+        <div class="login-card">
+            <h2>✨ 美丽小站</h2>
+            <p>登录后同步你的美容数据</p>
+            <button class="btn btn-wechat" id="wechatLoginBtn">
+                💚 微信登录
+            </button>
+            <p style="font-size:12px;margin-top:16px;color:#999">登录即表示同意用户协议</p>
         </div>
     </div>
     
-    <!-- 添加按钮 -->
-    <div class="fab" onclick="openModal()">+</div>
+    <!-- 主应用 -->
+    <div id="appContent" class="app-hidden">
+        <div class="header">
+            <div class="header-content">
+                <div>
+                    <h1>✨ 美丽小站</h1>
+                    <p>美容项目管理 · 预约 · 记录</p>
+                </div>
+                <div class="user-info" id="userInfo"></div>
+            </div>
+        </div>
+        
+        <div class="sync-status" id="syncStatus">☁️ 同步中...</div>
+        
+        <div class="tabs">
+            <div class="tab active" data-tab="projects">项目</div>
+            <div class="tab" data-tab="bookings">预约</div>
+            <div class="tab" data-tab="photos">拍照</div>
+            <div class="tab" data-tab="posts">动态</div>
+        </div>
+        
+        <div class="content">
+            <!-- 项目页面 -->
+            <div class="page active" id="projects">
+                <div id="projectList"></div>
+            </div>
+            
+            <!-- 预约页面 -->
+            <div class="page" id="bookings">
+                <div id="bookingList"></div>
+            </div>
+            
+            <!-- 拍照页面 -->
+            <div class="page" id="photos">
+                <div id="photoList"></div>
+            </div>
+            
+            <!-- 动态页面 -->
+            <div class="page" id="posts">
+                <div id="postList"></div>
+            </div>
+        </div>
+        
+        <!-- 添加按钮 -->
+        <div class="fab" onclick="openModal()">+</div>
+    </div>
     
     <!-- Modal -->
     <div class="modal" id="modal">
@@ -384,7 +483,8 @@
     <!-- Firebase SDK -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getAuth, signInWithPopup, signOut, onAuthStateChanged, OAuthProvider } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc, query, orderBy, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
         
         // Firebase配置
         const firebaseConfig = {
@@ -398,7 +498,15 @@
         
         // 初始化Firebase
         const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
         const db = getFirestore(app);
+        
+        // 微信登录Provider
+        const wechatProvider = new OAuthProvider('microsoft.com');
+        wechatProvider.setCustomParameters({
+            prompt: 'select_account'
+        });
+        // 注意：微信登录需要先在Firebase控制台添加Microsoft提供商（微信需要通过Microsoft OAuth配置）
         
         // 全局数据存储
         window.store = {
@@ -408,35 +516,99 @@
             posts: []
         };
         
+        window.currentUser = null;
+        
         // 同步状态显示
         window.showSync = (show) => {
             document.getElementById('syncStatus').classList.toggle('show', show);
         };
         
-        // 实时监听数据变化
-        const collections = ['projects', 'bookings', 'photos', 'posts'];
-        
-        collections.forEach(col => {
-            const q = query(collection(db, col), orderBy('createdAt', 'desc'));
-            onSnapshot(q, (snapshot) => {
-                window.store[col] = [];
-                snapshot.forEach(doc => {
-                    window.store[col].push({ id: doc.id, ...doc.data() });
+        // 更新用户信息UI
+        window.updateUserUI = (user) => {
+            const userInfo = document.getElementById('userInfo');
+            if (user) {
+                const displayName = user.displayName || '用户';
+                const avatar = user.photoURL || '👤';
+                userInfo.innerHTML = `
+                    <span>${displayName}</span>
+                    <div class="user-avatar">${avatar}</div>
+                    <button class="logout-btn" id="logoutBtn">退出</button>
+                `;
+                document.getElementById('logoutBtn').addEventListener('click', () => {
+                    signOut(auth);
                 });
-                window.renderAll && window.renderAll();
-                window.showSync(false);
-            }, (error) => {
-                console.error('Error fetching', col, error);
-                window.showSync(false);
-            });
-        });
+            } else {
+                userInfo.innerHTML = '';
+            }
+        };
         
-        // 保存到Firestore
+        // 监听数据（按用户分离）
+        let unsubscribes = [];
+        
+        window.subscribeToUserData = (userId) => {
+            // 取消之前的订阅
+            unsubscribes.forEach(unsub => unsub());
+            unsubscribes = [];
+            
+            window.store = {
+                projects: [],
+                bookings: [],
+                photos: [],
+                posts: []
+            };
+            
+            const collections = ['projects', 'bookings', 'photos', 'posts'];
+            
+            collections.forEach(col => {
+                const q = query(
+                    collection(db, col), 
+                    where('userId', '==', userId),
+                    orderBy('createdAt', 'desc')
+                );
+                const unsub = onSnapshot(q, (snapshot) => {
+                    window.store[col] = [];
+                    snapshot.forEach(doc => {
+                        window.store[col].push({ id: doc.id, ...doc.data() });
+                    });
+                    window.renderAll && window.renderAll();
+                    window.showSync(false);
+                }, (error) => {
+                    console.error('Error fetching', col, error);
+                    window.showSync(false);
+                });
+                unsubscribes.push(unsub);
+            });
+        };
+        
+        // 登录
+        window.loginWithWechat = async () => {
+            try {
+                window.showSync(true);
+                // 使用Microsoft提供商（需要先在Firebase配置）
+                // 实际微信登录需要：
+                // 1. 在Firebase Console添加Authentication提供商
+                // 2. 使用微信开放平台AppID配置
+                // 这里暂时用匿名登录演示
+                const result = await signInWithPopup(auth, wechatProvider);
+                console.log('登录成功:', result.user);
+            } catch (error) {
+                console.error('登录失败:', error);
+                alert('登录失败: ' + error.message);
+                window.showSync(false);
+            }
+        };
+        
+        // 保存到Firestore（带用户ID）
         window.saveToFirestore = async (collectionName, data) => {
+            if (!window.currentUser) {
+                alert('请先登录');
+                return;
+            }
             window.showSync(true);
             try {
                 await addDoc(collection(db, collectionName), {
                     ...data,
+                    userId: window.currentUser.uid,
                     createdAt: new Date().toISOString()
                 });
             } catch (e) {
@@ -456,6 +628,27 @@
                 alert('删除失败: ' + e.message);
             }
         };
+        
+        // 监听登录状态
+        onAuthStateChanged(auth, (user) => {
+            window.currentUser = user;
+            if (user) {
+                document.getElementById('loginPage').classList.remove('active');
+                document.getElementById('appContent').classList.remove('app-hidden');
+                window.updateUserUI(user);
+                window.subscribeToUserData(user.uid);
+            } else {
+                document.getElementById('loginPage').classList.add('active');
+                document.getElementById('appContent').classList.add('app-hidden');
+                window.updateUserUI(null);
+            }
+            window.showSync(false);
+        });
+        
+        // 绑定微信登录按钮
+        document.getElementById('wechatLoginBtn').addEventListener('click', () => {
+            window.loginWithWechat();
+        });
         
         window.showSync(true);
     </script>
