@@ -11,278 +11,294 @@
             --primary-dark: #c2185b;
             --text: #333;
             --text-light: #666;
-            --bg: #fafafa;
+            --bg: #f5f5f5;
             --card-bg: #fff;
-            --shadow: 0 2px 8px rgba(0,0,0,0.08);
-            --radius: 12px;
-            --border-color: #eee;
+            --shadow: 0 2px 12px rgba(0,0,0,0.08);
+            --radius: 16px;
         }
-
+        
         [data-theme="dark"] {
-            --text: #e0e0e0;
-            --text-light: #999;
+            --text: #f5f5f5;
+            --text-light: #aaa;
             --bg: #1a1a1a;
             --card-bg: #2d2d2d;
-            --shadow: 0 2px 8px rgba(0,0,0,0.3);
-            --border-color: #444;
+            --shadow: 0 2px 12px rgba(0,0,0,0.3);
         }
-
+        
         * { margin: 0; padding: 0; box-sizing: border-box; }
-
+        
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: var(--bg);
             color: var(--text);
-            line-height: 1.6;
+            line-height: 1.5;
             padding-bottom: 80px;
             transition: background 0.3s, color 0.3s;
         }
-
+        
         .header {
             background: linear-gradient(135deg, var(--primary) 0%, #ff6b9d 100%);
             color: white;
-            padding: 24px 20px;
+            padding: 20px;
             position: sticky;
             top: 0;
             z-index: 100;
         }
-
+        
         .header-content {
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
-
-        .header h1 { font-size: 22px; font-weight: 600; }
-        .header p { font-size: 13px; opacity: 0.9; margin-top: 4px; }
-
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .user-avatar {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            background: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 18px;
-        }
-
-        .logout-btn {
-            background: rgba(255,255,255,0.2);
-            border: none;
-            color: white;
-            padding: 6px 12px;
-            border-radius: 16px;
-            font-size: 12px;
-            cursor: pointer;
-        }
-
+        
+        .header h1 { font-size: 20px; font-weight: 600; }
+        
         .dark-mode-btn {
-            background: rgba(255,255,255,0.2);
+            background: none;
             border: none;
-            color: white;
-            padding: 6px 12px;
-            border-radius: 16px;
-            font-size: 12px;
+            font-size: 20px;
             cursor: pointer;
-            margin-left: 4px;
+            padding: 4px;
         }
-
+        
         .tabs {
             display: flex;
             background: var(--card-bg);
-            padding: 0 12px;
             position: sticky;
-            top: 68px;
+            top: 60px;
             z-index: 99;
-            border-bottom: 1px solid var(--border-color);
-            transition: background 0.3s;
+            border-bottom: 1px solid rgba(0,0,0,0.1);
         }
-
+        
+        [data-theme="dark"] .tabs { border-bottom-color: rgba(255,255,255,0.1); }
+        
         .tab {
             flex: 1;
-            padding: 14px 8px;
+            padding: 16px 8px;
             text-align: center;
-            font-size: 13px;
+            font-size: 14px;
             color: var(--text-light);
             cursor: pointer;
             position: relative;
         }
-
-        .tab.active { color: var(--primary); font-weight: 500; }
+        
+        .tab.active { color: var(--primary); font-weight: 600; }
         .tab.active::after {
             content: '';
             position: absolute;
             bottom: 0;
             left: 50%;
             transform: translateX(-50%);
-            width: 24px;
+            width: 40px;
             height: 3px;
             background: var(--primary);
             border-radius: 2px;
         }
-
+        
         .content { padding: 16px; }
-
+        
         .page { display: none; }
         .page.active { display: block; }
-
-        .card {
+        
+        /* 项目 - 瀑布流 */
+        .project-grid {
+            column-count: 2;
+            column-gap: 12px;
+        }
+        
+        .project-card {
+            break-inside: avoid;
+            margin-bottom: 12px;
             background: var(--card-bg);
             border-radius: var(--radius);
-            padding: 16px;
-            margin-bottom: 12px;
+            overflow: hidden;
             box-shadow: var(--shadow);
-            transition: background 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+            transition: transform 0.2s;
         }
-
-        .btn {
+        
+        .project-card:active { transform: scale(0.98); }
+        
+        .project-card img {
+            width: 100%;
+            display: block;
+        }
+        
+        .project-info { padding: 12px; }
+        
+        .project-title {
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+        
+        .project-desc {
+            font-size: 12px;
+            color: var(--text-light);
+            margin-bottom: 8px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        
+        .project-price {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        
+        /* 项目详情页 */
+        .detail-page {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--bg);
+            z-index: 1000;
+            overflow-y: auto;
+        }
+        
+        .detail-page.active { display: block; }
+        
+        .detail-header {
             background: var(--primary);
             color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: var(--radius);
-            font-size: 14px;
-            font-weight: 500;
-            cursor: pointer;
-            width: 100%;
-        }
-
-        .btn:active { opacity: 0.9; }
-
-        .btn-wechat {
-            background: #07C160;
-            margin-bottom: 12px;
-        }
-
-        .btn-google {
-            background: #4285F4;
-            margin-bottom: 12px;
-        }
-
-        .btn-anonymous {
-            background: #666;
-        }
-
-        .fab {
-            position: fixed;
-            bottom: 24px;
-            right: 24px;
-            width: 56px;
-            height: 56px;
-            background: var(--primary);
-            border-radius: 50%;
+            padding: 16px 20px;
             display: flex;
             align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 28px;
-            box-shadow: 0 4px 12px rgba(233,30,99,0.4);
-            cursor: pointer;
-            z-index: 90;
+            gap: 12px;
         }
-
-        .project-item {
+        
+        .detail-header button {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+        }
+        
+        .detail-content { padding: 20px; }
+        
+        .detail-cover {
+            width: 100%;
+            border-radius: var(--radius);
+            margin-bottom: 20px;
+        }
+        
+        .detail-title {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+        
+        .detail-price {
+            font-size: 24px;
+            color: var(--primary);
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+        
+        .detail-section {
+            margin-bottom: 24px;
+        }
+        
+        .detail-section h3 {
+            font-size: 16px;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid rgba(0,0,0,0.1);
+        }
+        
+        [data-theme="dark"] .detail-section h3 { border-bottom-color: rgba(255,255,255,0.1); }
+        
+        .detail-text { font-size: 14px; line-height: 1.8; color: var(--text-light); }
+        
+        .detail-images {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+        }
+        
+        .detail-images img {
+            width: 100%;
+            border-radius: 12px;
+        }
+        
+        /* 预约 - 日历视图 */
+        .booking-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 12px 0;
-            border-bottom: 1px solid var(--border-color);
-            transition: border-color 0.3s;
+            margin-bottom: 16px;
         }
-
-        .project-item:last-child { border-bottom: none; }
-
-        .project-name { font-weight: 500; }
-        .project-price { color: var(--primary); font-weight: 600; }
-        .project-category {
-            font-size: 11px;
-            background: var(--primary-light);
-            color: var(--primary-dark);
-            padding: 2px 8px;
-            border-radius: 10px;
-            margin-left: 8px;
-        }
-
-        .booking-card { border-left: 3px solid var(--primary); }
-
-        .booking-status {
-            display: inline-block;
-            padding: 4px 10px;
-            border-radius: 12px;
-            font-size: 12px;
-            margin-left: 8px;
-        }
-
-        .status-pending { background: #fff3e0; color: #f57c00; }
-        .status-confirmed { background: #e8f5e9; color: #43a047; }
-        .status-completed { background: #e3f2fd; color: #1976d2; }
-
-        .photo-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 8px;
-            margin-top: 12px;
-        }
-
-        .photo-item {
-            aspect-ratio: 1;
-            border-radius: 8px;
-            overflow: hidden;
-            background: var(--border-color);
-            transition: background 0.3s;
-        }
-
-        .photo-item img { width: 100%; height: 100%; object-fit: cover; }
-
-        .post-item { padding: 16px 0; border-bottom: 1px solid var(--border-color); transition: border-color 0.3s; }
-        .post-item:last-child { border-bottom: none; }
-        .post-time { font-size: 12px; color: var(--text-light); margin-bottom: 8px; }
-        .post-content { font-size: 14px; }
-
-        .post-images {
+        
+        .booking-header h2 { font-size: 18px; }
+        
+        .booking-date {
             display: flex;
             gap: 8px;
-            margin-top: 10px;
-            flex-wrap: wrap;
+            overflow-x: auto;
+            padding-bottom: 12px;
+            margin-bottom: 16px;
         }
-
-        .post-images img { width: 80px; height: 80px; object-fit: cover; border-radius: 8px; }
-
-        .form-group { margin-bottom: 16px; }
-
-        .form-group label {
-            display: block;
-            font-size: 13px;
-            color: var(--text-light);
-            margin-bottom: 6px;
-        }
-
-        .form-group input,
-        .form-group select,
-        .form-group textarea {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            font-size: 14px;
+        
+        .date-item {
+            min-width: 50px;
+            padding: 10px 8px;
             background: var(--card-bg);
-            color: var(--text);
-            transition: background 0.3s, border-color 0.3s, color 0.3s;
+            border-radius: 12px;
+            text-align: center;
+            cursor: pointer;
+            box-shadow: var(--shadow);
         }
-
-        .form-group textarea { min-height: 80px; resize: vertical; }
-
-        .empty { text-align: center; padding: 40px 20px; color: var(--text-light); }
-        .empty-icon { font-size: 48px; margin-bottom: 12px; }
-
-        .modal {
+        
+        .date-item.active {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .date-day { font-size: 12px; }
+        .date-num { font-size: 18px; font-weight: 600; }
+        
+        .time-slots {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+        
+        .time-slot {
+            padding: 16px 12px;
+            background: var(--card-bg);
+            border-radius: 12px;
+            text-align: center;
+            cursor: pointer;
+            box-shadow: var(--shadow);
+            transition: all 0.2s;
+        }
+        
+        .time-slot:hover { transform: scale(1.02); }
+        
+        .time-slot.booked {
+            background: #f0f0f0;
+            color: #999;
+            cursor: not-allowed;
+        }
+        
+        [data-theme="dark"] .time-slot.booked { background: #333; color: #666; }
+        
+        .time-slot.selected {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .slot-time { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+        .slot-status { font-size: 11px; }
+        
+        /* 预约弹窗 */
+        .booking-modal {
             display: none;
             position: fixed;
             top: 0;
@@ -290,370 +306,296 @@
             right: 0;
             bottom: 0;
             background: rgba(0,0,0,0.5);
-            z-index: 1000;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .modal.active { display: flex; }
-
-        .modal-content {
-            background: var(--card-bg);
-            border-radius: 16px;
-            padding: 24px;
-            width: 90%;
-            max-width: 400px;
-            max-height: 80vh;
-            overflow-y: auto;
-            color: var(--text);
-            transition: background 0.3s;
-        }
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .modal-header h3 { font-size: 18px; }
-        .modal-close { font-size: 24px; color: #999; cursor: pointer; }
-
-        .photo-preview { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
-        .photo-preview img { width: 60px; height: 60px; object-fit: cover; border-radius: 8px; }
-
-        .sync-status {
-            position: fixed;
-            top: 80px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(0,0,0,0.7);
-            color: white;
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 12px;
-            z-index: 200;
-            display: none;
-        }
-
-        .sync-status.show { display: block; }
-
-        .delete-btn {
-            background: #ff5252;
-            color: white;
-            border: none;
-            padding: 6px 12px;
-            border-radius: 6px;
-            font-size: 12px;
-            cursor: pointer;
-            margin-left: 8px;
-        }
-
-        .login-page {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(135deg, var(--primary) 0%, #ff6b9d 100%);
             z-index: 2000;
             align-items: center;
             justify-content: center;
-            flex-direction: column;
-            padding: 20px;
         }
-
-        .login-page.active { display: flex; }
-
-        .login-card {
+        
+        .booking-modal.active { display: flex; }
+        
+        .booking-modal-content {
             background: var(--card-bg);
             border-radius: 20px;
-            padding: 32px;
-            width: 100%;
-            max-width: 320px;
-            text-align: center;
-            color: var(--text);
-            transition: background 0.3s, color 0.3s;
+            padding: 24px;
+            width: 90%;
+            max-width: 360px;
         }
-
-        .login-card h2 { color: var(--primary); margin-bottom: 8px; }
-        .login-card p { color: var(--text-light); font-size: 14px; margin-bottom: 24px; }
-
-        .app-hidden { display: none !important; }
-
-        .input-hint { font-size: 11px; color: #999; margin-top: 4px; }
+        
+        .booking-modal h3 { margin-bottom: 16px; }
+        
+        .form-group { margin-bottom: 16px; }
+        .form-group label { display: block; font-size: 13px; color: var(--text-light); margin-bottom: 6px; }
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #eee;
+            border-radius: 10px;
+            font-size: 14px;
+            background: var(--bg);
+            color: var(--text);
+        }
+        
+        .btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 600;
+            width: 100%;
+            cursor: pointer;
+        }
+        
+        /* 拍照 - 时间轴 */
+        .timeline { position: relative; padding-left: 24px; }
+        
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 8px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: var(--primary);
+        }
+        
+        .timeline-item {
+            position: relative;
+            margin-bottom: 24px;
+            padding: 16px;
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+        }
+        
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -20px;
+            top: 20px;
+            width: 12px;
+            height: 12px;
+            background: var(--primary);
+            border-radius: 50%;
+            border: 3px solid var(--bg);
+        }
+        
+        .timeline-date {
+            font-size: 13px;
+            color: var(--primary);
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        
+        .timeline-projects {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+        
+        .timeline-tag {
+            padding: 6px 12px;
+            background: var(--primary-light);
+            color: var(--primary-dark);
+            border-radius: 20px;
+            font-size: 13px;
+        }
+        
+        .timeline-photos {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 6px;
+        }
+        
+        .timeline-photos img {
+            width: 100%;
+            aspect-ratio: 1;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-light);
+        }
+        
+        .empty-state-icon { font-size: 48px; margin-bottom: 12px; }
     </style>
 </head>
 <body>
-    <!-- 登录页 -->
-    <div class="login-page" id="loginPage">
-        <div class="login-card">
-            <h2>✨ 美丽小站</h2>
-            <p>登录后同步你的美容数据</p>
-            <button class="btn btn-wechat" id="wechatLoginBtn">💚 微信登录</button>
-            <button class="btn btn-google" id="googleLoginBtn">🔵 Google登录</button>
-            <button class="btn btn-anonymous" id="anonymousLoginBtn">⚪ 游客登录</button>
-            <p style="font-size:12px;margin-top:16px;color:#999">登录即表示同意用户协议</p>
+    <!-- Header -->
+    <div class="header">
+        <div class="header-content">
+            <h1>✨ 美丽小站</h1>
+            <button class="dark-mode-btn" id="darkModeBtn" title="切换深色模式">🌙</button>
         </div>
     </div>
-
-    <!-- 主应用 -->
-    <div id="appContent" class="app-hidden">
-        <div class="header">
-            <div class="header-content">
-                <div>
-                    <h1>✨ 美丽小站</h1>
-                    <p>美容项目管理 · 预约 · 记录</p>
-                </div>
-                <div class="user-info" id="userInfo">
-                    <button class="dark-mode-btn" id="darkModeBtn" title="切换深色模式">🌙</button>
-                </div>
-            </div>
-        </div>
-
-        <div class="sync-status" id="syncStatus">☁️ 同步中...</div>
-
-        <div class="tabs">
-            <div class="tab active" data-tab="projects">项目</div>
-            <div class="tab" data-tab="bookings">预约</div>
-            <div class="tab" data-tab="photos">拍照</div>
-            <div class="tab" data-tab="posts">动态</div>
-        </div>
-
-        <div class="content">
-            <div class="page active" id="projects">
-                <div id="projectList"></div>
-            </div>
-            <div class="page" id="bookings">
-                <div id="bookingList"></div>
-            </div>
-            <div class="page" id="photos">
-                <div id="photoList"></div>
-            </div>
-            <div class="page" id="posts">
-                <div id="postList"></div>
-            </div>
-        </div>
-
-        <div class="fab" onclick="openModal()">+</div>
+    
+    <!-- Tabs -->
+    <div class="tabs">
+        <div class="tab active" data-tab="projects">项目</div>
+        <div class="tab" data-tab="booking">预约</div>
+        <div class="tab" data-tab="timeline">记录</div>
     </div>
-
-    <!-- Modal -->
-    <div class="modal" id="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 id="modalTitle">添加</h3>
-                <span class="modal-close" onclick="closeModal()">×</span>
+    
+    <div class="content">
+        <!-- 项目页面 -->
+        <div class="page active" id="projects">
+            <div class="project-grid" id="projectGrid"></div>
+        </div>
+        
+        <!-- 预约页面 -->
+        <div class="page" id="booking">
+            <div class="booking-header">
+                <h2>📅 可预约时间</h2>
             </div>
-            <div id="modalBody"></div>
+            <div class="booking-date" id="bookingDate"></div>
+            <div class="time-slots" id="timeSlots"></div>
+        </div>
+        
+        <!-- 时间轴页面 -->
+        <div class="page" id="timeline">
+            <div class="timeline" id="timelineList"></div>
         </div>
     </div>
-
-    <!-- Firebase SDK -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getAuth, signInWithPopup, signOut, onAuthStateChanged, GoogleAuthProvider, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc, query, orderBy, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyBOPa-J7SpDyOSdWiy7gsA5re01Xd-FuvI",
-            authDomain: "beauty-app-6527c.firebaseapp.com",
-            projectId: "beauty-app-6527c",
-            storageBucket: "beauty-app-6527c.firebasestorage.app",
-            messagingSenderId: "396685995260",
-            appId: "1:396685995260:web:0bb1a0676b339378a5bb79"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-
-        const googleProvider = new GoogleAuthProvider();
-
-        window.store = { projects: [], bookings: [], photos: [], posts: [] };
-        window.currentUser = null;
-
-        window.showSync = (show) => {
-            document.getElementById('syncStatus').classList.toggle('show', show);
-        };
-
-        window.updateUserUI = (user) => {
-            const userInfo = document.getElementById('userInfo');
-            if (user) {
-                const displayName = user.isAnonymous ? '游客' : (user.displayName || '用户');
-                const avatar = user.photoURL || (user.isAnonymous ? '👤' : '😊');
-                const provider = user.isAnonymous ? '' : ` (${user.providerData[0]?.provider || '已登录'})`;
-                userInfo.innerHTML = `
-                    <span>${displayName}${provider}</span>
-                    <div class="user-avatar">${avatar}</div>
-                    <button class="logout-btn" id="logoutBtn">退出</button>
-                    <button class="dark-mode-btn" id="darkModeBtn" title="切换深色模式">🌙</button>
-                `;
-                document.getElementById('logoutBtn').addEventListener('click', () => signOut(auth));
-                initDarkMode();
-            } else {
-                userInfo.innerHTML = '<button class="dark-mode-btn" id="darkModeBtn" title="切换深色模式">🌙</button>';
-                initDarkMode();
-            }
-        };
-
-        let unsubscribes = [];
-
-        window.subscribeToUserData = (userId) => {
-            unsubscribes.forEach(unsub => unsub());
-            unsubscribes = [];
-            window.store = { projects: [], bookings: [], photos: [], posts: [] };
-
-            ['projects', 'bookings', 'photos', 'posts'].forEach(col => {
-                const q = query(collection(db, col), where('userId', '==', userId), orderBy('createdAt', 'desc'));
-                const unsub = onSnapshot(q, (snapshot) => {
-                    window.store[col] = [];
-                    snapshot.forEach(doc => window.store[col].push({ id: doc.id, ...doc.data() }));
-                    window.renderAll && window.renderAll();
-                    window.showSync(false);
-                }, (error) => { console.error('Error fetching', col, error); window.showSync(false); });
-                unsubscribes.push(unsub);
-            });
-        };
-
-        window.loginWithGoogle = async () => {
-            try {
-                window.showSync(true);
-                await signInWithPopup(auth, googleProvider);
-            } catch (error) {
-                console.error('登录失败:', error);
-                alert('登录失败: ' + error.message);
-                window.showSync(false);
-            }
-        };
-
-        window.loginAnonymously = async () => {
-            try {
-                window.showSync(true);
-                await signInAnonymously(auth);
-            } catch (error) {
-                console.error('登录失败:', error);
-                alert('登录失败: ' + error.message);
-                window.showSync(false);
-            }
-        };
-
-        window.saveToFirestore = async (collectionName, data) => {
-            if (!window.currentUser) { alert('请先登录'); return; }
-            window.showSync(true);
-            try {
-                await addDoc(collection(db, collectionName), {
-                    ...data,
-                    userId: window.currentUser.uid,
-                    createdAt: new Date().toISOString()
-                });
-            } catch (e) {
-                console.error('Error adding document: ', e);
-                alert('保存失败: ' + e.message);
-            }
-        };
-
-        window.deleteFromFirestore = async (collectionName, docId) => {
-            if (!confirm('确定删除?')) return;
-            window.showSync(true);
-            try { await deleteDoc(doc(db, collectionName, docId)); }
-            catch (e) { console.error('Error deleting document: ', e); alert('删除失败: ' + e.message); }
-        };
-
-        onAuthStateChanged(auth, (user) => {
-            window.currentUser = user;
-            if (user) {
-                document.getElementById('loginPage').classList.remove('active');
-                document.getElementById('appContent').classList.remove('app-hidden');
-                window.updateUserUI(user);
-                window.subscribeToUserData(user.uid);
-            } else {
-                document.getElementById('loginPage').classList.add('active');
-                document.getElementById('appContent').classList.add('app-hidden');
-                window.updateUserUI(null);
-            }
-            window.showSync(false);
-        });
-
-        document.getElementById('googleLoginBtn').addEventListener('click', window.loginWithGoogle);
-        document.getElementById('anonymousLoginBtn').addEventListener('click', window.loginAnonymously);
-        document.getElementById('wechatLoginBtn').addEventListener('click', () => alert('微信登录需要配置微信开放平台，请先使用Google或游客登录'));
-
-        window.showSync(true);
-    </script>
-
+    
+    <!-- 项目详情页 -->
+    <div class="detail-page" id="detailPage">
+        <div class="detail-header">
+            <button onclick="closeDetail()">←</button>
+            <span>项目详情</span>
+        </div>
+        <div class="detail-content" id="detailContent"></div>
+    </div>
+    
+    <!-- 预约弹窗 -->
+    <div class="booking-modal" id="bookingModal">
+        <div class="booking-modal-content">
+            <h3>📅 确认预约</h3>
+            <div class="form-group">
+                <label>您的姓名</label>
+                <input type="text" id="bookingName" placeholder="请输入姓名">
+            </div>
+            <div class="form-group">
+                <label>联系方式</label>
+                <input type="tel" id="bookingPhone" placeholder="请输入手机号">
+            </div>
+            <div class="form-group">
+                <label>备注</label>
+                <textarea id="bookingNote" placeholder="可选" rows="2"></textarea>
+            </div>
+            <button class="btn" onclick="confirmBooking()">确认预约</button>
+            <button class="btn" style="margin-top:10px;background:#999" onclick="closeBookingModal()">取消</button>
+        </div>
+    </div>
+    
     <script>
         // ========== 深色模式 ==========
         function initDarkMode() {
-            const savedTheme = localStorage.getItem('theme');
-            if (savedTheme === 'dark') {
+            const saved = localStorage.getItem('theme');
+            if (saved === 'dark') {
                 document.documentElement.setAttribute('data-theme', 'dark');
-            }
-
-            const btn = document.getElementById('darkModeBtn');
-            if (btn) {
-                btn.onclick = toggleDarkMode;
+                document.getElementById('darkModeBtn').textContent = '☀️';
             }
         }
-
+        
         function toggleDarkMode() {
             const html = document.documentElement;
             const isDark = html.getAttribute('data-theme') === 'dark';
-
             if (isDark) {
                 html.removeAttribute('data-theme');
                 localStorage.setItem('theme', 'light');
+                document.getElementById('darkModeBtn').textContent = '🌙';
             } else {
                 html.setAttribute('data-theme', 'dark');
                 localStorage.setItem('theme', 'dark');
+                document.getElementById('darkModeBtn').textContent = '☀️';
             }
         }
-
-        // ========== 安全工具函数 ==========
-        const Security = {
-            // HTML转义 - 防止XSS
-            escapeHtml(text) {
-                if (!text) return '';
-                const div = document.createElement('div');
-                div.textContent = text;
-                return div.innerHTML;
+        
+        document.getElementById('darkModeBtn').onclick = toggleDarkMode;
+        initDarkMode();
+        
+        // ========== 数据 ==========
+        const projects = [
+            {
+                id: 1,
+                title: '光子嫩肤',
+                desc: '采用IPL光子技术，改善肤色不均、色斑、毛孔粗大等问题',
+                price: 899,
+                cover: 'https://images.unsplash.com/photo-1616394584738-fc6e612e71b9?w=400',
+                detailText: '光子嫩肤是一种非侵入性的皮肤美容技术，通过特定波长的强脉冲光作用于皮肤，产生光热作用和光化学作用。它可以：\n\n1. 改善肤色不均\n2. 淡化色斑\n3. 收缩毛孔\n4. 去除红血丝\n5. 刺激胶原蛋白再生',
+                detailImages: [
+                    'https://images.unsplash.com/photo-1616394584738-fc6e612e71b9?w=400',
+                    'https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=400'
+                ]
             },
-
-            // 验证输入长度
-            validateLength(value, min, max) {
-                return value.length >= min && value.length <= max;
+            {
+                id: 2,
+                title: '水光针',
+                desc: '深层补水锁水，让肌肤水润透亮',
+                price: 1280,
+                cover: 'https://images.unsplash.com/photo-1512290923902-8a9f81dc236c?w=400',
+                detailText: '水光针是将透明质酸直接注入真皮层的治疗方法，让皮肤深层补水锁水。\n\n功效：\n1. 深层补水\n2. 改善细纹\n3. 提亮肤色\n4. 增加皮肤弹性',
+                detailImages: [
+                    'https://images.unsplash.com/photo-1512290923902-8a9f81dc236c?w=400'
+                ]
             },
-
-            // 验证价格（正整数）
-            validatePrice(value) {
-                const num = parseInt(value);
-                return !isNaN(num) && num > 0 && num <= 999999;
+            {
+                id: 3,
+                title: '果酸换肤',
+                desc: '温和去除老化角质，改善肌肤粗糙',
+                price: 680,
+                cover: 'https://images.unsplash.com/photo-1515377905703-c4788e51af15?w=400',
+                detailText: '果酸换肤通过使用不同浓度的果酸，促使老化角质层脱落，加速表皮细胞更新。\n\n适用：\n1. 痘痘肌\n2. 毛孔粗大\n3. 肤色暗沉\n4. 皮肤粗糙',
+                detailImages: [
+                    'https://images.unsplash.com/photo-1515377905703-c4788e51af15?w=400'
+                ]
             },
-
-            // 验证日期格式
-            validateDate(value) {
-                return /^\d{4}-\d{2}-\d{2}$/.test(value);
+            {
+                id: 4,
+                title: '小气泡清洁',
+                desc: '深层清洁毛孔，去除黑头粉刺',
+                price: 398,
+                cover: 'https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=400',
+                detailText: '小气泡采用真空负压技术，配合专用的清洁溶液，能够：\n1. 深层清洁毛孔\n2. 去除黑头\n3. 清除粉刺\n4. 补水保湿',
+                detailImages: [
+                    'https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=400'
+                ]
             },
-
-            // 验证时间格式
-            validateTime(value) {
-                return /^(\d{2}):(\d{2})$/.test(value);
+            {
+                id: 5,
+                title: '射频紧肤',
+                desc: '刺激胶原蛋白再生，提升面部轮廓',
+                price: 1680,
+                cover: 'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=400',
+                detailText: '射频技术通过加热真皮层，刺激胶原蛋白收缩和新生，达到紧肤效果。\n\n功效：\n1. 提升紧致\n2. 淡化皱纹\n3. 改善双下巴\n4. 塑造V脸',
+                detailImages: [
+                    'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=400'
+                ]
             },
-
-            // 清理输入（去除控制字符）
-            sanitizeInput(value) {
-                if (!value) return '';
-                return value.replace(/[\x00-\x1F\x7F]/g, '').trim();
-            },
-
-            // 验证URL（可选）
-            validateUrl(value) {
-                if (!value) return true;
-                try { new URL(value); return true; } catch { return false; }
+            {
+                id: 6,
+                title: '纹眉',
+                desc: '半永久纹眉，自然持久',
+                price: 1580,
+                cover: 'https://images.unsplash.com/photo-1595476108010-b4d1f102b1b1?w=400',
+                detailText: '采用进口植物色料，纹出的眉毛自然立体，效果持久1-2年。\n\n服务内容：\n1. 眉形设计\n2. 手法纹绣\n3. 后期补色',
+                detailImages: [
+                    'https://images.unsplash.com/photo-1595476108010-b4d1f102b1b1?w=400'
+                ]
             }
-        };
-
+        ];
+        
+        // 模拟预约数据（实际应该从后端获取）
+        const bookings = [];
+        const currentWeek = getCurrentWeek();
+        let selectedDate = null;
+        let selectedTime = null;
+        
         // ========== Tab切换 ==========
         document.querySelectorAll('.tab').forEach(tab => {
             tab.addEventListener('click', () => {
@@ -663,322 +605,216 @@
                 document.getElementById(tab.dataset.tab).classList.add('active');
             });
         });
-
-        // ========== 渲染函数 ==========
+        
+        // ========== 项目渲染 ==========
         function renderProjects() {
-            const container = document.getElementById('projectList');
-            const projects = window.store.projects || [];
-            if (!projects.length) {
-                container.innerHTML = '<div class="empty"><div class="empty-icon">📋</div><p>暂无项目<br>点击+添加</p></div>';
-                return;
-            }
-            container.innerHTML = projects.map(p => `
-                <div class="card">
-                    <div class="project-item">
-                        <div>
-                            <span class="project-name">${Security.escapeHtml(p.name)}</span>
-                            <span class="project-category">${Security.escapeHtml(p.category)}</span>
-                        </div>
-                        <div>
-                            <span class="project-price">¥${Security.escapeHtml(p.price)}</span>
-                            <button class="delete-btn" onclick="deleteFromFirestore('projects', '${p.id}')">删除</button>
-                        </div>
+            const grid = document.getElementById('projectGrid');
+            grid.innerHTML = projects.map(p => `
+                <div class="project-card" onclick="showDetail(${p.id})">
+                    <img src="${p.cover}" alt="${p.title}">
+                    <div class="project-info">
+                        <div class="project-title">${p.title}</div>
+                        <div class="project-desc">${p.desc}</div>
+                        <div class="project-price">¥${p.price}</div>
                     </div>
-                    ${p.notes ? `<p style="font-size:12px;color:var(--text-light);margin-top:8px">${Security.escapeHtml(p.notes)}</p>` : ''}
                 </div>
             `).join('');
         }
-
-        function renderBookings() {
-            const containerById('booking = document.getElementList');
-            const bookings = window.store.bookings || [];
-            if (!bookings.length) {
-                container.innerHTML = '<div class="empty"><div class="empty-icon">📅</div><p>暂无预约<br>点击+添加</p></div>';
-                return;
-            }
-            container.innerHTML = bookings.map(b => `
-                <div class="card booking-card">
-                    <div class="project-item">
-                        <div>
-                            <span class="project-name">${Security.escapeHtml(b.project)}</span>
-                            <span class="booking-status status-${Security.escapeHtml(b.status)}">${b.status === 'pending' ? '待确认' : b.status === 'confirmed' ? '已确认' : '已完成'}</span>
-                        </div>
-                        <button class="delete-btn" onclick="deleteFromFirestore('bookings', '${b.id}')">删除</button>
+        
+        function showDetail(id) {
+            const project = projects.find(p => p.id === id);
+            const detailPage = document.getElementById('detailPage');
+            const content = document.getElementById('detailContent');
+            
+            content.innerHTML = `
+                <img src="${project.cover}" class="detail-cover">
+                <div class="detail-title">${project.title}</div>
+                <div class="detail-price">¥${project.price}</div>
+                
+                <div class="detail-section">
+                    <h3>📝 项目介绍</h3>
+                    <div class="detail-text">${project.detailText.replace(/\n/g, '<br>')}</div>
+                </div>
+                
+                <div class="detail-section">
+                    <h3>📷 效果图</h3>
+                    <div class="detail-images">
+                        ${project.detailImages.map(img => `<img src="${img}">`).join('')}
                     </div>
-                    <p style="font-size:13px;color:var(--text-light);margin-top:8px">📅 ${Security.escapeHtml(b.date)} ${Security.escapeHtml(b.time)}</p>
-                    <p style="font-size:13px;color:var(--text-light)">📍 ${Security.escapeHtml(b.location)}</p>
+                </div>
+            `;
+            
+            detailPage.classList.add('active');
+        }
+        
+        function closeDetail() {
+            document.getElementById('detailPage').classList.remove('active');
+        }
+        
+        // ========== 预约功能 ==========
+        function getCurrentWeek() {
+            const week = [];
+            const today = new Date();
+            for (let i = 0; i < 7; i++) {
+                const date = new Date(today);
+                date.setDate(today.getDate() + i);
+                week.push({
+                    day: ['日', '一', '二', '三', '四', '五', '六'][date.getDay()],
+                    num: date.getDate(),
+                    full: date.toISOString().split('T')[0]
+                });
+            }
+            return week;
+        }
+        
+        function renderBookingDates() {
+            const container = document.getElementById('bookingDate');
+            container.innerHTML = currentWeek.map((d, i) => `
+                <div class="date-item ${i === 0 ? 'active' : ''}" onclick="selectDate(${i})">
+                    <div class="date-day">周${d.day}</div>
+                    <div class="date-num">${d.num}</div>
                 </div>
             `).join('');
+            selectedDate = currentWeek[0].full;
+            renderTimeSlots();
         }
-
-        function renderPhotos() {
-            const container = document.getElementById('photoList');
-            const photos = window.store.photos || [];
-            if (!photos.length) {
-                container.innerHTML = '<div class="empty"><div class="empty-icon">📸</div><p>暂无记录<br>点击+添加</p></div>';
-                return;
-            }
-            container.innerHTML = photos.map(p => `
-                <div class="card">
-                    <div class="project-item">
-                        <span class="project-name">${Security.escapeHtml(p.project)}</span>
-                        <button class="delete-btn" onclick="deleteFromFirestore('photos', '${p.id}')">删除</button>
-                    </div>
-                    ${p.description ? `<p style="font-size:12px;color:var(--text-light);margin:8px 0">${Security.escapeHtml(p.description)}</p>` : ''}
-                    <div class="photo-grid">
-                        ${p.before ? `<div class="photo-item"><img src="${p.before}" alt="before"></div>` : ''}
-                        ${p.after ? `<div class="photo-item"><img src="${p.after}" alt="after"></div>` : ''}
-                    </div>
-                    <p style="font-size:11px;color:var(--text-light);margin-top:8px">${Security.escapeHtml(p.date)}</p>
-                </div>
-            `).join('');
-        }
-
-        function renderPosts() {
-            const container = document.getElementById('postList');
-            const posts = window.store.posts || [];
-            if (!posts.length) {
-                container.innerHTML = '<div class="empty"><div class="empty-icon">💬</div><p>暂无动态<br>点击+发布</p></div>';
-                return;
-            }
-            container.innerHTML = posts.map(p => `
-                <div class="card">
-                    <div class="project-item">
-                        <span class="post-time">${Security.escapeHtml(p.date)}</span>
-                        <button class="delete-btn" onclick="deleteFromFirestore('posts', '${p.id}')">删除</button>
-                    </div>
-                    <div class="post-content">${Security.escapeHtml(p.content)}</div>
-                    ${p.images && p.images.length ? `<div class="post-images">${p.images.map(img => `<img src="${img}">`).join('')}</div>` : ''}
-                </div>
-            `).join('');
-        }
-
-        window.renderAll = function() {
-            renderProjects();
-            renderBookings();
-            renderPhotos();
-            renderPosts();
-        };
-
-        // ========== Modal ==========
-        let currentModal = '';
-
-        function openModal(type = 'project') {
-            currentModal = type;
-            const title = document.getElementById('modalTitle');
-            const body = document.getElementById('modalBody');
-            const projects = window.store.projects || [];
-
-            if (type === 'project') {
-                title.textContent = '添加项目';
-                body.innerHTML = `
-                    <div class="form-group">
-                        <label>项目名称 *</label>
-                        <input type="text" id="projectName" placeholder="如：光子嫩肤" maxlength="50">
-                        <p class="input-hint">必填，最多50字符</p>
-                    </div>
-                    <div class="form-group">
-                        <label>类别</label>
-                        <select id="projectCategory">
-                            <option value="护肤">护肤</option>
-                            <option value="美容">美容</option>
-                            <option value="美甲">美甲</option>
-                            <option value="美发">美发</option>
-                            <option value="其他">其他</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>价格 *</label>
-                        <input type="number" id="projectPrice" placeholder="如：299" min="1" max="999999">
-                        <p class="input-hint">必填，1-999999</p>
-                    </div>
-                    <div class="form-group">
-                        <label>备注</label>
-                        <textarea id="projectNotes" placeholder="可选" maxlength="200"></textarea>
-                        <p class="input-hint">最多200字符</p>
-                    </div>
-                    <button class="btn" onclick="addProject()">保存</button>
-                `;
-            } else if (type === 'booking') {
-                title.textContent = '添加预约';
-                body.innerHTML = `
-                    <div class="form-group">
-                        <label>选择项目 *</label>
-                        <select id="bookingProject">
-                            ${projects.length ? projects.map(p => `<option value="${Security.escapeHtml(p.name)}">${Security.escapeHtml(p.name)}</option>`).join('') : '<option value="">请先添加项目</option>'}
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>日期 *</label>
-                        <input type="date" id="bookingDate">
-                    </div>
-                    <div class="form-group">
-                        <label>时间 *</label>
-                        <input type="time" id="bookingTime">
-                    </div>
-                    <div class="form-group">
-                        <label>地点 *</label>
-                        <input type="text" id="bookingLocation" placeholder="如：XX美容店" maxlength="100">
-                        <p class="input-hint">必填，最多100字符</p>
-                    </div>
-                    <button class="btn" onclick="addBooking()">保存</button>
-                `;
-            } else if (type === 'photo') {
-                title.textContent = '添加记录';
-                body.innerHTML = `
-                    <div class="form-group">
-                        <label>选择项目 *</label>
-                        <select id="photoProject">
-                            ${projects.length ? projects.map(p => `<option value="${Security.escapeHtml(p.name)}">${Security.escapeHtml(p.name)}</option>`).join('') : '<option value="">请先添加项目</option>'}
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>描述</label>
-                        <textarea id="photoDesc" placeholder="如：第一次做光子嫩肤" maxlength="200"></textarea>
-                        <p class="input-hint">最多200字符</p>
-                    </div>
-                    <div class="form-group">
-                        <label>Before照片</label>
-                        <input type="file" accept="image/*" id="photoBefore" onchange="previewPhoto(this, 'before')">
-                        <div class="photo-preview" id="beforePreview"></div>
-                    </div>
-                    <div class="form-group">
-                        <label>After照片</label>
-                        <input type="file" accept="image/*" id="photoAfter" onchange="previewPhoto(this, 'after')">
-                        <div class="photo-preview" id="afterPreview"></div>
-                    </div>
-                    <button class="btn" onclick="addPhoto()">保存</button>
-                `;
-            } else if (type === 'post') {
-                title.textContent = '发布动态';
-                body.innerHTML = `
-                    <div class="form-group">
-                        <label>内容 *</label>
-                        <textarea id="postContent" placeholder="分享你的想法..." maxlength="1000"></textarea>
-                        <p class="input-hint">必填，最多1000字符</p>
-                    </div>
-                    <div class="form-group">
-                        <label>图片（可选）</label>
-                        <input type="file" accept="image/*" multiple id="postImages" onchange="previewPostPhotos()">
-                        <div class="photo-preview" id="postPhotosPreview"></div>
-                    </div>
-                    <button class="btn" onclick="addPost()">发布</button>
-                `;
-            }
-
-            document.getElementById('modal').classList.add('active');
-        }
-
-        function closeModal() {
-            document.getElementById('modal').classList.remove('active');
-        }
-
-        // ========== 照片处理 ==========
-        let beforeData = '', afterData = '', postPhotosData = [];
-
-        function previewPhoto(input, type) {
-            const file = input.files[0];
-            if (!file) return;
-            // 验证文件大小（最大5MB）
-            if (file.size > 5 * 1024 * 1024) {
-                alert('图片大小不能超过5MB');
-                input.value = '';
-                return;
-            }
-            const reader = new FileReader();
-            reader.onload = e => {
-                if (type === 'before') {
-                    beforeData = e.target.result;
-                    document.getElementById('beforePreview').innerHTML = `<img src="${e.target.result}">`;
-                } else {
-                    afterData = e.target.result;
-                    document.getElementById('afterPreview').innerHTML = `<img src="${e.target.result}">`;
-                }
-            };
-            reader.readAsDataURL(file);
-        }
-
-        function previewPostPhotos() {
-            const input = document.getElementById('postImages');
-            const preview = document.getElementById('postPhotosPreview');
-            postPhotosData = [];
-            preview.innerHTML = '';
-
-            Array.from(input.files).forEach(file => {
-                if (file.size > 5 * 1024 * 1024) {
-                    alert('图片大小不能超过5MB');
-                    return;
-                }
-                const reader = new FileReader();
-                reader.onload = e => {
-                    postPhotosData.push(e.target.result);
-                    preview.innerHTML += `<img src="${e.target.result}">`;
-                };
-                reader.readAsDataURL(file);
+        
+        function selectDate(index) {
+            document.querySelectorAll('.date-item').forEach((el, i) => {
+                el.classList.toggle('active', i === index);
             });
+            selectedDate = currentWeek[index].full;
+            selectedTime = null;
+            renderTimeSlots();
         }
-
-        // ========== 添加数据（带安全验证） ==========
-        function addProject() {
-            const name = Security.sanitizeInput(document.getElementById('projectName').value);
-            const category = document.getElementById('projectCategory').value;
-            const price = document.getElementById('projectPrice').value;
-            const notes = Security.sanitizeInput(document.getElementById('projectNotes').value);
-
-            if (!name || !Security.validateLength(name, 1, 50)) return alert('请填写项目名称（1-50字符）');
-            if (!Security.validatePrice(price)) return alert('请填写有效价格（1-999999）');
-
-            window.saveToFirestore('projects', { name, category, price, notes });
-            closeModal();
+        
+        function renderTimeSlots() {
+            const container = document.getElementById('timeSlots');
+            const times = [];
+            // 10:00 - 22:00，每小时一个时段
+            for (let hour = 10; hour <= 21; hour++) {
+                times.push(`${hour}:00`);
+            }
+            
+            container.innerHTML = times.map(time => {
+                const isBooked = Math.random() < 0.3; // 模拟30%已被预约
+                return `
+                    <div class="time-slot ${isBooked ? 'booked' : ''}" 
+                         onclick="${isBooked ? '' : `selectTime('${time}')`}">
+                        <div class="slot-time">${time}</div>
+                        <div class="slot-status">${isBooked ? '已约满' : '可预约'}</div>
+                    </div>
+                `;
+            }).join('');
         }
-
-        function addBooking() {
-            const project = document.getElementById('bookingProject').value;
-            const date = document.getElementById('bookingDate').value;
-            const time = document.getElementById('bookingTime').value;
-            const location = Security.sanitizeInput(document.getElementById('bookingLocation').value);
-
-            if (!project || !date || !time || !location) return alert('请填写完整信息');
-            if (!Security.validateLength(location, 1, 100)) return alert('地点最多100字符');
-
-            window.saveToFirestore('bookings', { project, date, time, location, status: 'pending' });
-            closeModal();
+        
+        function selectTime(time) {
+            document.querySelectorAll('.time-slot').forEach(el => el.classList.remove('selected'));
+            event.target.closest('.time-slot').classList.add('selected');
+            selectedTime = time;
+            // 延迟打开弹窗，让用户看到选择效果
+            setTimeout(() => {
+                document.getElementById('bookingModal').classList.add('active');
+            }, 200);
         }
-
-        function addPhoto() {
-            const project = document.getElementById('photoProject').value;
-            const description = Security.sanitizeInput(document.getElementById('photoDesc').value);
-
-            if (!project) return alert('请选择项目');
-
-            window.saveToFirestore('photos', {
-                project,
-                description,
-                before: beforeData,
-                after: afterData,
-                date: new Date().toLocaleDateString('zh-CN')
+        
+        function closeBookingModal() {
+            document.getElementById('bookingModal').classList.remove('active');
+            selectedTime = null;
+            renderTimeSlots();
+        }
+        
+        function confirmBooking() {
+            const name = document.getElementById('bookingName').value.trim();
+            const phone = document.getElementById('bookingPhone').value.trim();
+            
+            if (!name || !phone) {
+                alert('请填写姓名和联系方式');
+                return;
+            }
+            
+            // 保存预约（实际应该发送到后端）
+            bookings.push({
+                date: selectedDate,
+                time: selectedTime,
+                name,
+                phone,
+                note: document.getElementById('bookingNote').value
             });
-            beforeData = '';
-            afterData = '';
-            closeModal();
+            
+            alert('预约成功！我们会尽快与您联系确认');
+            closeBookingModal();
+            
+            // 清空表单
+            document.getElementById('bookingName').value = '';
+            document.getElementById('bookingPhone').value = '';
+            document.getElementById('bookingNote').value = '';
+            
+            // 刷新时间槽（模拟该时段被预约）
+            renderTimeSlots();
         }
-
-        function addPost() {
-            const content = Security.sanitizeInput(document.getElementById('postContent').value);
-
-            if (!content || !Security.validateLength(content, 1, 1000)) return alert('请填写内容（1-1000字符）');
-
-            window.saveToFirestore('posts', {
-                content,
-                images: postPhotosData,
-                date: new Date().toLocaleString('zh-CN')
-            });
-            postPhotosData = [];
-            closeModal();
+        
+        // ========== 时间轴 ==========
+        const timelineData = [
+            {
+                date: '2026-03-08',
+                dateText: '3月8日',
+                projects: ['光子嫩肤', '小气泡清洁', '果酸换肤'],
+                photos: [
+                    'https://images.unsplash.com/photo-1616394584738-fc6e612e71b9?w=200',
+                    'https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=200'
+                ]
+            },
+            {
+                date: '2026-02-14',
+                dateText: '2月14日',
+                projects: ['水光针', '射频紧肤'],
+                photos: [
+                    'https://images.unsplash.com/photo-1512290923902-8a9f81dc236c?w=200'
+                ]
+            },
+            {
+                date: '2026-01-20',
+                dateText: '1月20日',
+                projects: ['纹眉'],
+                photos: [
+                    'https://images.unsplash.com/photo-1595476108010-b4d1f102b1b1?w=200',
+                    'https://images.unsplash.com/photo-1595476108010-b4d1f102b1b1?w=200'
+                ]
+            }
+        ];
+        
+        function renderTimeline() {
+            const container = document.getElementById('timelineList');
+            
+            if (timelineData.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📸</div>
+                        <p>暂无记录</p>
+                        <p style="font-size:12px;margin-top:8px">完成美容项目后可在此查看</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = timelineData.map(item => `
+                <div class="timeline-item">
+                    <div class="timeline-date">${item.dateText}</div>
+                    <div class="timeline-projects">
+                        ${item.projects.map(p => `<span class="timeline-tag">${p}</span>`).join('')}
+                    </div>
+                    <div class="timeline-photos">
+                        ${item.photos.map(photo => `<img src="${photo}">`).join('')}
+                    </div>
+                </div>
+            `).join('');
         }
-
-        // 页面加载时初始化深色模式
-        initDarkMode();
+        
+        // ========== 初始化 ==========
+        renderProjects();
+        renderBookingDates();
+        renderTimeline();
     </script>
 </body>
 </html>
