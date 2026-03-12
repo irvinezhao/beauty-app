@@ -7,7 +7,6 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/style.css">
     <style>
         :root { 
             --primary: #EC4899; 
@@ -300,15 +299,15 @@
             
             <!-- 手机号登录 -->
             <div id="phoneLoginForm">
-                <div class="form-group"><label>手机号</label><input type="tel" id="loginPhone" placeholder="请输入手机号"></div>
+                <div class="form-group"><label>手机号</label><input type="tel" id="adminLoginPhone" placeholder="请输入手机号"></div>
                 <div class="form-group">
                     <label>验证码</label>
                     <div style="display:flex;gap:8px">
-                        <input type="text" id="loginCode" placeholder="请输入验证码" style="flex:1">
-                        <button type="button" id="sendCodeBtn" onclick="sendCode()" style="width:auto;padding:12px;background:var(--primary);color:white;border:none;border-radius:10px;font-size:13px">发送验证码</button>
+                        <input type="text" id="adminLoginCode" placeholder="请输入验证码" style="flex:1">
+                        <button type="button" id="adminSendCodeBtn" onclick="adminSendCode()" style="width:auto;padding:12px;background:var(--primary);color:white;border:none;border-radius:10px;font-size:13px">发送验证码</button>
                     </div>
                 </div>
-                <button class="btn" onclick="loginWithCode()">登录</button>
+                <button class="btn" onclick="adminLogin()">登录</button>
                 <button class="btn btn-secondary" onclick="showPasswordLogin()" style="margin-top:8px">用账号密码登录</button>
             </div>
             
@@ -549,20 +548,17 @@
         // 验证码相关（模拟发送）
         let verificationCodes = {};
         
-        window.sendCode = function() {
-            const phone = document.getElementById('loginPhone').value.trim();
+        window.adminSendCode = function() {
+            const phone = document.getElementById('adminLoginPhone').value.trim();
             if (!/^1\d{10}$/.test(phone)) return alert('请输入正确的手机号');
             
-            // 生成6位验证码
             const code = Math.floor(100000 + Math.random() * 900000).toString();
-            verificationCodes[phone] = { code, expires: Date.now() + 5 * 60 * 1000 }; // 5分钟有效
+            verificationCodes[phone] = { code, expires: Date.now() + 5 * 60 * 1000 };
             
-            // 模拟发送（实际需要短信接口）
             alert(`验证码已发送（测试码：${code}）`);
             
-            // 倒计时
             let countdown = 60;
-            const btn = document.getElementById('sendCodeBtn');
+            const btn = document.getElementById('adminSendCodeBtn');
             btn.disabled = true;
             btn.textContent = `${countdown}s`;
             
@@ -577,25 +573,66 @@
             }, 1000);
         };
         
-        // 手机号验证码登录
-        window.loginWithCode = function() {
-            const phone = document.getElementById('loginPhone').value.trim();
-            const code = document.getElementById('loginCode').value.trim();
+        window.adminLogin = function() {
+            const phone = document.getElementById('adminLoginPhone').value.trim();
+            const code = document.getElementById('adminLoginCode').value.trim();
+            
+            const adminPhones = ['17665124666', '13632736654'];
             
             if (!phone || !code) return alert('请填写手机号和验证码');
+            if (!adminPhones.includes(phone)) return alert('此手机号不是管理员账号');
             
             const stored = verificationCodes[phone];
             if (!stored) return alert('请先获取验证码');
             if (Date.now() > stored.expires) return alert('验证码已过期，请重新获取');
             if (stored.code !== code) return alert('验证码错误');
             
-            // 登录成功，检查用户是否存在，不存在则创建
-            let user = users.find(u => u.phone === phone);
-            if (!user) {
-                user = {
-                    id: Date.now().toString(),
-                    name: '用户' + phone.slice(-4),
-                    phone: phone,
+            isLoggedIn = true;
+            localStorage.setItem('adminLoggedIn', 'true');
+            document.getElementById('loginPage').classList.remove('active');
+            document.getElementById('adminPage').classList.add('active');
+            renderAdminProjects();
+            renderAdminBookingCalendar();
+            document.getElementById('serviceHoursDisplay').textContent = `${bookingSettings.startTime}:00 - ${bookingSettings.endTime}:00`;
+            document.getElementById('serviceDurationDisplay').textContent = bookingSettings.duration;
+            renderAdminBookings();
+            renderRechargeList();
+            renderCouponList();
+            renderDiscountList();
+        };
+        
+        // 手机号验证码登录
+        window.loginWithCode = function() {
+            const phone = document.getElementById('loginPhone').value.trim();
+            const code = document.getElementById('loginCode').value.trim();
+            
+            // 管理员手机号白名单
+            const adminPhones = ['17665124666', '13632736654'];
+            
+            if (!phone || !code) return alert('请填写手机号和验证码');
+            if (!adminPhones.includes(phone)) return alert('此手机号不是管理员账号');
+            
+            const stored = verificationCodes[phone];
+            if (!stored) return alert('请先获取验证码');
+            if (Date.now() > stored.expires) return alert('验证码已过期，请重新获取');
+            if (stored.code !== code) return alert('验证码错误');
+            
+            // 管理员登录成功
+            isLoggedIn = true;
+            localStorage.setItem('adminLoggedIn', 'true');
+            document.getElementById('loginPage').classList.remove('active');
+            document.getElementById('adminPage').classList.add('active');
+            renderAdminProjects();
+            renderAdminBookingCalendar();
+            document.getElementById('serviceHoursDisplay').textContent = `${bookingSettings.startTime}:00 - ${bookingSettings.endTime}:00`;
+            document.getElementById('serviceDurationDisplay').textContent = bookingSettings.duration;
+            renderAdminBookings();
+            renderRechargeList();
+            renderCouponList();
+            renderDiscountList();
+        };
+        
+        // 用户端登录相关
                     balance: 0,
                     totalSpent: 0,
                     tags: [],
