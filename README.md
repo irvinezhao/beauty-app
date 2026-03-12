@@ -8,58 +8,61 @@
 - 📋 项目浏览 - 瀑布流展示美容服务项目
 - 📅 在线预约 - 日历选择时间段
 - 💬 社区互动 - 发布帖子、评论交流
-- 👤 个人中心 - 资料管理、预约记录
-- 🔐 手机号登录 - 验证码登录
+- 📔 美容日记 - 预约记录时间轴
+- 👤 个人中心 - 头像修改、资料管理、充值、优惠券
 
 ### 商家后台
-- 👥 用户管理 - 查看用户、标签、储值余额
-- 📝 项目管理 - 添加/编辑/删除美容项目
-- 📆 预约管理 - 日历视图、设置服务时间
+- 👥 用户管理 - 查看用户、储值余额、累计消费
+- 📝 项目管理 - 添加/删除美容项目
+- 📆 预约管理 - 查看预约日历
 - 💰 充值管理 - 充值方案设置
 - 🎫 优惠券管理 - 发放优惠券
+- 🏷️ 打折配置 - 折扣设置
 
 ## 技术栈
 
 - 纯前端：HTML + CSS + JavaScript
-- 数据存储：LocalStorage
-- 无需后端，部署即用
+- 数据存储：Firebase Realtime Database（云端同步）
+- 部署：GitHub Pages
 
-## 快速开始
+## 在线访问
 
-1. 克隆项目：
-```bash
-git clone https://github.com/irvinezhao/beauty-app.git
-```
-
-2. 用浏览器打开 `index.html` 即可使用
+https://irvinezhao.github.io/beauty-app/
 
 ## 默认账号
 
-- 商家后台账号：`admin`
-- 商家后台密码：`beauty123`
+- 用户登录：手机号 + 验证码（测试码：123456）
+- 商家后台：账号 `admin` / 密码 `beauty123`
 
 ## 页面结构
 
-```
-├── 项目    - 瀑布流展示美容项目
-├── 预约    - 在线预约服务
-├── 社区    - 用户交流社区
-├── 记录    - 美容日记时间轴
-└── 我的    - 个人中心
-```
+底部导航：
+- 📋 项目 - 瀑布流展示美容项目
+- 📅 预约 - 在线预约服务
+- 💬 社区 - 用户交流社区
+- 📔 日记 - 美容记录时间轴
+- 👤 我的 - 个人中心
+
+顶部：
+- 商家入口 → 商家后台
 
 ## 设计
 
 - 配色：玫瑰粉(#EC4899) + 薰衣草紫(#8B5CF6)
 - 字体：Playfair Display + Inter
 - 风格：Soft UI 柔和现代风
+- 底部导航栏
 
-## 后续规划
+## Firebase 配置
 
-- [ ] 接入Firebase实现云端数据同步
-- [ ] 微信登录
-- [ ] 短信通知
-- [ ] 支付功能
+```javascript
+const firebaseConfig = {
+    apiKey: "AIzaSyBOPa-J7SpDyOSdWiy7gsA5re01Xd-FuvI",
+    authDomain: "beauty-app-6527c.firebaseapp.com",
+    projectId: "beauty-app-6527c",
+    databaseURL: "https://beauty-app-6527c-default-rtdb.asia-southeast1.firebasedatabase.app"
+};
+```
 
 ---
 
