@@ -162,6 +162,15 @@
         </div>
         <div class="admin-content">
             <div class="admin-section">
+                <h3>👥 用户管理 <button class="admin-btn-small admin-btn-edit" onclick="openUserList()">查看用户</button></h3>
+                <div id="adminUserStats" style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;padding:12px;background:var(--bg);border-radius:12px">
+                    <div style="text-align:center"><div style="font-size:24px;font-weight:700;color:var(--primary)" id="totalUsers">0</div><div style="font-size:12px;color:var(--text-light)">总用户</div></div>
+                    <div style="text-align:center"><div style="font-size:24px;font-weight:700;color:var(--primary)" id="totalRevenue">¥0</div><div style="font-size:12px;color:var(--text-light)">总消费</div></div>
+                    <div style="text-align:center"><div style="font-size:24px;font-weight:700;color:var(--primary)" id="totalBalance">¥0</div><div style="font-size:12px;color:var(--text-light)">储值余额</div></div>
+                </div>
+            </div>
+            
+            <div class="admin-section">
                 <h3>美容项目 <button class="admin-btn-small admin-btn-edit" onclick="openProjectModal()">+ 添加项目</button></h3>
                 <div id="adminProjectList"></div>
             </div>
@@ -235,6 +244,24 @@
             </div>
             <button class="btn" onclick="saveSettings()">保存设置</button>
             <button class="btn btn-secondary" onclick="closeSettingsModal()">取消</button>
+        </div>
+    </div>
+    
+    <!-- 用户列表弹窗 -->
+    <div class="project-modal" id="userListModal">
+        <div class="project-modal-content" style="max-width:500px;max-height:80vh">
+            <h3>👥 用户列表</h3>
+            <div style="max-height:60vh;overflow-y:auto" id="userListContent"></div>
+            <button class="btn btn-secondary" onclick="closeUserListModal()">关闭</button>
+        </div>
+    </div>
+    
+    <!-- 用户详情弹窗 -->
+    <div class="project-modal" id="userDetailModal">
+        <div class="project-modal-content" style="max-width:600px;max-height:80vh;overflow-y:auto">
+            <h3>👤 用户详情</h3>
+            <div id="userDetailContent"></div>
+            <button class="btn btn-secondary" onclick="closeUserDetailModal()">关闭</button>
         </div>
     </div>
     
@@ -436,6 +463,9 @@
             window.adminBookings.push(booking);
             localStorage.setItem('adminBookings', JSON.stringify(window.adminBookings));
             
+            // 更新用户信息
+            updateUserFromBooking(booking);
+            
             alert('预约成功！');
             closeBookingModal();
             document.getElementById('bookingName').value = ''; document.getElementById('bookingPhone').value = ''; document.getElementById('bookingNote').value = '';
@@ -602,6 +632,156 @@
             }
             localStorage.setItem('closedDates', JSON.stringify(closedDates));
             renderAdminBookingCalendar();
+        }
+        
+        // 用户管理
+        let users = JSON.parse(localStorage.getItem('users') || '[]');
+        
+        function renderUserStats() {
+            const totalUsers = users.length;
+            const totalRevenue = users.reduce((sum, u) => sum + (u.totalSpent || 0), 0);
+            const totalBalance = users.reduce((sum, u) => sum + (u.balance || 0), 0);
+            
+            document.getElementById('totalUsers').textContent = totalUsers;
+            document.getElementById('totalRevenue').textContent = '¥' + totalRevenue;
+            document.getElementById('totalBalance').textContent = '¥' + totalBalance;
+        }
+        
+        function openUserList() {
+            const listContent = document.getElementById('userListContent');
+            if (users.length === 0) {
+                listContent.innerHTML = '<p style="text-align:center;color:var(--text-light);padding:20px">暂无用户</p>';
+            } else {
+                listContent.innerHTML = users.map(u => `
+                    <div class="admin-list-item" style="cursor:pointer" onclick="viewUserDetail('${u.id}')">
+                        <div class="admin-item-info">
+                            <h4>${u.name}</h4>
+                            <p>${u.phone}</p>
+                        </div>
+                        <div style="text-align:right">
+                            <div style="font-size:14px;font-weight:600;color:var(--primary)">¥${u.balance || 0}</div>
+                            <p style="font-size:11px;color:var(--text-light)">储值余额</p>
+                        </div>
+                    </div>
+                `).join('');
+            }
+            document.getElementById('userListModal').classList.add('active');
+        }
+        
+        function closeUserListModal() {
+            document.getElementById('userListModal').classList.remove('active');
+        }
+        
+        function viewUserDetail(userId) {
+            const user = users.find(u => u.id === userId);
+            if (!user) return;
+            
+            // 获取用户消费记录
+            const userBookings = window.adminBookings.filter(b => b.phone === user.phone);
+            
+            const detailContent = document.getElementById('userDetailContent');
+            detailContent.innerHTML = `
+                <div style="background:var(--bg);padding:16px;border-radius:12px;margin-bottom:16px">
+                    <h4 style="margin-bottom:12px">基本信息</h4>
+                    <p><strong>姓名：</strong>${user.name}</p>
+                    <p><strong>电话：</strong>${user.phone}</p>
+                    <p><strong>标签：</strong>${(user.tags || []).join(', ') || '无'}</p>
+                    <p><strong>储值余额：</strong><span style="color:var(--primary);font-weight:700">¥${user.balance || 0}</span></p>
+                    <p><strong>累计消费：</strong><span style="color:var(--primary);font-weight:700">¥${user.totalSpent || 0}</span></p>
+                </div>
+                
+                <div style="background:var(--bg);padding:16px;border-radius:12px;margin-bottom:16px">
+                    <h4 style="margin-bottom:12px">打标签</h4>
+                    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px">
+                        ${['VIP', '老客户', '新客户', '高消费', '潜力客户'].map(tag => `
+                            <span class="timeline-tag" style="cursor:pointer" onclick="addUserTag('${user.id}', '${tag}')">${tag}</span>
+                        `).join('')}
+                    </div>
+                    <button class="btn" style="padding:8px;font-size:13px" onclick="addNewUserTag('${user.id}')">+ 自定义标签</button>
+                </div>
+                
+                <div>
+                    <h4 style="margin-bottom:12px">美容日记</h4>
+                    <div class="timeline" style="padding-left:20px">
+                        ${userBookings.length === 0 ? '<p style="color:var(--text-light)">暂无记录</p>' : userBookings.map(b => `
+                            <div class="timeline-item">
+                                <div class="timeline-date">${b.date}</div>
+                                <div class="timeline-projects">
+                                    <span class="timeline-tag">预约：${b.time}</span>
+                                </div>
+                                <p style="font-size:12px;color:var(--text-light)">${b.note || ''}</p>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+                
+                <div style="margin-top:16px;padding-top:16px;border-top:1px solid #eee">
+                    <h4 style="margin-bottom:12px">储值操作</h4>
+                    <div style="display:flex;gap:8px">
+                        <input type="number" id="rechargeAmount" placeholder="金额" style="flex:1;padding:10px;border:1px solid #ddd;border-radius:8px">
+                        <button class="btn" style="width:auto;padding:10px 20px" onclick="rechargeUser('${user.id}')">充值</button>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('userListModal').classList.remove('active');
+            document.getElementById('userDetailModal').classList.add('active');
+        }
+        
+        function closeUserDetailModal() {
+            document.getElementById('userDetailModal').classList.remove('active');
+        }
+        
+        function addUserTag(userId, tag) {
+            const user = users.find(u => u.id === userId);
+            if (!user) return;
+            if (!user.tags) user.tags = [];
+            if (!user.tags.includes(tag)) {
+                user.tags.push(tag);
+                localStorage.setItem('users', JSON.stringify(users));
+                viewUserDetail(userId);
+            }
+        }
+        
+        function addNewUserTag(userId) {
+            const tag = prompt('请输入自定义标签：');
+            if (tag) addUserTag(userId, tag);
+        }
+        
+        function rechargeUser(userId) {
+            const amount = parseInt(document.getElementById('rechargeAmount').value);
+            if (!amount || amount <= 0) return alert('请输入有效金额');
+            
+            const user = users.find(u => u.id === userId);
+            if (!user) return;
+            
+            user.balance = (user.balance || 0) + amount;
+            user.totalSpent = (user.totalSpent || 0) + amount;
+            
+            localStorage.setItem('users', JSON.stringify(users));
+            renderUserStats();
+            viewUserDetail(userId);
+        }
+        
+        // 用户预约时自动创建/更新用户
+        function updateUserFromBooking(booking) {
+            let user = users.find(u => u.phone === booking.phone);
+            if (!user) {
+                user = {
+                    id: Date.now().toString(),
+                    name: booking.name,
+                    phone: booking.phone,
+                    balance: 0,
+                    totalSpent: 0,
+                    tags: [],
+                    createdAt: new Date().toISOString()
+                };
+                users.push(user);
+            } else {
+                user.name = booking.name;
+            }
+            localStorage.setItem('users', JSON.stringify(users));
+            renderUserStats();
         }
         
         function openProjectModal(project = null) {
