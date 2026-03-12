@@ -1,42 +1,3 @@
-        if (window.currentUser) {
-            document.getElementById('userLoginBtn').textContent = window.currentUser.name;
-            document.getElementById('userLoginBtn').onclick = userLogout;
-        }
-        
-        // 项目管理数据（本地存储）
-        window.adminProjects = JSON.parse(localStorage.getItem('adminProjects') || '[]');
-        window.adminBookings = JSON.parse(localStorage.getItem('adminBookings') || '[]');
-        
-        // 保存到本地存储
-        function saveAdminData() {
-            localStorage.setItem('adminProjects', JSON.stringify(window.adminProjects));
-            localStorage.setItem('adminBookings', JSON.stringify(window.adminBookings));
-        }
-        
-        window.saveProjectToFirestore = function(data) {
-            if (window.editingProjectId) {
-                const index = window.adminProjects.findIndex(p => p.id === window.editingProjectId);
-                if (index !== -1) {
-                    window.adminProjects[index] = { ...window.adminProjects[index], ...data };
-                }
-            } else {
-                window.adminProjects.push({ id: Date.now().toString(), ...data, createdAt: new Date().toISOString() });
-            }
-            saveAdminData();
-            closeProjectModal();
-            renderAdminProjects();
-            renderUserProjects();
-        };
-        
-        window.deleteProjectFromFirestore = function(id) {
-            if (!confirm('确定删除?')) return;
-            window.adminProjects = window.adminProjects.filter(p => p.id !== id);
-            saveAdminData();
-            renderAdminProjects();
-            renderUserProjects();
-        };
-    </script>
-    
     <script>
         const defaultProjects = [
             { id: 1, title: '光子嫩肤', desc: '采用IPL光子技术，改善肤色不均、色斑、毛孔粗大等问题', price: 899, category: '护肤', cover: 'https://images.unsplash.com/photo-1616394584738-fc6e612e71b9?w=400', detailText: '光子嫩肤是一种非侵入性的皮肤美容技术。\n\n1. 改善肤色不均\n2. 淡化色斑\n3. 收缩毛孔', detailImages: 'https://images.unsplash.com/photo-1616394584738-fc6e612e71b9?w=400' },
@@ -203,18 +164,6 @@
                 <div class="admin-section">
                     <h3>📅 我的预约</h3>
                     <div id="myBookingsList"></div>
-                </div>
-                
-                <!-- 充值方案 -->
-                <div class="admin-section">
-                    <h3>💰 充值优惠</h3>
-                    <div id="userRechargeList"></div>
-                </div>
-                
-                <!-- 我的优惠券 -->
-                <div class="admin-section">
-                    <h3>🎫 优惠券</h3>
-                    <div id="userCouponList"></div>
                 </div>
                 
                 <button class="btn" style="background:#f44336;margin-top:16px" onclick="userLogout()">退出登录</button>
@@ -410,64 +359,6 @@
                 renderProfile();
             }
         };
-        
-        // 用户端充值方案
-        function renderUserRechargeList() {
-            const container = document.getElementById('userRechargeList');
-            if (rechargePlans.length === 0) {
-                container.innerHTML = '<p style="text-align:center;color:var(--text-light);padding:20px">暂无可用充值方案</p>';
-                return;
-            }
-            container.innerHTML = rechargePlans.map(p => `
-                <div class="admin-list-item" style="cursor:pointer" onclick="doRecharge(${p.amount}, ${p.bonus})">
-                    <div class="admin-item-info">
-                        <h4 style="color:var(--primary)">充¥${p.amount} 送¥${p.bonus}</h4>
-                        <p style="font-size:12px">¥${p.amount + p.bonus}到账</p>
-                    </div>
-                    <button class="admin-btn-small admin-btn-edit">充值</button>
-                </div>
-            `).join('');
-        }
-        
-        // 用户充值
-        window.doRecharge = function(amount, bonus) {
-            if (!window.currentUser) {
-                alert('请先登录');
-                return openUserLogin();
-            }
-            if (!confirm(`确认充值¥${amount}？将赠送¥${bonus}到您的账户`)) return;
-            
-            // 更新用户余额
-            const userIndex = users.findIndex(u => u.phone === window.currentUser.phone);
-            if (userIndex !== -1) {
-                users[userIndex].balance = (users[userIndex].balance || 0) + amount + bonus;
-                localStorage.setItem('users', JSON.stringify(users));
-                
-                window.currentUser.balance = users[userIndex].balance;
-                localStorage.setItem('currentUser', JSON.stringify(window.currentUser));
-                
-                alert(`充值成功！¥${amount + bonus}已到账`);
-                renderProfile();
-            }
-        };
-        
-        // 用户端优惠券
-        function renderUserCouponList() {
-            const container = document.getElementById('userCouponList');
-            if (coupons.length === 0) {
-                container.innerHTML = '<p style="text-align:center;color:var(--text-light);padding:20px">暂无可用优惠券</p>';
-                return;
-            }
-            container.innerHTML = coupons.map(c => `
-                <div class="admin-list-item">
-                    <div class="admin-item-info">
-                        <h4>${c.name}</h4>
-                        <p style="font-size:12px">满¥${c.minSpend}减¥${c.discount} · ${c.expireDays}天有效</p>
-                    </div>
-                    <button class="admin-btn-small admin-btn-edit">使用</button>
-                </div>
-            `).join('');
-        }
         
         function openAdminLogin() { document.getElementById('loginPage').classList.add('active'); }
         
@@ -982,3 +873,112 @@
                     id: Date.now().toString(),
                     name: booking.name,
                     phone: booking.phone,
+                    balance: 0,
+                    totalSpent: 0,
+                    tags: [],
+                    createdAt: new Date().toISOString()
+                };
+                users.push(user);
+            } else {
+                user.name = booking.name;
+            }
+            localStorage.setItem('users', JSON.stringify(users));
+            renderUserStats();
+        }
+        
+        function openProjectModal(project = null) {
+            window.editingProjectId = project ? project.id : null;
+            document.getElementById('projectModalTitle').textContent = project ? '编辑项目' : '添加项目';
+            document.getElementById('projectName').value = project ? project.title : '';
+            document.getElementById('projectDesc').value = project ? project.desc : '';
+            document.getElementById('projectPrice').value = project ? project.price : '';
+            document.getElementById('projectCategory').value = project ? project.category : '护肤';
+            // 文件输入不能预设值，清空并提示
+            document.getElementById('projectCover').value = '';
+            document.getElementById('projectDetailText').value = project ? project.detailText : '';
+            document.getElementById('projectDetailImages').value = '';
+            document.getElementById('projectModal').classList.add('active');
+        }
+        
+        function closeProjectModal() { document.getElementById('projectModal').classList.remove('active'); window.editingProjectId = null; }
+        
+        function editProject(id) { const p = window.adminProjects.find(item => item.id === id); if (p) openProjectModal(p); }
+        
+        // 图片转Base64
+        function fileToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+        }
+        
+        // 处理多张图片
+        async function handleDetailImages(files) {
+            const base64Images = [];
+            for (const file of files) {
+                if (file.size > 2 * 1024 * 1024) {
+                    alert('图片不能超过2MB');
+                    continue;
+                }
+                const base64 = await fileToBase64(file);
+                base64Images.push(base64);
+            }
+            return base64Images;
+        }
+        
+        async function saveProject() {
+            const title = document.getElementById('projectName').value.trim();
+            const price = document.getElementById('projectPrice').value;
+            if (!title || !price) return alert('请填写名称和价格');
+            
+            // 处理封面图片
+            let coverBase64 = '';
+            const coverFile = document.getElementById('projectCover').files[0];
+            if (coverFile) {
+                if (coverFile.size > 2 * 1024 * 1024) return alert('封面图片不能超过2MB');
+                coverBase64 = await fileToBase64(coverFile);
+            } else {
+                // 如果没选新图片，保留原来的
+                const existingProject = window.adminProjects.find(p => p.id === window.editingProjectId);
+                if (existingProject) coverBase64 = existingProject.cover || '';
+            }
+            
+            // 处理详情图片
+            const detailFiles = document.getElementById('projectDetailImages').files;
+            let detailImagesBase64 = [];
+            if (detailFiles.length > 0) {
+                detailImagesBase64 = await handleDetailImages(detailFiles);
+            } else {
+                const existingProject = window.adminProjects.find(p => p.id === window.editingProjectId);
+                if (existingProject) detailImagesBase64 = existingProject.detailImages || [];
+            }
+            
+            window.saveProjectToFirestore({ 
+                title, 
+                desc: document.getElementById('projectDesc').value, 
+                price: parseInt(price), 
+                category: document.getElementById('projectCategory').value, 
+                cover: coverBase64, 
+                detailText: document.getElementById('projectDetailText').value, 
+                detailImages: detailImagesBase64 
+            });
+        }
+        
+        renderUserProjects();
+        renderBookingDates();
+        renderTimeSlots();
+        renderTimeline();
+        renderProfile();
+        renderCommunity();
+        
+        // 检查管理员登录状态
+        if (isLoggedIn) {
+            document.getElementById('adminPage').classList.add('active');
+            renderAdminProjects();
+            renderAdminBookingCalendar();
+            document.getElementById('serviceHoursDisplay').textContent = `${bookingSettings.startTime}:00 - ${bookingSettings.endTime}:00`;
+            document.getElementById('serviceDurationDisplay').textContent = bookingSettings.duration;
+            renderAdminBookings();
+        }

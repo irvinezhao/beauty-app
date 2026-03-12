@@ -1,4 +1,3 @@
-    <link rel="stylesheet" href="css/style.css">
     <style>
         :root { 
             --primary: #EC4899; 
@@ -112,4 +111,3 @@
         .admin-btn-edit { background: #2196F3; color: white; }
         .admin-btn-delete { background: #f44336; color: white; }
         .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-    </style>
