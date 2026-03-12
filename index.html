@@ -249,6 +249,8 @@
         }
         window.addEventListener('hashchange', renderRoute);
         document.querySelectorAll('#userTabs .tab, .tabs .tab').forEach(tab => { tab.addEventListener('click', () => { setRoute(tab.dataset.tab); }); });
+        // 确保默认路由
+        if(!location.hash) { location.hash = 'projects'; }
         renderRoute();
         window.openUserLogin = function() { document.getElementById('userLoginPage').classList.add('active'); };
         window.closeUserLogin = function() { document.getElementById('userLoginPage').classList.remove('active'); };
