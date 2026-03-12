@@ -18,12 +18,12 @@
         .header-btn { background: rgba(255,255,255,0.2); border: none; color: white; padding: 6px 12px; border-radius: 20px; font-size: 12px; cursor: pointer; transition: all 0.3s; }
         .header-btn:hover { background: rgba(255,255,255,0.3); transform: scale(1.05); }
 
-        /* Tabs: larger icons, gradient active underline */
-        .tabs { display: flex; background: linear-gradient(180deg, #FFF 0%, #FDF2F8 100%); position: sticky; top: 54px; z-index: 99; border-bottom: 1px solid rgba(236,72,153,0.1); overflow-x: auto; }
-        .tab { flex: 1; padding: 14px 8px; text-align: center; font-size: 13px; color: var(--text-light); cursor: pointer; white-space: nowrap; position: relative; transition: all 0.3s; }
+        /* Tabs: bottom nav bar, larger icons, gradient active */
+        .tabs { display: flex; background: white; position: fixed; bottom: 0; left: 0; right: 0; z-index: 99; border-top: 1px solid rgba(236,72,153,0.15); box-shadow: 0 -4px 20px rgba(236,72,153,0.1); padding-bottom: env(safe-area-inset-bottom, 0); }
+        .tab { flex: 1; padding: 12px 8px 16px; text-align: center; font-size: 11px; color: var(--text-light); cursor: pointer; white-space: nowrap; position: relative; transition: all 0.3s; }
         .tab.active { color: var(--primary); font-weight: 600; }
-        .tab.active::after { content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 40px; height: 3px; background: linear-gradient(90deg, var(--primary), var(--secondary)); border-radius: 2px; }
-        .tab span { font-size: 24px; display: block; margin-bottom: 2px; }
+        .tab.active::after { content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 30px; height: 3px; background: linear-gradient(90deg, var(--primary), var(--secondary)); border-radius: 2px; }
+        .tab span { font-size: 22px; display: block; margin-bottom: 2px; }
 
         .page { display: none; padding: 16px; }
         .page.active { display: block; }
@@ -142,15 +142,6 @@
             <button class="header-btn" id="userBtn" onclick="openUserLogin()">登录</button>
             <button class="header-btn" onclick="setRoute('admin')">商家</button>
         </div>
-    </div>
-
-    <!-- Tabs -->
-    <div class="tabs">
-        <div class="tab" data-tab="projects"><span>📋</span>项目</div>
-        <div class="tab" data-tab="booking"><span>📅</span>预约</div>
-        <div class="tab" data-tab="community"><span>💬</span>社区</div>
-        <div class="tab" data-tab="timeline"><span>📔</span>日记</div>
-        <div class="tab" data-tab="profile"><span>👤</span>我的</div>
     </div>
 
     <!-- Projects Page -->
@@ -1283,5 +1274,14 @@
     // Start sync
     syncData();
     </script>
+
+    <!-- Bottom Navigation -->
+    <div class="tabs">
+        <div class="tab active" data-tab="projects"><span>📋</span>项目</div>
+        <div class="tab" data-tab="booking"><span>📅</span>预约</div>
+        <div class="tab" data-tab="community"><span>💬</span>社区</div>
+        <div class="tab" data-tab="timeline"><span>📔</span>日记</div>
+        <div class="tab" data-tab="profile"><span>👤</span>我的</div>
+    </div>
 </body>
 </html>
