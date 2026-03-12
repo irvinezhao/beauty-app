@@ -131,7 +131,7 @@ function syncData() {
         <h1>✨ 美丽小站</h1>
         <div class="header-btns">
             <button class="header-btn" id="userBtn" onclick="openUserLogin()">登录</button>
-            <button class="header-btn" onclick="openAdmin()">商家</button>
+            <button class="header-btn" onclick="setRoute('admin')">商家</button>
         </div>
     </div>
     
@@ -288,6 +288,26 @@ function syncData() {
         document.getElementById('userBtn').textContent = currentUser ? currentUser.name || '我的' : '登录';
         if(isAdmin) showAdminPanel();
         renderProjects(); renderCalendar(); renderPosts(); renderTimeline(); renderProfile();
+        
+        // 路由功能
+        function getRoute() { return location.hash.slice(1) || 'projects'; }
+        function setRoute(route) { location.hash = route; }
+        function renderRoute() {
+            const route = getRoute();
+            document.querySelectorAll('.tabs .tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            const tab = document.querySelector('.tabs .tab[data-tab="' + route + '"]');
+            if(tab) tab.classList.add('active');
+            const page = document.getElementById(route);
+            if(page) page.classList.add('active');
+            if(route === 'admin') { if(!isLoggedIn) { openAdmin(); } else { document.getElementById('adminPanel').classList.add('active'); } }
+        }
+        window.addEventListener('hashchange', renderRoute);
+        document.querySelectorAll('.tabs .tab').forEach(tab => {
+            tab.addEventListener('click', () => { setRoute(tab.dataset.tab); });
+        });
+        if(!location.hash) location.hash = 'projects';
+
         syncData();
         
         // Tabs
@@ -439,9 +459,40 @@ function syncData() {
                 return;
             }
             const myBooks = bookings.filter(b => b.phone === currentUser.phone);
-            document.getElementById('profileStats').innerHTML = `<div class="stat-box"><div class="stat-num">${myBooks.length}</div><div class="stat-label">预约次数</div></div><div class="stat-box"><div class="stat-num">¥${currentUser.balance||0}</div><div class="stat-label">储值余额</div></div><div class="stat-box"><div class="stat-num">${(currentUser.tags||[]).length}</div><div class="stat-label">标签</div></div>`;
-            document.getElementById('myBookings').innerHTML = '<div class="section-title">我的预约</div>' + (myBooks.length ? myBooks.map(b => `<div class="item-row"><span>${b.date} ${b.time}</span><span>${b.name}</span></div>`).join('') : '<div class="empty">暂无预约</div>');
-            document.getElementById('myCoupons').innerHTML = '<div class="section-title">可用优惠券</div>' + (coupons.length ? coupons.map(c => `<div class="item-row"><span>${c.name}</span><span>¥${c.val}</span></div>`).join('') : '<div class="empty">暂无</div>');
+            document.getElementById('profileStats').innerHTML = `
+                <div class="stat-box">
+                    <div class="stat-num">${myBooks.length}</div>
+                    <div class="stat-label">📅 预约次数</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-num">¥${currentUser.balance||0}</div>
+                    <div class="stat-label">💰 储值余额</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-num">${currentUser.totalSpent||0}</div>
+                    <div class="stat-label">💎 累计消费</div>
+                </div>`;
+            
+            let profileHTML = '<div class="profile-info">';
+            profileHTML += '<div class="profile-avatar">' + (currentUser.name?.charAt(0) || '?') + '</div>';
+            profileHTML += '<div class="profile-name">' + (currentUser.name || '用户') + '</div>';
+            profileHTML += '<div class="profile-phone">📱 ' + (currentUser.phone || '') + '</div>';
+            profileHTML += '<button class="btn" style="margin-top:12px" onclick="editProfile()">✏️ 修改资料</button>';
+            profileHTML += '</div>';
+            
+            document.getElementById('myBookings').innerHTML = profileHTML + '<h3 style="margin:16px 0">📅 我的预约</h3>' + (myBooks.length ? myBooks.map(b => `<div class="item-row"><span>${b.date} ${b.time}</span><span>${b.name}</span></div>`).join('') : '<div class="empty">暂无预约</div>');
+            document.getElementById('myCoupons').innerHTML = '<h3 style="margin:16px 0">🎫 可用优惠券</h3>' + (coupons.length ? coupons.map(c => `<div class="item-row"><span>${c.name}</span><span>¥${c.val}</span></div>`).join('') : '<div class="empty">暂无</div>');
+        }
+        
+        window.editProfile = function() {
+            const newName = prompt('请输入新名字:', currentUser.name || '');
+            if(newName !== null) {
+                currentUser.name = newName;
+                localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                const idx = users.findIndex(u => u.id === currentUser.id);
+                if(idx >= 0) { users[idx].name = newName; localStorage.setItem('users', JSON.stringify(users)); }
+                renderProfile();
+            }
         }
         
         // Login
