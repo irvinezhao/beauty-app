@@ -333,7 +333,7 @@
             name: '管理员'
         };
         
-        let isLoggedIn = false;
+        let isLoggedIn = localStorage.getItem('adminLoggedIn') === 'true';
         
         // 预约设置
         let bookingSettings = JSON.parse(localStorage.getItem('bookingSettings')) || {
@@ -435,6 +435,7 @@
             
             if (username === ADMIN_USER.username && password === ADMIN_USER.password) {
                 isLoggedIn = true;
+                localStorage.setItem('adminLoggedIn', 'true');
                 document.getElementById('loginPage').classList.remove('active');
                 document.getElementById('adminPage').classList.add('active');
                 renderAdminProjects();
@@ -449,6 +450,7 @@
         
         window.logoutAdmin = function() {
             isLoggedIn = false;
+            localStorage.setItem('adminLoggedIn', 'false');
             document.getElementById('adminPage').classList.remove('active');
         };
         
@@ -1173,6 +1175,16 @@
         renderTimeSlots();
         renderTimeline();
         renderProfile();
+        
+        // 检查管理员登录状态
+        if (isLoggedIn) {
+            document.getElementById('adminPage').classList.add('active');
+            renderAdminProjects();
+            renderAdminBookingCalendar();
+            document.getElementById('serviceHoursDisplay').textContent = `${bookingSettings.startTime}:00 - ${bookingSettings.endTime}:00`;
+            document.getElementById('serviceDurationDisplay').textContent = bookingSettings.duration;
+            renderAdminBookings();
+        }
     </script>
 </body>
 </html>
