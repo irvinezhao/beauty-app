@@ -725,14 +725,6 @@ function syncData() {
             // 退出登录
             profileHTML += '<div class="profile-section"><button class="btn" style="background:#6B7280" onclick="userLogout()">🚪 退出登录</button></div>';
             
-            document.getElementById('myBookings').innerHTML = profileHTML;
-            document.getElementById('myCoupons').innerHTML = '';
-        }
-        
-        window.openRechargeModal = function() {
-            if(!currentUser) { openUserLogin(); return; }
-            let html = '<div style="padding:20px">';
-            const plans = JSON.parse(localStorage.getItem("rechargePlans")) || [];
             if(!plans.length) {
                 html += '<div class="empty">暂无可用充值方案</div>';
             } else {
