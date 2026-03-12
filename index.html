@@ -278,7 +278,7 @@ const db = firebase.database();
 function saveToFirebase(path, data) { db.ref(path).push().set(data); }
 
 function syncData() {
-    db.ref("projects").on("value", s => { if(s.val()) { projects = Object.values(s.val()); localStorage.setItem("adminProjects", JSON.stringify(projects)); if(typeof renderUserProjects==="function") renderUserProjects(); }});
+    db.ref("projects").on("value", s => { if(s.val()) { projects = Object.values(s.val()); localStorage.setItem("adminProjects", JSON.stringify(projects)); if(typeof renderProjects==="function") renderProjects(); }});
     db.ref("rechargePlans").on("value", s => { if(s.val()) { rechargePlans = Object.values(s.val()); localStorage.setItem("rechargePlans", JSON.stringify(rechargePlans)); }});
     db.ref("users").on("value", s => { if(s.val()) { users = Object.values(s.val()); localStorage.setItem("users", JSON.stringify(users)); }});
     db.ref("bookings").on("value", s => { if(s.val()) { bookings = Object.values(s.val()); adminBookings = bookings; localStorage.setItem("bookings", JSON.stringify(bookings)); localStorage.setItem("adminBookings", JSON.stringify(bookings)); if(typeof renderProfile==="function") renderProfile(); }});
@@ -432,7 +432,7 @@ function syncData() {
     
     <script>
         // Data
-        let projects = JSON.parse(localStorage.getItem('projects')) || [
+        let projects = JSON.parse(localStorage.getItem('adminProjects')) || [
             {id:1,title:'光子嫩肤',desc:'IPL光子技术，改善肤色',price:899,cover:'https://images.unsplash.com/photo-1616394584738-fc6e612e71b9?w=400'},
             {id:2,title:'水光针',desc:'深层补水锁水',price:1280,cover:'https://images.unsplash.com/photo-1512290923902-8a9f81dc236c?w=400'},
             {id:3,title:'果酸换肤',desc:'温和去除老化角质',price:680,cover:'https://images.unsplash.com/photo-1515377905703-c4788e51af15?w=400'}
