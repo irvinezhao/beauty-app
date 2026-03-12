@@ -106,6 +106,7 @@
         <div class="header-content">
             <h1>✨ 美丽小站</h1>
             <div class="header-right">
+                <button class="admin-btn" id="userLoginBtn" onclick="openUserLogin()">登录</button>
                 <button class="admin-btn" onclick="openAdminLogin()">商家入口</button>
                 <button class="dark-mode-btn" id="darkModeBtn" title="切换深色模式">🌙</button>
             </div>
@@ -144,7 +145,25 @@
         </div>
     </div>
     
-    <div class="login-page" id="loginPage">
+    <!-- 用户登录弹窗 -->
+    <div class="login-page" id="userLoginPage" style="z-index:3000">
+        <div class="login-card">
+            <h2>👤 用户登录</h2>
+            <p>登录后可查看预约记录</p>
+            
+            <div class="form-group"><label>手机号</label><input type="tel" id="userLoginPhone" placeholder="请输入手机号"></div>
+            <div class="form-group">
+                <label>验证码</label>
+                <div style="display:flex;gap:8px">
+                    <input type="text" id="userLoginCode" placeholder="请输入验证码" style="flex:1">
+                    <button type="button" id="userSendCodeBtn" onclick="sendUserCode()" style="width:auto;padding:12px;background:var(--primary);color:white;border:none;border-radius:10px;font-size:13px">发送验证码</button>
+                </div>
+            </div>
+            <button class="btn" onclick="userLogin()">登录</button>
+        </div>
+    </div>
+    
+    <div class="login-page" id="loginPage" style="z-index:2500">
         <div class="login-card">
             <h2>🔐 商家后台</h2>
             <p id="loginSubtitle">请输入手机号登录</p>
@@ -438,6 +457,93 @@
             document.getElementById('phoneLoginForm').style.display = 'block';
             document.getElementById('passwordLoginForm').style.display = 'none';
         };
+        
+        // 用户端登录
+        window.currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
+        
+        window.openUserLogin = function() {
+            document.getElementById('userLoginPage').classList.add('active');
+        };
+        
+        window.closeUserLogin = function() {
+            document.getElementById('userLoginPage').classList.remove('active');
+        };
+        
+        window.sendUserCode = function() {
+            const phone = document.getElementById('userLoginPhone').value.trim();
+            if (!/^1\d{10}$/.test(phone)) return alert('请输入正确的手机号');
+            
+            const code = Math.floor(100000 + Math.random() * 900000).toString();
+            verificationCodes[phone] = { code, expires: Date.now() + 5 * 60 * 1000 };
+            
+            alert(`验证码已发送（测试码：${code}）`);
+            
+            let countdown = 60;
+            const btn = document.getElementById('userSendCodeBtn');
+            btn.disabled = true;
+            btn.textContent = `${countdown}s`;
+            
+            const timer = setInterval(() => {
+                countdown--;
+                btn.textContent = `${countdown}s`;
+                if (countdown <= 0) {
+                    clearInterval(timer);
+                    btn.disabled = false;
+                    btn.textContent = '发送验证码';
+                }
+            }, 1000);
+        };
+        
+        window.userLogin = function() {
+            const phone = document.getElementById('userLoginPhone').value.trim();
+            const code = document.getElementById('userLoginCode').value.trim();
+            
+            if (!phone || !code) return alert('请填写手机号和验证码');
+            
+            const stored = verificationCodes[phone];
+            if (!stored) return alert('请先获取验证码');
+            if (Date.now() > stored.expires) return alert('验证码已过期');
+            if (stored.code !== code) return alert('验证码错误');
+            
+            // 查找或创建用户
+            let user = users.find(u => u.phone === phone);
+            if (!user) {
+                user = {
+                    id: Date.now().toString(),
+                    name: '用户' + phone.slice(-4),
+                    phone: phone,
+                    balance: 0,
+                    totalSpent: 0,
+                    tags: [],
+                    createdAt: new Date().toISOString()
+                };
+                users.push(user);
+                localStorage.setItem('users', JSON.stringify(users));
+            }
+            
+            window.currentUser = user;
+            localStorage.setItem('currentUser', JSON.stringify(user));
+            
+            // 更新UI
+            document.getElementById('userLoginBtn').textContent = user.name;
+            document.getElementById('userLoginBtn').onclick = userLogout;
+            
+            alert('登录成功！');
+            closeUserLogin();
+        };
+        
+        window.userLogout = function() {
+            window.currentUser = null;
+            localStorage.removeItem('currentUser');
+            document.getElementById('userLoginBtn').textContent = '登录';
+            document.getElementById('userLoginBtn').onclick = openUserLogin;
+        };
+        
+        // 检查登录状态
+        if (window.currentUser) {
+            document.getElementById('userLoginBtn').textContent = window.currentUser.name;
+            document.getElementById('userLoginBtn').onclick = userLogout;
+        }
         
         // 项目管理数据（本地存储）
         window.adminProjects = JSON.parse(localStorage.getItem('adminProjects') || '[]');
