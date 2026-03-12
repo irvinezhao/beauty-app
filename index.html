@@ -98,7 +98,164 @@
         .detail-price { font-size: 28px; font-weight: 700; color: var(--primary); margin: 16px 0; }
         
         .empty { text-align: center; padding: 40px; color: var(--text-light); }
-    </style>
+    
+        /* 增强样式 */
+        .card { border-radius: 16px; box-shadow: 0 4px 20px rgba(236,72,153,0.12); transition: all 0.3s; }
+        .card:hover { transform: translateY(-4px); box-shadow: 0 8px 30px rgba(236,72,153,0.2); }
+        
+        .project-card { border-radius: 16px; overflow: hidden; }
+        .project-card img { transition: transform 0.3s; }
+        .project-card:hover img { transform: scale(1.05); }
+        .project-price { 
+            background: linear-gradient(135deg, #EC4899, #8B5CF6); 
+            -webkit-background-clip: text; 
+            -webkit-text-fill-color: transparent;
+            font-weight: 700;
+        }
+        .discount-badge {
+            background: linear-gradient(135deg, #EF4444, #F97316);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .tabs { 
+            background: linear-gradient(180deg, #FFF 0%, #FDF2F8 100%);
+            border-bottom: 1px solid rgba(236,72,153,0.1);
+        }
+        .tab.active { 
+            color: #EC4899; 
+            font-weight: 600;
+        }
+        .tab.active::after {
+            content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); 
+            width: 40px; height: 3px; 
+            background: linear-gradient(90deg, #EC4899, #8B5CF6); 
+            border-radius: 2px;
+        }
+        .tab span { font-size: 20px; display: block; margin-bottom: 2px; }
+        
+        .header {
+            background: linear-gradient(135deg, #EC4899 0%, #8B5CF6 100%);
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #EC4899, #8B5CF6);
+            border: none;
+            box-shadow: 0 4px 15px rgba(236,72,153,0.3);
+            transition: all 0.3s;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(236,72,153,0.4);
+        }
+        
+        .stat-box {
+            background: linear-gradient(135deg, #FDF2F8, #F3E8FF);
+            border-radius: 16px;
+            padding: 16px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(236,72,153,0.1);
+        }
+        .stat-num {
+            font-size: 28px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #EC4899, #8B5CF6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .profile-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #EC4899, #8B5CF6);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            font-weight: 700;
+            margin: 0 auto 16px;
+            border: 4px solid white;
+            box-shadow: 0 4px 20px rgba(236,72,153,0.3);
+        }
+        .profile-name { font-size: 24px; font-weight: 700; text-align: center; margin-bottom: 8px; }
+        .profile-phone { text-align: center; color: #6B7280; }
+        
+        .date-item {
+            border-radius: 12px;
+            transition: all 0.3s;
+            min-width: 60px;
+        }
+        .date-item.active {
+            background: linear-gradient(135deg, #EC4899, #8B5CF6);
+            color: white;
+            box-shadow: 0 4px 15px rgba(236,72,153,0.3);
+        }
+        
+        .time-slot {
+            border-radius: 12px;
+            transition: all 0.3s;
+        }
+        .time-slot:hover { transform: scale(1.05); }
+        .time-slot.selected {
+            background: linear-gradient(135deg, #EC4899, #8B5CF6);
+            color: white;
+            box-shadow: 0 4px 15px rgba(236,72,153,0.4);
+        }
+        
+        .modal-content {
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(236,72,153,0.2);
+        }
+        
+        .form-group input, .form-group textarea, .form-group select {
+            border-radius: 12px;
+            border: 2px solid #F3E8FF;
+            padding: 14px;
+            transition: all 0.3s;
+        }
+        .form-group input:focus, .form-group textarea:focus {
+            border-color: #EC4899;
+            box-shadow: 0 0 0 3px rgba(236,72,153,0.1);
+            outline: none;
+        }
+        
+        .login-card {
+            background: linear-gradient(180deg, #FFF, #FDF2F8);
+            border-radius: 24px;
+            box-shadow: 0 20px 60px rgba(236,72,153,0.2);
+        }
+        
+        .menu-item {
+            padding: 16px;
+            border-radius: 12px;
+            transition: all 0.3s;
+        }
+        .menu-item:hover {
+            background: linear-gradient(135deg, #FDF2F8, #F3E8FF);
+        }
+        
+        .post-card {
+            border-radius: 16px;
+            transition: all 0.3s;
+        }
+        .post-card:hover {
+            box-shadow: 0 8px 30px rgba(236,72,153,0.15);
+        }
+        
+        .admin-panel {
+            background: linear-gradient(180deg, #FDF2F8, #FFF);
+        }
+        
+        h1, h2, h3, .project-title {
+            font-family: 'Playfair Display', serif;
+        }
+
+</style>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 <script>
