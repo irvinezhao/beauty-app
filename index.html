@@ -199,7 +199,7 @@ function syncData() {
         <div class="login-card">
             <h2 class="login-title">🔐 商家后台</h2>
             <div class="form-group"><input type="text" id="adminUser" placeholder="账号"></div>
-            <div class="form-group"><input type="password" id="adminPass" placeholder="密码"></div>
+            <div class="form-group"><form><input type="password" id="adminPass" placeholder="密码"></form></div>
             <button class="btn" onclick="doAdminLogin()">登录</button>
             <button onclick="closeModal('adminModal')" style="margin-top:12px;background:none;border:none;color:var(--text-light)">取消</button>
         </div>
@@ -288,6 +288,7 @@ function syncData() {
         document.getElementById('userBtn').textContent = currentUser ? currentUser.name || '我的' : '登录';
         if(isAdmin) showAdminPanel();
         renderProjects(); renderCalendar(); renderPosts(); renderTimeline(); renderProfile();
+        syncData();
         
         // Tabs
         document.querySelectorAll('.tab').forEach(t => t.onclick = () => {
@@ -548,6 +549,5 @@ function syncData() {
         
         function closeModal(id) { document.getElementById(id).classList.remove('active'); }
     </script>
-<script>syncData();</script>
 </body>
 </html>
