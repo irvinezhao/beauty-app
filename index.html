@@ -17,6 +17,115 @@
         };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
+
+        // 默认数据
+        const defaultProjects = [
+            {id:'1',title:'光子嫩肤',desc:'IPL光子技术，改善肤色',price:899,cover:'https://images.unsplash.com/photo-1616394584738-fc6e612e71b9?w=400',category:'护肤'},
+            {id:'2',title:'水光针',desc:'深层补水锁水',price:1280,cover:'https://images.unsplash.com/photo-1512290923902-8a9f81dc236c?w=400',category:'护肤'},
+            {id:'3',title:'果酸换肤',desc:'温和去除老化角质',price:680,cover:'https://images.unsplash.com/photo-1515377905703-c4788e51af15?w=400',category:'美容'},
+            {id:'4',title:'面部SPA',desc:'深层清洁+补水护理',price:458,cover:'https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=400',category:'护肤'},
+            {id:'5',title:'美甲套餐',desc:'精致美甲设计',price:288,cover:'https://images.unsplash.com/photo-1604654894610-df63bc536371?w=400',category:'美甲'},
+            {id:'6',title:'纹眉',desc:'半永久自然眉形',price:1680,cover:'https://images.unsplash.com/photo-1519699047748-de8e44100de5?w=400',category:'美容'}
+        ];
+        
+        // 初始化数据
+        function initData() {
+            // 首次运行时从Firebase同步
+            syncAllData();
+        }
+        
+        // 全量同步
+        function syncAllData() {
+            db.ref('projects').on('value', (snap) => {
+                const val = snap.val();
+                if(val) {
+                    projects = Object.values(val);
+                    localStorage.setItem('adminProjects', JSON.stringify(projects));
+                    renderUserProjects();
+                }
+            });
+            db.ref('users').on('value', (snap) => {
+                const val = snap.val();
+                if(val) {
+                    users = Object.values(val);
+                    localStorage.setItem('users', JSON.stringify(users));
+                }
+            });
+            db.ref('bookings').on('value', (snap) => {
+                const val = snap.val();
+                if(val) {
+                    adminBookings = Object.values(val);
+                    localStorage.setItem('adminBookings', JSON.stringify(adminBookings));
+                }
+            });
+            db.ref('rechargePlans').on('value', (snap) => {
+                const val = snap.val();
+                if(val) {
+                    rechargePlans = Object.values(val);
+                    localStorage.setItem('rechargePlans', JSON.stringify(rechargePlans));
+                } else {
+                    // 使用默认值
+                    const defaults = [
+                        {id:'1',amount:500,bonus:50},
+                        {id:'2',amount:1000,bonus:150},
+                        {id:'3',amount:2000,bonus:400}
+                    ];
+                    defaults.forEach(p => saveToFirebase('rechargePlans', p));
+                }
+            });
+            db.ref('coupons').on('value', (snap) => {
+                const val = snap.val();
+                if(val) {
+                    coupons = Object.values(val);
+                    localStorage.setItem('coupons', JSON.stringify(coupons));
+                }
+            });
+            db.ref('discounts').on('value', (snap) => {
+                const val = snap.val();
+                if(val) {
+                    discounts = Object.values(val);
+                    localStorage.setItem('discounts', JSON.stringify(discounts));
+                }
+            });
+            db.ref('posts').on('value', (snap) => {
+                const val = snap.val();
+                if(val) {
+                    posts = Object.values(val);
+                    localStorage.setItem('communityPosts', JSON.stringify(posts));
+                }
+            });
+            db.ref('settings').on('value', (snap) => {
+                const val = snap.val();
+                if(val) {
+                    if(val.bookingSettings) {
+                        bookingSettings = val.bookingSettings;
+                        localStorage.setItem('bookingSettings', JSON.stringify(bookingSettings));
+                    }
+                    if(val.closedDates) {
+                        closedDates = val.closedDates;
+                        localStorage.setItem('closedDates', JSON.stringify(closedDates));
+                    }
+                }
+            });
+        }
+        
+        // 保存到Firebase
+        function saveToFirebase(path, data) {
+            const ref = db.ref(path).push();
+            ref.set(data);
+            return ref.key;
+        }
+        
+        // 更新Firebase
+        function updateFirebase(path, data) {
+            db.ref(path).set(data);
+        }
+        
+        // 删除Firebase
+        function removeFromFirebase(path, key) {
+            db.ref(path + '/' + key).remove();
+        }
+
         
         // 同步充值方案
         function syncRechargePlans() {
@@ -273,6 +382,7 @@
         function toggleDarkMode() { const html = document.documentElement; const isDark = html.getAttribute('data-theme') === 'dark'; if (isDark) { html.removeAttribute('data-theme'); localStorage.setItem('theme', 'light'); document.getElementById('darkModeBtn').textContent = '🌙'; } else { html.setAttribute('data-theme', 'dark'); localStorage.setItem('theme', 'dark'); document.getElementById('darkModeBtn').textContent = '☀️'; } }
         initDarkMode();
         syncRechargePlans();
+        initData();
         // 路由
         function getRoute() { return location.hash.slice(1) || 'projects'; }
         function setRoute(route) { location.hash = route; }
@@ -297,7 +407,7 @@
         window.openAdminLogin = function() { document.getElementById('loginPage').classList.add('active'); };
         window.closeAdminLogin = function() { document.getElementById('loginPage').classList.remove('active'); };
         window.sendUserCode = function() { const p = document.getElementById('userLoginPhone').value.trim(); if (!/^1\d{10}$/.test(p)) return showToast('请输入正确的手机号'); const c = Math.floor(100000 + Math.random() * 900000).toString(); verificationCodes[p] = { code: c, expires: Date.now() + 5 * 60 * 1000 }; showToast('验证码已发送（测试码：' + c + '）'); let cd = 60; const b = document.getElementById('userSendCodeBtn'); b.disabled = true; b.textContent = cd + 's'; const t = setInterval(() => { cd--; b.textContent = cd + 's'; if (cd <= 0) { clearInterval(t); b.disabled = false; b.textContent = '发送验证码'; } }, 1000); };
-        window.userLogin = function() { const p = document.getElementById('userLoginPhone').value.trim(); const c = document.getElementById('userLoginCode').value.trim(); if (!p || !c) return showToast('请填写手机号和验证码'); const s = verificationCodes[p]; if (!s) return showToast('请先获取验证码'); if (Date.now() > s.expires) return showToast('验证码已过期'); if (s.code !== c) return showToast('验证码错误'); let u = users.find(u => u.phone === p); if (!u) { u = { id: Date.now().toString(), name: '用户' + p.slice(-4), phone: p, balance: 0, totalSpent: 0, tags: [], createdAt: new Date().toISOString() }; users.push(u); localStorage.setItem('users', JSON.stringify(users)); } window.currentUser = u; localStorage.setItem('currentUser', JSON.stringify(u)); document.getElementById('userLoginBtn').textContent = u.name; document.getElementById('userLoginBtn').onclick = userLogout; showToast('登录成功！'); closeUserLogin(); renderProfile(); };
+        window.userLogin = function() { const p = document.getElementById('userLoginPhone').value.trim(); const c = document.getElementById('userLoginCode').value.trim(); if (!p || !c) return showToast('请填写手机号和验证码'); const s = verificationCodes[p]; if (!s) return showToast('请先获取验证码'); if (Date.now() > s.expires) return showToast('验证码已过期'); if (s.code !== c) return showToast('验证码错误'); let u = users.find(u => u.phone === p); if (!u) { u = { id: Date.now().toString(), name: '用户' + p.slice(-4), phone: p, balance: 0, totalSpent: 0, tags: [], createdAt: new Date().toISOString() }; users.push(u); localStorage.setItem('users', JSON.stringify(users)); saveToFirebase('users', u); } window.currentUser = u; localStorage.setItem('currentUser', JSON.stringify(u)); document.getElementById('userLoginBtn').textContent = u.name; document.getElementById('userLoginBtn').onclick = userLogout; showToast('登录成功！'); closeUserLogin(); renderProfile(); };
         window.userLogout = function() { if (!confirm('确定要退出登录吗？')) return; window.currentUser = null; localStorage.removeItem('currentUser'); document.getElementById('userLoginBtn').textContent = '登录'; document.getElementById('userLoginBtn').onclick = openUserLogin; renderProfile(); };
 
         window.logoutAdmin = function() { isLoggedIn = false; localStorage.setItem('adminLoggedIn', 'false'); setRoute('projects'); };
@@ -308,7 +418,7 @@
         window.openUserRecharge = function() { renderUserRechargeList(); document.getElementById('userRechargeModal').classList.add('active'); };
         window.closeUserRechargeModal = function() { document.getElementById('userRechargeModal').classList.remove('active'); };
         window.renderUserRechargeList = function() { const c = document.getElementById('userRechargeList'); const plans = JSON.parse(localStorage.getItem("rechargePlans")) || []; if(!plans.length) { c.innerHTML = '<p style="text-align:center;color:var(--text-light);padding:20px">暂无可用充值方案</p>'; return; } c.innerHTML = plans.map(p => '<div style="display:flex;justify-content:space-between;align-items:center;padding:16px;background:var(--bg);border-radius:12px;margin-bottom:12px"><div><div style="font-weight:600">充¥' + p.amount + ' 送¥' + p.bonus + '</div><div style="font-size:12px;color:var(--primary)">到账 ¥' + (p.amount + p.bonus) + '</div></div><button class="btn" style="width:auto;padding:8px 20px" onclick="doUserRecharge(' + p.amount + ')">充值</button></div>').join(''); };
-        window.doUserRecharge = function(amount) { if(!window.currentUser) return openUserLogin(); if(!confirm('确认充值 ¥' + amount + '？')) return; const u = window.currentUser; u.balance = (u.balance || 0) + amount; localStorage.setItem('currentUser', JSON.stringify(u)); const idx = users.findIndex(x => x.id === u.id); if(idx >= 0) { users[idx].balance = u.balance; localStorage.setItem('users', JSON.stringify(users)); } showToast('充值成功！'); renderProfile(); closeUserRechargeModal(); };
+        window.doUserRecharge = function(amount) { if(!window.currentUser) return openUserLogin(); if(!confirm('确认充值 ¥' + amount + '？')) return; const u = window.currentUser; u.balance = (u.balance || 0) + amount; localStorage.setItem('currentUser', JSON.stringify(u)); const idx = users.findIndex(x => x.id === u.id); if(idx >= 0) { users[idx].balance = u.balance; localStorage.setItem('users', JSON.stringify(users)); saveToFirebase('users', users[idx]); } showToast('充值成功！'); renderProfile(); closeUserRechargeModal(); };
 
         window.loginWithPassword = function() { const u = document.getElementById('loginUsername').value.trim(); const pw = document.getElementById('loginPassword').value; if (u === ADMIN_USER.username && pw === ADMIN_USER.password) { isLoggedIn = true; localStorage.setItem('adminLoggedIn', 'true'); closeAdminLogin(); setRoute('admin'); } else { showToast('账号或密码错误'); } };
         function renderUserProjects() { const g = document.getElementById('projectGrid'); const d = JSON.parse(localStorage.getItem('adminProjects')) || defaultProjects; g.innerHTML = d.map(p => { const dp = getDiscountedPrice(p.price, p.id); const hd = dp < p.price; return '<div class="project-card" onclick="showDetail(\'' + p.id + '\')">' + (hd ? '<span class="discount-badge">特惠</span>' : '') + '<img src="' + (p.cover || 'https://via.placeholder.com/400x300') + '"><div class="project-info"><div class="project-title">' + p.title + '</div><div class="project-desc">' + (p.desc || '') + '</div><div class="project-price">' + (hd ? '<span style="text-decoration:line-through;color:#999;font-size:12px;margin-right:8px">¥' + p.price + '</span>' : '') + '¥' + dp + '</div></div></div>'; }).join(''); }
@@ -321,7 +431,7 @@
         function renderTimeSlots() { const c = document.getElementById('timeSlots'); let h = ''; for (let hr = bookingSettings.startTime; hr < bookingSettings.endTime; hr++) { const b = Math.random() < 0.3; h += '<div class="time-slot ' + (b ? 'booked' : '') + '" onclick="' + (b ? '' : "selectTime('" + hr + ":00')") + '"><div class="slot-time">' + hr + ':00</div><div class="slot-status">' + (b ? '已约满' : '可预约') + '</div></div>'; } c.innerHTML = h; }
         window.selectTime = function(t) { if (!window.currentUser) { showToast('请先登录'); return openUserLogin(); } document.querySelectorAll('.time-slot').forEach(el => el.classList.remove('selected')); event.target.closest('.time-slot').classList.add('selected'); selectedTime = t; setTimeout(() => document.getElementById('bookingModal').classList.add('active'), 200); };
         window.closeBookingModal = function() { document.getElementById('bookingModal').classList.remove('active'); selectedTime = null; renderTimeSlots(); };
-        window.confirmBooking = function() { const n = document.getElementById('bookingName').value.trim(); const ph = document.getElementById('bookingPhone').value.trim(); if (!n || !ph) return showToast('请填写姓名和联系方式'); const b = { id: Date.now().toString(), date: selectedDate, time: selectedTime, name: n, phone: ph, note: document.getElementById('bookingNote').value, createdAt: new Date().toISOString() }; adminBookings.push(b); localStorage.setItem('adminBookings', JSON.stringify(adminBookings)); updateUserFromBooking(b); showToast('预约成功！'); closeBookingModal(); document.getElementById('bookingName').value = ''; document.getElementById('bookingPhone').value = ''; document.getElementById('bookingNote').value = ''; };
+        window.confirmBooking = function() { const n = document.getElementById('bookingName').value.trim(); const ph = document.getElementById('bookingPhone').value.trim(); if (!n || !ph) return showToast('请填写姓名和联系方式'); const b = { id: Date.now().toString(), date: selectedDate, time: selectedTime, name: n, phone: ph, note: document.getElementById('bookingNote').value, createdAt: new Date().toISOString() }; adminBookings.push(b); localStorage.setItem('adminBookings', JSON.stringify(adminBookings)); saveToFirebase('bookings', b); updateUserFromBooking(b); showToast('预约成功！'); closeBookingModal(); document.getElementById('bookingName').value = ''; document.getElementById('bookingPhone').value = ''; document.getElementById('bookingNote').value = ''; };
         const timelineData = [{ dateText: '2024年3月8日', projects: ['光子嫩肤', '小气泡清洁'], photos: ['https://images.unsplash.com/photo-1616394584738-fc6e612e71b9?w=200'] }, { dateText: '2024年2月14日', projects: ['水光针'], photos: ['https://images.unsplash.com/photo-1512290923902-8a9f81dc236c?w=200'] }, { dateText: '2024年1月1日', projects: ['日式美甲', '植睫毛'], photos: ['https://images.unsplash.com/photo-1604654894610-df63bc536371?w=200', 'https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=200'] }];
         function renderTimeline() { document.getElementById('timelineList').innerHTML = timelineData.map(i => '<div class="timeline-item"><div class="timeline-date">' + i.dateText + '</div><div class="timeline-projects">' + i.projects.map(p => '<span class="timeline-tag">' + p + '</span>').join('') + '</div><div class="timeline-photos">' + i.photos.map(ph => '<img src="' + ph + '">').join('') + '</div></div>').join(''); }
         function renderProfile() { const c = document.getElementById('profileContent'); if (!window.currentUser) { c.innerHTML = '<div class="empty-state"><div class="empty-state-icon">👤</div><p>请先登录</p><button class="btn" style="margin-top:16px" onclick="openUserLogin()">立即登录</button></div>'; return; } const u = window.currentUser; const mb = adminBookings.filter(b => b.phone === u.phone); c.innerHTML = '<div class="profile-header"><div class="profile-avatar">' + u.name.charAt(0) + '</div><div class="profile-name">' + u.name + '</div><div class="profile-phone">' + u.phone + '</div></div><div class="stats-grid"><div class="stat-card"><div class="stat-value">¥' + (u.balance || 0) + '</div><div class="stat-label">储值余额</div></div><div class="stat-card"><div class="stat-value">¥' + (u.totalSpent || 0) + '</div><div class="stat-label">累计消费</div></div><div class="stat-card"><div class="stat-value">' + mb.length + '</div><div class="stat-label">预约次数</div></div></div><div class="menu-list"><div class="menu-item" onclick="alert(\'请在商家后台添加充值方案\')"><span class="menu-icon">💰</span><span class="menu-text">充值</span><span class="menu-arrow">→</span></div><div class="menu-item" onclick="alert(\'暂无可用优惠券\')"><span class="menu-icon">🎫</span><span class="menu-text">优惠券</span><span class="menu-arrow">→</span></div></div><div class="admin-section" style="margin-top:20px"><h3>📅 我的预约</h3><div id="myBookingsList"></div></div><button class="btn btn-secondary" style="margin-top:20px" onclick="userLogout()">退出登录</button>'; document.getElementById('myBookingsList').innerHTML = mb.length ? mb.map(b => '<div class="admin-list-item"><div class="admin-item-info"><h4>' + b.date + ' ' + b.time + '</h4><p>' + (b.note || '无备注') + '</p></div></div>').join('') : '<p style="text-align:center;color:var(--text-light);padding:20px">暂无预约记录</p>'; }
@@ -356,19 +466,19 @@
         function renderRechargeList() { const c = document.getElementById('rechargeList'); c.innerHTML = rechargePlans.length ? rechargePlans.map(p => '<div class="admin-list-item"><div class="admin-item-info"><h4>充¥' + p.amount + ' 送¥' + p.bonus + '</h4><p style="font-size:12px">¥' + (p.amount + p.bonus) + '到账</p></div><button class="admin-btn-small admin-btn-delete" onclick="deleteRecharge(\'' + p.id + '\')">删除</button></div>').join('') : '<p style="text-align:center;color:var(--text-light);padding:20px">暂无充值方案</p>'; }
         window.openRechargeModal = function() { document.getElementById('rechargeAmount').value = ''; document.getElementById('rechargeBonus').value = ''; document.getElementById('rechargeModal').classList.add('active'); };
         window.closeRechargeModal = function() { document.getElementById('rechargeModal').classList.remove('active'); };
-        window.saveRecharge = function() { const a = parseInt(document.getElementById('rechargeAmount').value); const b = parseInt(document.getElementById('rechargeBonus').value) || 0; if (!a || a <= 0) return showToast('请填写充值金额'); const plan = { id: Date.now().toString(), amount: a, bonus: b }; rechargePlans.push(plan); localStorage.setItem('rechargePlans', JSON.stringify(rechargePlans)); saveRechargeToFirebase(plan); closeRechargeModal(); renderRechargeList(); showToast('充值方案已保存'); };
-        window.deleteRecharge = function(id) { if (!confirm('确定删除？')) return; rechargePlans = rechargePlans.filter(p => p.id !== id); localStorage.setItem('rechargePlans', JSON.stringify(rechargePlans)); deleteRechargeFromFirebase(id); renderRechargeList(); };
+        window.saveRecharge = function() { const a = parseInt(document.getElementById('rechargeAmount').value); const b = parseInt(document.getElementById('rechargeBonus').value) || 0; if (!a || a <= 0) return showToast('请填写充值金额'); const plan = { id: Date.now().toString(), amount: a, bonus: b }; rechargePlans.push(plan); localStorage.setItem('rechargePlans', JSON.stringify(rechargePlans)); saveToFirebase('rechargePlans', plan); closeRechargeModal(); renderRechargeList(); showToast('充值方案已保存'); };
+        window.deleteRecharge = function(id) { if (!confirm('确定删除？')) return; rechargePlans = rechargePlans.filter(p => p.id !== id); localStorage.setItem('rechargePlans', JSON.stringify(rechargePlans)); removeFromFirebase('rechargePlans', id); renderRechargeList(); };
         function renderCouponList() { const c = document.getElementById('couponList'); c.innerHTML = coupons.length ? coupons.map(c => '<div class="admin-list-item"><div class="admin-item-info"><h4>' + c.name + '</h4><p style="font-size:12px">满¥' + c.minSpend + '减¥' + c.discount + ' · ' + c.expireDays + '天有效</p></div><button class="admin-btn-small admin-btn-delete" onclick="deleteCoupon(\'' + c.id + '\')">删除</button></div>').join('') : '<p style="text-align:center;color:var(--text-light);padding:20px">暂无优惠券</p>'; }
         window.openCouponModal = function() { document.getElementById('couponName').value = ''; document.getElementById('couponDiscount').value = ''; document.getElementById('couponMinSpend').value = ''; document.getElementById('couponExpireDays').value = ''; document.getElementById('couponModal').classList.add('active'); };
         window.closeCouponModal = function() { document.getElementById('couponModal').classList.remove('active'); };
-        window.saveCoupon = function() { const n = document.getElementById('couponName').value.trim(); const d = parseInt(document.getElementById('couponDiscount').value); const m = parseInt(document.getElementById('couponMinSpend').value) || 0; const e = parseInt(document.getElementById('couponExpireDays').value) || 30; if (!n || !d) return showToast('请填写名称和优惠金额'); coupons.push({ id: Date.now().toString(), name: n, discount: d, minSpend: m, expireDays: e, createdAt: new Date().toISOString() }); localStorage.setItem('coupons', JSON.stringify(coupons)); closeCouponModal(); renderCouponList(); showToast('优惠券已保存'); };
-        window.deleteCoupon = function(id) { if (!confirm('确定删除？')) return; coupons = coupons.filter(c => c.id !== id); localStorage.setItem('coupons', JSON.stringify(coupons)); renderCouponList(); };
+        window.saveCoupon = function() { const n = document.getElementById('couponName').value.trim(); const d = parseInt(document.getElementById('couponDiscount').value); const m = parseInt(document.getElementById('couponMinSpend').value) || 0; const e = parseInt(document.getElementById('couponExpireDays').value) || 30; if (!n || !d) return showToast('请填写名称和优惠金额'); const coupon = { id: Date.now().toString(), name: n, discount: d, minSpend: m, expireDays: e, createdAt: new Date().toISOString() }; coupons.push(coupon); localStorage.setItem('coupons', JSON.stringify(coupons)); saveToFirebase('coupons', coupon); closeCouponModal(); renderCouponList(); showToast('优惠券已保存'); };
+        window.deleteCoupon = function(id) { if (!confirm('确定删除？')) return; coupons = coupons.filter(c => c.id !== id); localStorage.setItem('coupons', JSON.stringify(coupons)); removeFromFirebase('coupons', id); renderCouponList(); };
         function renderDiscountList() { const c = document.getElementById('discountList'); c.innerHTML = discounts.length ? discounts.map(d => '<div class="admin-list-item"><div class="admin-item-info"><h4>' + (d.type === 'fixed' ? '一口价 ¥' + d.fixedPrice : d.percent + '折') + '</h4><p style="font-size:12px">' + (d.projectIds?.length || 0) + '个项目</p></div><button class="admin-btn-small admin-btn-delete" onclick="deleteDiscount(\'' + d.id + '\')">删除</button></div>').join('') : '<p style="text-align:center;color:var(--text-light);padding:20px">暂无折扣配置</p>'; }
         window.openDiscountModal = function() { const s = document.getElementById('discountProjectSelect'); const d = JSON.parse(localStorage.getItem('adminProjects')) || defaultProjects; s.innerHTML = d.map(p => '<label style="display:flex;align-items:center;gap:8px;padding:8px"><input type="checkbox" value="' + p.id + '" style="width:auto">' + p.title + '</label>').join(''); document.getElementById('discountType').value = 'fixed'; document.getElementById('fixedPriceGroup').style.display = 'block'; document.getElementById('percentGroup').style.display = 'none'; document.getElementById('discountModal').classList.add('active'); };
         window.toggleDiscountType = function() { const t = document.getElementById('discountType').value; document.getElementById('fixedPriceGroup').style.display = t === 'fixed' ? 'block' : 'none'; document.getElementById('percentGroup').style.display = t === 'percent' ? 'block' : 'none'; };
         window.closeDiscountModal = function() { document.getElementById('discountModal').classList.remove('active'); };
-        window.saveDiscount = function() { const t = document.getElementById('discountType').value; let dd = { type: t }; if (t === 'fixed') { dd.fixedPrice = parseInt(document.getElementById('fixedPrice').value); if (!dd.fixedPrice) return showToast('请填写一口价'); } else { dd.percent = parseInt(document.getElementById('discountPercent').value); if (!dd.percent || dd.percent < 1 || dd.percent > 100) return showToast('请填写1-100的折扣比例'); } const cb = document.querySelectorAll('#discountProjectSelect input:checked'); const pids = Array.from(cb).map(c => c.value); if (pids.length === 0) return showToast('请至少选择一个项目'); dd.projectIds = pids; dd.id = Date.now().toString(); discounts.push(dd); localStorage.setItem('discounts', JSON.stringify(discounts)); closeDiscountModal(); renderDiscountList(); renderUserProjects(); showToast('折扣已保存'); };
-        window.deleteDiscount = function(id) { if (!confirm('确定删除？')) return; discounts = discounts.filter(d => d.id !== id); localStorage.setItem('discounts', JSON.stringify(discounts)); renderDiscountList(); renderUserProjects(); };
+        window.saveDiscount = function() { const t = document.getElementById('discountType').value; let dd = { type: t }; if (t === 'fixed') { dd.fixedPrice = parseInt(document.getElementById('fixedPrice').value); if (!dd.fixedPrice) return showToast('请填写一口价'); } else { dd.percent = parseInt(document.getElementById('discountPercent').value); if (!dd.percent || dd.percent < 1 || dd.percent > 100) return showToast('请填写1-100的折扣比例'); } const cb = document.querySelectorAll('#discountProjectSelect input:checked'); const pids = Array.from(cb).map(c => c.value); if (pids.length === 0) return showToast('请至少选择一个项目'); dd.projectIds = pids; dd.id = Date.now().toString(); discounts.push(dd); localStorage.setItem('discounts', JSON.stringify(discounts)); saveToFirebase('discounts', dd); closeDiscountModal(); renderDiscountList(); renderUserProjects(); showToast('折扣已保存'); };
+        window.deleteDiscount = function(id) { if (!confirm('确定删除？')) return; discounts = discounts.filter(d => d.id !== id); localStorage.setItem('discounts', JSON.stringify(discounts)); removeFromFirebase('discounts', id); renderDiscountList(); renderUserProjects(); };
         function updateUserFromBooking(b) { let u = users.find(u => u.phone === b.phone); if (!u) { u = { id: Date.now().toString(), name: b.name, phone: b.phone, balance: 0, totalSpent: 0, tags: [], createdAt: new Date().toISOString() }; users.push(u); } else { u.name = b.name; } localStorage.setItem('users', JSON.stringify(users)); renderUserStats(); }
         renderUserProjects(); renderBookingDates(); renderTimeSlots(); renderTimeline(); renderProfile(); renderCommunity();
     </script>
