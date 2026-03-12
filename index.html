@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>美丽小站 - 美容项目管理</title>
+    <style>
+        :root {
+            --primary: #e91e63;
+            --primary-light: #fce4ec;
+            --primary-dark: #c2185b;
+            --text: #333;
+            --text-light: #666;
+            --bg: #fafafa;
+            --card-bg: #fff;
+            --shadow: 0 2px 8px rgba(0,0,0,0.08);
+            --radius: 12px;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            padding-bottom: 80px;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, var(--primary) 0%, #ff6b9d 100%);
+            color: white;
+            padding: 24px 20px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .header h1 { font-size: 22px; font-weight: 600; }
+        .header p { font-size: 13px; opacity: 0.9; margin-top: 4px; }
+        
+        .tabs {
+            display: flex;
+            background: var(--card-bg);
+            padding: 0 12px;
+            position: sticky;
+            top: 68px;
+            z-index: 99;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .tab {
+            flex: 1;
+            padding: 14px 8px;
+            text-align: center;
+            font-size: 13px;
+            color: var(--text-light);
+            cursor: pointer;
+            position: relative;
+        }
+        
+        .tab.active { color: var(--primary); font-weight: 500; }
+        .tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 24px;
+            height: 3px;
+            background: var(--primary);
+            border-radius: 2px;
+        }
+        
+        .content { padding: 16px; }
+        
+        .page { display: none; }
+        .page.active { display: block; }
+        
+        .card {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 16px;
+            margin-bottom: 12px;
+            box-shadow: var(--shadow);
+        }
+        
+        .btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: var(--radius);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            width: 100%;
+        }
+        
+        .btn:active { opacity: 0.9; }
+        
+        .fab {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            width: 56px;
+            height: 56px;
+            background: var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 28px;
+            box-shadow: 0 4px 12px rgba(233,30,99,0.4);
+            cursor: pointer;
+        }
+        
+        /* 项目列表 */
+        .project-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #f5f5f5;
+        }
+        
+        .project-item:last-child { border-bottom: none; }
+        
+        .project-name { font-weight: 500; }
+        .project-price { color: var(--primary); font-weight: 600; }
+        .project-category {
+            font-size: 11px;
+            background: var(--primary-light);
+            color: var(--primary-dark);
+            padding: 2px 8px;
+            border-radius: 10px;
+            margin-left: 8px;
+        }
+        
+        /* 预约卡片 */
+        .booking-card {
+            border-left: 3px solid var(--primary);
+        }
+        
+        .booking-status {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            margin-left: 8px;
+        }
+        
+        .status-pending { background: #fff3e0; color: #f57c00; }
+        .status-confirmed { background: #e8f5e9; color: #43a047; }
+        .status-completed { background: #e3f2fd; color: #1976d2; }
+        
+        /* 拍照记录 */
+        .photo-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-top: 12px;
+        }
+        
+        .photo-item {
+            aspect-ratio: 1;
+            border-radius: 8px;
+            overflow: hidden;
+            background: #f5f5f5;
+        }
+        
+        .photo-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        /* 动态 */
+        .post-item {
+            padding: 16px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .post-item:last-child { border-bottom: none; }
+        
+        .post-time {
+            font-size: 12px;
+            color: var(--text-light);
+            margin-bottom: 8px;
+        }
+        
+        .post-content { font-size: 14px; }
+        
+        .post-images {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .post-images img {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+        
+        /* 表单 */
+        .form-group { margin-bottom: 16px; }
+        
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            color: var(--text-light);
+            margin-bottom: 6px;
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+        
+        .form-group textarea { min-height: 80px; resize: vertical; }
+        
+        /* 空状态 */
+        .empty {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-light);
+        }
+        
+        .empty-icon { font-size: 48px; margin-bottom: 12px; }
+        
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal.active { display: flex; }
+        
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            width: 90%;
+            max-width: 400px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .modal-header h3 { font-size: 18px; }
+        
+        .modal-close {
+            font-size: 24px;
+            color: #999;
+            cursor: pointer;
+        }
+        
+        .photo-upload {
+            border: 2px dashed #ddd;
+            border-radius: 12px;
+            padding: 24px;
+            text-align: center;
+            cursor: pointer;
+        }
+        
+        .photo-upload:active { border-color: var(--primary); }
+        
+        .photo-preview {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 12px;
+        }
+        
+        .photo-preview img {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>✨ 美丽小站</h1>
+        <p>美容项目管理 · 预约 · 记录</p>
+    </div>
+    
+    <div class="tabs">
+        <div class="tab active" data-tab="projects">项目</div>
+        <div class="tab" data-tab="bookings">预约</div>
+        <div class="tab" data-tab="photos">拍照</div>
+        <div class="tab" data-tab="posts">动态</div>
+    </div>
+    
+    <div class="content">
+        <!-- 项目页面 -->
+        <div class="page active" id="projects">
+            <div id="projectList"></div>
+        </div>
+        
+        <!-- 预约页面 -->
+        <div class="page" id="bookings">
+            <div id="bookingList"></div>
+        </div>
+        
+        <!-- 拍照页面 -->
+        <div class="page" id="photos">
+            <div id="photoList"></div>
+        </div>
+        
+        <!-- 动态页面 -->
+        <div class="page" id="posts">
+            <div id="postList"></div>
+        </div>
+    </div>
+    
+    <!-- 添加按钮 -->
+    <div class="fab" onclick="openModal()">+</div>
+    
+    <!-- Modal -->
+    <div class="modal" id="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">添加</h3>
+                <span class="modal-close" onclick="closeModal()">×</span>
+            </div>
+            <div id="modalBody"></div>
+        </div>
+    </div>
+    
+    <script>
+        // 数据存储
+        const store = {
+            projects: JSON.parse(localStorage.getItem('beauty_projects') || '[]'),
+            bookings: JSON.parse(localStorage.getItem('beauty_bookings') || '[]'),
+            photos: JSON.parse(localStorage.getItem('beauty_photos') || '[]'),
+            posts: JSON.parse(localStorage.getItem('beauty_posts') || '[]')
+        };
+        
+        function save() {
+            localStorage.setItem('beauty_projects', JSON.stringify(store.projects));
+            localStorage.setItem('beauty_bookings', JSON.stringify(store.bookings));
+            localStorage.setItem('beauty_photos', JSON.stringify(store.photos));
+            localStorage.setItem('beauty_posts', JSON.stringify(store.posts));
+        }
+        
+        // Tab切换
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+                tab.classList.add('active');
+                document.getElementById(tab.dataset.tab).classList.add('active');
+            });
+        });
+        
+        // 渲染项目
+        function renderProjects() {
+            const container = document.getElementById('projectList');
+            if (store.projects.length === 0) {
+                container.innerHTML = '<div class="empty"><div class="empty-icon">📋</div><p>暂无项目<br>点击+添加</p></div>';
+                return;
+            }
+            container.innerHTML = store.projects.map((p, i) => `
+                <div class="card">
+                    <div class="project-item">
+                        <div>
+                            <span class="project-name">${p.name}</span>
+                            <span class="project-category">${p.category}</span>
+                        </div>
+                        <span class="project-price">¥${p.price}</span>
+                    </div>
+                    ${p.notes ? `<p style="font-size:12px;color:#666;margin-top:8px">${p.notes}</p>` : ''}
+                </div>
+            `).join('');
+        }
+        
+        // 渲染预约
+        function renderBookings() {
+            const container = document.getElementById('bookingList');
+            if (store.bookings.length === 0) {
+                container.innerHTML = '<div class="empty"><div class="empty-icon">📅</div><p>暂无预约<br>点击+添加</p></div>';
+                return;
+            }
+            container.innerHTML = store.bookings.map(b => `
+                <div class="card booking-card">
+                    <div class="project-item">
+                        <div>
+                            <span class="project-name">${b.project}</span>
+                            <span class="booking-status status-${b.status}">${b.status === 'pending' ? '待确认' : b.status === 'confirmed' ? '已确认' : '已完成'}</span>
+                        </div>
+                    </div>
+                    <p style="font-size:13px;color:#666;margin-top:8px">📅 ${b.date} ${b.time}</p>
+                    <p style="font-size:13px;color:#666">📍 ${b.location}</p>
+                </div>
+            `).join('');
+        }
+        
+        // 渲染拍照
+        function renderPhotos() {
+            const container = document.getElementById('photoList');
+            if (store.photos.length === 0) {
+                container.innerHTML = '<div class="empty"><div class="empty-icon">📸</div><p>暂无记录<br>点击+添加</p></div>';
+                return;
+            }
+            container.innerHTML = store.photos.map(p => `
+                <div class="card">
+                    <div class="project-name">${p.project}</div>
+                    <p style="font-size:12px;color:#666;margin:8px 0">${p.description}</p>
+                    <div class="photo-grid">
+                        ${p.before ? `<div class="photo-item"><img src="${p.before}" alt="before"></div>` : ''}
+                        ${p.after ? `<div class="photo-item"><img src="${p.after}" alt="after"></div>` : ''}
+                    </div>
+                    <p style="font-size:11px;color:#999;margin-top:8px">${p.date}</p>
+                </div>
+            `).join('');
+        }
+        
+        // 渲染动态
+        function renderPosts() {
+            const container = document.getElementById('postList');
+            if (store.posts.length === 0) {
+                container.innerHTML = '<div class="empty"><div class="empty-icon">💬</div><p>暂无动态<br>点击+发布</p></div>';
+                return;
+            }
+            container.innerHTML = store.posts.map(p => `
+                <div class="card">
+                    <div class="post-time">${p.date}</div>
+                    <div class="post-content">${p.content}</div>
+                    ${p.images && p.images.length ? `
+                        <div class="post-images">
+                            ${p.images.map(img => `<img src="${img}">`).join('')}
+                        </div>
+                    ` : ''}
+                </div>
+            `).join('');
+        }
+        
+        // Modal
+        let currentModal = '';
+        
+        function openModal(type = 'project') {
+            currentModal = type;
+            const modal = document.getElementById('modal');
+            const title = document.getElementById('modalTitle');
+            const body = document.getElementById('modalBody');
+            
+            if (type === 'project') {
+                title.textContent = '添加项目';
+                body.innerHTML = `
+                    <div class="form-group">
+                        <label>项目名称</label>
+                        <input type="text" id="projectName" placeholder="如：光子嫩肤">
+                    </div>
+                    <div class="form-group">
+                        <label>类别</label>
+                        <select id="projectCategory">
+                            <option value="护肤">护肤</option>
+                            <option value="美容">美容</option>
+                            <option value="美甲">美甲</option>
+                            <option value="美发">美发</option>
+                            <option value="其他">其他</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>价格</label>
+                        <input type="number" id="projectPrice" placeholder="如：299">
+                    </div>
+                    <div class="form-group">
+                        <label>备注</label>
+                        <textarea id="projectNotes" placeholder="可选"></textarea>
+                    </div>
+                    <button class="btn" onclick="addProject()">保存</button>
+                `;
+            } else if (type === 'booking') {
+                title.textContent = '添加预约';
+                body.innerHTML = `
+                    <div class="form-group">
+                        <label>选择项目</label>
+                        <select id="bookingProject">
+                            ${store.projects.map(p => `<option value="${p.name}">${p.name}</option>`).join('')}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>日期</label>
+                        <input type="date" id="bookingDate">
+                    </div>
+                    <div class="form-group">
+                        <label>时间</label>
+                        <input type="time" id="bookingTime">
+                    </div>
+                    <div class="form-group">
+                        <label>地点</label>
+                        <input type="text" id="bookingLocation" placeholder="如：XX美容店">
+                    </div>
+                    <button class="btn" onclick="addBooking()">保存</button>
+                `;
+            } else if (type === 'photo') {
+                title.textContent = '添加记录';
+                body.innerHTML = `
+                    <div class="form-group">
+                        <label>选择项目</label>
+                        <select id="photoProject">
+                            ${store.projects.map(p => `<option value="${p.name}">${p.name}</option>`).join('')}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>描述</label>
+                        <textarea id="photoDesc" placeholder="如：第一次做光子嫩肤"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Before照片</label>
+                        <input type="file" accept="image/*" id="photoBefore" onchange="previewPhoto(this, 'before')">
+                        <div class="photo-preview" id="beforePreview"></div>
+                    </div>
+                    <div class="form-group">
+                        <label>After照片</label>
+                        <input type="file" accept="image/*" id="photoAfter" onchange="previewPhoto(this, 'after')">
+                        <div class="photo-preview" id="afterPreview"></div>
+                    </div>
+                    <button class="btn" onclick="addPhoto()">保存</button>
+                `;
+            } else if (type === 'post') {
+                title.textContent = '发布动态';
+                body.innerHTML = `
+                    <div class="form-group">
+                        <label>内容</label>
+                        <textarea id="postContent" placeholder="分享你的想法..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>图片（可选）</label>
+                        <input type="file" accept="image/*" multiple id="postImages" onchange="previewPostPhotos()">
+                        <div class="photo-preview" id="postPhotosPreview"></div>
+                    </div>
+                    <button class="btn" onclick="addPost()">发布</button>
+                `;
+            }
+            
+            modal.classList.add('active');
+        }
+        
+        function closeModal() {
+            document.getElementById('modal').classList.remove('active');
+        }
+        
+        // 照片预览
+        let beforeData = '', afterData = '', postPhotosData = [];
+        
+        function previewPhoto(input, type) {
+            const file = input.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = e => {
+                if (type === 'before') {
+                    beforeData = e.target.result;
+                    document.getElementById('beforePreview').innerHTML = `<img src="${e.target.result}">`;
+                } else {
+                    afterData = e.target.result;
+                    document.getElementById('afterPreview').innerHTML = `<img src="${e.target.result}">`;
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+        
+        function previewPostPhotos() {
+            const input = document.getElementById('postImages');
+            const preview = document.getElementById('postPhotosPreview');
+            postPhotosData = [];
+            preview.innerHTML = '';
+            
+            Array.from(input.files).forEach(file => {
+                const reader = new FileReader();
+                reader.onload = e => {
+                    postPhotosData.push(e.target.result);
+                    preview.innerHTML += `<img src="${e.target.result}">`;
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+        
+        // 添加项目
+        function addProject() {
+            const name = document.getElementById('projectName').value;
+            const category = document.getElementById('projectCategory').value;
+            const price = document.getElementById('projectPrice').value;
+            const notes = document.getElementById('projectNotes').value;
+            
+            if (!name || !price) return alert('请填写名称和价格');
+            
+            store.projects.push({ name, category, price, notes });
+            save();
+            renderProjects();
+            closeModal();
+        }
+        
+        // 添加预约
+        function addBooking() {
+            const project = document.getElementById('bookingProject').value;
+            const date = document.getElementById('bookingDate').value;
+            const time = document.getElementById('bookingTime').value;
+            const location = document.getElementById('bookingLocation').value;
+            
+            if (!project || !date || !time || !location) return alert('请填写完整信息');
+            
+            store.bookings.push({ project, date, time, location, status: 'pending' });
+            save();
+            renderBookings();
+            closeModal();
+        }
+        
+        // 添加拍照记录
+        function addPhoto() {
+            const project = document.getElementById('photoProject').value;
+            const description = document.getElementById('photoDesc').value;
+            
+            if (!project) return alert('请选择项目');
+            
+            store.photos.push({
+                project,
+                description,
+                before: beforeData,
+                after: afterData,
+                date: new Date().toLocaleDateString('zh-CN')
+            });
+            beforeData = '';
+            afterData = '';
+            save();
+            renderPhotos();
+            closeModal();
+        }
+        
+        // 发布动态
+        function addPost() {
+            const content = document.getElementById('postContent').value;
+            
+            if (!content) return alert('请输入内容');
+            
+            store.posts.unshift({
+                content,
+                images: postPhotosData,
+                date: new Date().toLocaleString('zh-CN')
+            });
+            postPhotosData = [];
+            save();
+            renderPosts();
+            closeModal();
+        }
+        
+        // 初始化
+        renderProjects();
+        renderBookings();
+        renderPhotos();
+        renderPosts();
+    </script>
+</body>
+</html>
