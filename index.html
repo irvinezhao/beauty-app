@@ -137,6 +137,15 @@
             margin-bottom: 12px;
         }
         
+        .btn-google {
+            background: #4285F4;
+            margin-bottom: 12px;
+        }
+        
+        .btn-anonymous {
+            background: #666;
+        }
+        
         .fab {
             position: fixed;
             bottom: 24px;
@@ -155,7 +164,6 @@
             z-index: 90;
         }
         
-        /* 项目列表 */
         .project-item {
             display: flex;
             justify-content: space-between;
@@ -177,10 +185,7 @@
             margin-left: 8px;
         }
         
-        /* 预约卡片 */
-        .booking-card {
-            border-left: 3px solid var(--primary);
-        }
+        .booking-card { border-left: 3px solid var(--primary); }
         
         .booking-status {
             display: inline-block;
@@ -194,7 +199,6 @@
         .status-confirmed { background: #e8f5e9; color: #43a047; }
         .status-completed { background: #e3f2fd; color: #1976d2; }
         
-        /* 拍照记录 */
         .photo-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -209,26 +213,11 @@
             background: #f5f5f5;
         }
         
-        .photo-item img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
+        .photo-item img { width: 100%; height: 100%; object-fit: cover; }
         
-        /* 动态 */
-        .post-item {
-            padding: 16px 0;
-            border-bottom: 1px solid #f0f0f0;
-        }
-        
+        .post-item { padding: 16px 0; border-bottom: 1px solid #f0f0f0; }
         .post-item:last-child { border-bottom: none; }
-        
-        .post-time {
-            font-size: 12px;
-            color: var(--text-light);
-            margin-bottom: 8px;
-        }
-        
+        .post-time { font-size: 12px; color: var(--text-light); margin-bottom: 8px; }
         .post-content { font-size: 14px; }
         
         .post-images {
@@ -238,14 +227,8 @@
             flex-wrap: wrap;
         }
         
-        .post-images img {
-            width: 80px;
-            height: 80px;
-            object-fit: cover;
-            border-radius: 8px;
-        }
+        .post-images img { width: 80px; height: 80px; object-fit: cover; border-radius: 8px; }
         
-        /* 表单 */
         .form-group { margin-bottom: 16px; }
         
         .form-group label {
@@ -267,16 +250,9 @@
         
         .form-group textarea { min-height: 80px; resize: vertical; }
         
-        /* 空状态 */
-        .empty {
-            text-align: center;
-            padding: 40px 20px;
-            color: var(--text-light);
-        }
-        
+        .empty { text-align: center; padding: 40px 20px; color: var(--text-light); }
         .empty-icon { font-size: 48px; margin-bottom: 12px; }
         
-        /* Modal */
         .modal {
             display: none;
             position: fixed;
@@ -310,36 +286,10 @@
         }
         
         .modal-header h3 { font-size: 18px; }
+        .modal-close { font-size: 24px; color: #999; cursor: pointer; }
         
-        .modal-close {
-            font-size: 24px;
-            color: #999;
-            cursor: pointer;
-        }
-        
-        .photo-upload {
-            border: 2px dashed #ddd;
-            border-radius: 12px;
-            padding: 24px;
-            text-align: center;
-            cursor: pointer;
-        }
-        
-        .photo-upload:active { border-color: var(--primary); }
-        
-        .photo-preview {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            margin-top: 12px;
-        }
-        
-        .photo-preview img {
-            width: 60px;
-            height: 60px;
-            object-fit: cover;
-            border-radius: 8px;
-        }
+        .photo-preview { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+        .photo-preview img { width: 60px; height: 60px; object-fit: cover; border-radius: 8px; }
         
         .sync-status {
             position: fixed;
@@ -368,7 +318,6 @@
             margin-left: 8px;
         }
         
-        /* 登录页 */
         .login-page {
             display: none;
             position: fixed;
@@ -395,18 +344,12 @@
             text-align: center;
         }
         
-        .login-card h2 {
-            color: var(--primary);
-            margin-bottom: 8px;
-        }
-        
-        .login-card p {
-            color: var(--text-light);
-            font-size: 14px;
-            margin-bottom: 24px;
-        }
+        .login-card h2 { color: var(--primary); margin-bottom: 8px; }
+        .login-card p { color: var(--text-light); font-size: 14px; margin-bottom: 24px; }
         
         .app-hidden { display: none !important; }
+        
+        .input-hint { font-size: 11px; color: #999; margin-top: 4px; }
     </style>
 </head>
 <body>
@@ -415,9 +358,9 @@
         <div class="login-card">
             <h2>✨ 美丽小站</h2>
             <p>登录后同步你的美容数据</p>
-            <button class="btn btn-wechat" id="wechatLoginBtn">
-                💚 微信登录
-            </button>
+            <button class="btn btn-wechat" id="wechatLoginBtn">💚 微信登录</button>
+            <button class="btn btn-google" id="googleLoginBtn">🔵 Google登录</button>
+            <button class="btn btn-anonymous" id="anonymousLoginBtn">⚪ 游客登录</button>
             <p style="font-size:12px;margin-top:16px;color:#999">登录即表示同意用户协议</p>
         </div>
     </div>
@@ -444,28 +387,20 @@
         </div>
         
         <div class="content">
-            <!-- 项目页面 -->
             <div class="page active" id="projects">
                 <div id="projectList"></div>
             </div>
-            
-            <!-- 预约页面 -->
             <div class="page" id="bookings">
                 <div id="bookingList"></div>
             </div>
-            
-            <!-- 拍照页面 -->
             <div class="page" id="photos">
                 <div id="photoList"></div>
             </div>
-            
-            <!-- 动态页面 -->
             <div class="page" id="posts">
                 <div id="postList"></div>
             </div>
         </div>
         
-        <!-- 添加按钮 -->
         <div class="fab" onclick="openModal()">+</div>
     </div>
     
@@ -483,10 +418,9 @@
     <!-- Firebase SDK -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getAuth, signInWithPopup, signOut, onAuthStateChanged, OAuthProvider } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getAuth, signInWithPopup, signOut, onAuthStateChanged, GoogleAuthProvider, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
         import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc, query, orderBy, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
         
-        // Firebase配置
         const firebaseConfig = {
             apiKey: "AIzaSyBOPa-J7SpDyOSdWiy7gsA5re01Xd-FuvI",
             authDomain: "beauty-app-6527c.firebaseapp.com",
@@ -496,101 +430,59 @@
             appId: "1:396685995260:web:0bb1a0676b339378a5bb79"
         };
         
-        // 初始化Firebase
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
         
-        // 微信登录Provider
-        const wechatProvider = new OAuthProvider('microsoft.com');
-        wechatProvider.setCustomParameters({
-            prompt: 'select_account'
-        });
-        // 注意：微信登录需要先在Firebase控制台添加Microsoft提供商（微信需要通过Microsoft OAuth配置）
+        const googleProvider = new GoogleAuthProvider();
         
-        // 全局数据存储
-        window.store = {
-            projects: [],
-            bookings: [],
-            photos: [],
-            posts: []
-        };
-        
+        window.store = { projects: [], bookings: [], photos: [], posts: [] };
         window.currentUser = null;
         
-        // 同步状态显示
         window.showSync = (show) => {
             document.getElementById('syncStatus').classList.toggle('show', show);
         };
         
-        // 更新用户信息UI
         window.updateUserUI = (user) => {
             const userInfo = document.getElementById('userInfo');
             if (user) {
-                const displayName = user.displayName || '用户';
-                const avatar = user.photoURL || '👤';
+                const displayName = user.isAnonymous ? '游客' : (user.displayName || '用户');
+                const avatar = user.photoURL || (user.isAnonymous ? '👤' : '😊');
+                const provider = user.isAnonymous ? '' : ` (${user.providerData[0]?.provider || '已登录'})`;
                 userInfo.innerHTML = `
-                    <span>${displayName}</span>
+                    <span>${displayName}${provider}</span>
                     <div class="user-avatar">${avatar}</div>
                     <button class="logout-btn" id="logoutBtn">退出</button>
                 `;
-                document.getElementById('logoutBtn').addEventListener('click', () => {
-                    signOut(auth);
-                });
+                document.getElementById('logoutBtn').addEventListener('click', () => signOut(auth));
             } else {
                 userInfo.innerHTML = '';
             }
         };
         
-        // 监听数据（按用户分离）
         let unsubscribes = [];
         
         window.subscribeToUserData = (userId) => {
-            // 取消之前的订阅
             unsubscribes.forEach(unsub => unsub());
             unsubscribes = [];
+            window.store = { projects: [], bookings: [], photos: [], posts: [] };
             
-            window.store = {
-                projects: [],
-                bookings: [],
-                photos: [],
-                posts: []
-            };
-            
-            const collections = ['projects', 'bookings', 'photos', 'posts'];
-            
-            collections.forEach(col => {
-                const q = query(
-                    collection(db, col), 
-                    where('userId', '==', userId),
-                    orderBy('createdAt', 'desc')
-                );
+            ['projects', 'bookings', 'photos', 'posts'].forEach(col => {
+                const q = query(collection(db, col), where('userId', '==', userId), orderBy('createdAt', 'desc'));
                 const unsub = onSnapshot(q, (snapshot) => {
                     window.store[col] = [];
-                    snapshot.forEach(doc => {
-                        window.store[col].push({ id: doc.id, ...doc.data() });
-                    });
+                    snapshot.forEach(doc => window.store[col].push({ id: doc.id, ...doc.data() }));
                     window.renderAll && window.renderAll();
                     window.showSync(false);
-                }, (error) => {
-                    console.error('Error fetching', col, error);
-                    window.showSync(false);
-                });
+                }, (error) => { console.error('Error fetching', col, error); window.showSync(false); });
                 unsubscribes.push(unsub);
             });
         };
         
-        // 登录
-        window.loginWithWechat = async () => {
+        window.loginWithGoogle = async () => {
             try {
                 window.showSync(true);
-                // 使用Microsoft提供商（需要先在Firebase配置）
-                // 实际微信登录需要：
-                // 1. 在Firebase Console添加Authentication提供商
-                // 2. 使用微信开放平台AppID配置
-                // 这里暂时用匿名登录演示
-                const result = await signInWithPopup(auth, wechatProvider);
-                console.log('登录成功:', result.user);
+                await signInWithPopup(auth, googleProvider);
             } catch (error) {
                 console.error('登录失败:', error);
                 alert('登录失败: ' + error.message);
@@ -598,12 +490,19 @@
             }
         };
         
-        // 保存到Firestore（带用户ID）
-        window.saveToFirestore = async (collectionName, data) => {
-            if (!window.currentUser) {
-                alert('请先登录');
-                return;
+        window.loginAnonymously = async () => {
+            try {
+                window.showSync(true);
+                await signInAnonymously(auth);
+            } catch (error) {
+                console.error('登录失败:', error);
+                alert('登录失败: ' + error.message);
+                window.showSync(false);
             }
+        };
+        
+        window.saveToFirestore = async (collectionName, data) => {
+            if (!window.currentUser) { alert('请先登录'); return; }
             window.showSync(true);
             try {
                 await addDoc(collection(db, collectionName), {
@@ -617,19 +516,13 @@
             }
         };
         
-        // 删除从Firestore
         window.deleteFromFirestore = async (collectionName, docId) => {
             if (!confirm('确定删除?')) return;
             window.showSync(true);
-            try {
-                await deleteDoc(doc(db, collectionName, docId));
-            } catch (e) {
-                console.error('Error deleting document: ', e);
-                alert('删除失败: ' + e.message);
-            }
+            try { await deleteDoc(doc(db, collectionName, docId)); }
+            catch (e) { console.error('Error deleting document: ', e); alert('删除失败: ' + e.message); }
         };
         
-        // 监听登录状态
         onAuthStateChanged(auth, (user) => {
             window.currentUser = user;
             if (user) {
@@ -645,16 +538,59 @@
             window.showSync(false);
         });
         
-        // 绑定微信登录按钮
-        document.getElementById('wechatLoginBtn').addEventListener('click', () => {
-            window.loginWithWechat();
-        });
+        document.getElementById('googleLoginBtn').addEventListener('click', window.loginWithGoogle);
+        document.getElementById('anonymousLoginBtn').addEventListener('click', window.loginAnonymously);
+        document.getElementById('wechatLoginBtn').addEventListener('click', () => alert('微信登录需要配置微信开放平台，请先使用Google或游客登录'));
         
         window.showSync(true);
     </script>
     
     <script>
-        // Tab切换
+        // ========== 安全工具函数 ==========
+        const Security = {
+            // HTML转义 - 防止XSS
+            escapeHtml(text) {
+                if (!text) return '';
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            },
+            
+            // 验证输入长度
+            validateLength(value, min, max) {
+                return value.length >= min && value.length <= max;
+            },
+            
+            // 验证价格（正整数）
+            validatePrice(value) {
+                const num = parseInt(value);
+                return !isNaN(num) && num > 0 && num <= 999999;
+            },
+            
+            // 验证日期格式
+            validateDate(value) {
+                return /^\d{4}-\d{2}-\d{2}$/.test(value);
+            },
+            
+            // 验证时间格式
+            validateTime(value) {
+                return /^(\d{2}):(\d{2})$/.test(value);
+            },
+            
+            // 清理输入（去除控制字符）
+            sanitizeInput(value) {
+                if (!value) return '';
+                return value.replace(/[\x00-\x1F\x7F]/g, '').trim();
+            },
+            
+            // 验证URL（可选）
+            validateUrl(value) {
+                if (!value) return true;
+                try { new URL(value); return true; } catch { return false; }
+            }
+        };
+        
+        // ========== Tab切换 ==========
         document.querySelectorAll('.tab').forEach(tab => {
             tab.addEventListener('click', () => {
                 document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
@@ -664,36 +600,35 @@
             });
         });
         
-        // 渲染项目
+        // ========== 渲染函数 ==========
         function renderProjects() {
             const container = document.getElementById('projectList');
             const projects = window.store.projects || [];
-            if (projects.length === 0) {
+            if (!projects.length) {
                 container.innerHTML = '<div class="empty"><div class="empty-icon">📋</div><p>暂无项目<br>点击+添加</p></div>';
                 return;
             }
-            container.innerHTML = projects.map((p, i) => `
+            container.innerHTML = projects.map(p => `
                 <div class="card">
                     <div class="project-item">
                         <div>
-                            <span class="project-name">${p.name}</span>
-                            <span class="project-category">${p.category}</span>
+                            <span class="project-name">${Security.escapeHtml(p.name)}</span>
+                            <span class="project-category">${Security.escapeHtml(p.category)}</span>
                         </div>
                         <div>
-                            <span class="project-price">¥${p.price}</span>
+                            <span class="project-price">¥${Security.escapeHtml(p.price)}</span>
                             <button class="delete-btn" onclick="deleteFromFirestore('projects', '${p.id}')">删除</button>
                         </div>
                     </div>
-                    ${p.notes ? `<p style="font-size:12px;color:#666;margin-top:8px">${p.notes}</p>` : ''}
+                    ${p.notes ? `<p style="font-size:12px;color:#666;margin-top:8px">${Security.escapeHtml(p.notes)}</p>` : ''}
                 </div>
             `).join('');
         }
         
-        // 渲染预约
         function renderBookings() {
             const container = document.getElementById('bookingList');
             const bookings = window.store.bookings || [];
-            if (bookings.length === 0) {
+            if (!bookings.length) {
                 container.innerHTML = '<div class="empty"><div class="empty-icon">📅</div><p>暂无预约<br>点击+添加</p></div>';
                 return;
             }
@@ -701,66 +636,59 @@
                 <div class="card booking-card">
                     <div class="project-item">
                         <div>
-                            <span class="project-name">${b.project}</span>
-                            <span class="booking-status status-${b.status}">${b.status === 'pending' ? '待确认' : b.status === 'confirmed' ? '已确认' : '已完成'}</span>
+                            <span class="project-name">${Security.escapeHtml(b.project)}</span>
+                            <span class="booking-status status-${Security.escapeHtml(b.status)}">${b.status === 'pending' ? '待确认' : b.status === 'confirmed' ? '已确认' : '已完成'}</span>
                         </div>
                         <button class="delete-btn" onclick="deleteFromFirestore('bookings', '${b.id}')">删除</button>
                     </div>
-                    <p style="font-size:13px;color:#666;margin-top:8px">📅 ${b.date} ${b.time}</p>
-                    <p style="font-size:13px;color:#666">📍 ${b.location}</p>
+                    <p style="font-size:13px;color:#666;margin-top:8px">📅 ${Security.escapeHtml(b.date)} ${Security.escapeHtml(b.time)}</p>
+                    <p style="font-size:13px;color:#666">📍 ${Security.escapeHtml(b.location)}</p>
                 </div>
             `).join('');
         }
         
-        // 渲染拍照
         function renderPhotos() {
             const container = document.getElementById('photoList');
             const photos = window.store.photos || [];
-            if (photos.length === 0) {
+            if (!photos.length) {
                 container.innerHTML = '<div class="empty"><div class="empty-icon">📸</div><p>暂无记录<br>点击+添加</p></div>';
                 return;
             }
             container.innerHTML = photos.map(p => `
                 <div class="card">
                     <div class="project-item">
-                        <span class="project-name">${p.project}</span>
+                        <span class="project-name">${Security.escapeHtml(p.project)}</span>
                         <button class="delete-btn" onclick="deleteFromFirestore('photos', '${p.id}')">删除</button>
                     </div>
-                    ${p.description ? `<p style="font-size:12px;color:#666;margin:8px 0">${p.description}</p>` : ''}
+                    ${p.description ? `<p style="font-size:12px;color:#666;margin:8px 0">${Security.escapeHtml(p.description)}</p>` : ''}
                     <div class="photo-grid">
                         ${p.before ? `<div class="photo-item"><img src="${p.before}" alt="before"></div>` : ''}
                         ${p.after ? `<div class="photo-item"><img src="${p.after}" alt="after"></div>` : ''}
                     </div>
-                    <p style="font-size:11px;color:#999;margin-top:8px">${p.date}</p>
+                    <p style="font-size:11px;color:#999;margin-top:8px">${Security.escapeHtml(p.date)}</p>
                 </div>
             `).join('');
         }
         
-        // 渲染动态
         function renderPosts() {
             const container = document.getElementById('postList');
             const posts = window.store.posts || [];
-            if (posts.length === 0) {
+            if (!posts.length) {
                 container.innerHTML = '<div class="empty"><div class="empty-icon">💬</div><p>暂无动态<br>点击+发布</p></div>';
                 return;
             }
             container.innerHTML = posts.map(p => `
                 <div class="card">
                     <div class="project-item">
-                        <span class="post-time">${p.date}</span>
+                        <span class="post-time">${Security.escapeHtml(p.date)}</span>
                         <button class="delete-btn" onclick="deleteFromFirestore('posts', '${p.id}')">删除</button>
                     </div>
-                    <div class="post-content">${p.content}</div>
-                    ${p.images && p.images.length ? `
-                        <div class="post-images">
-                            ${p.images.map(img => `<img src="${img}">`).join('')}
-                        </div>
-                    ` : ''}
+                    <div class="post-content">${Security.escapeHtml(p.content)}</div>
+                    ${p.images && p.images.length ? `<div class="post-images">${p.images.map(img => `<img src="${img}">`).join('')}</div>` : ''}
                 </div>
             `).join('');
         }
         
-        // 渲染所有
         window.renderAll = function() {
             renderProjects();
             renderBookings();
@@ -768,23 +696,22 @@
             renderPosts();
         };
         
-        // Modal
+        // ========== Modal ==========
         let currentModal = '';
         
         function openModal(type = 'project') {
             currentModal = type;
-            const modal = document.getElementById('modal');
             const title = document.getElementById('modalTitle');
             const body = document.getElementById('modalBody');
-            
             const projects = window.store.projects || [];
             
             if (type === 'project') {
                 title.textContent = '添加项目';
                 body.innerHTML = `
                     <div class="form-group">
-                        <label>项目名称</label>
-                        <input type="text" id="projectName" placeholder="如：光子嫩肤">
+                        <label>项目名称 *</label>
+                        <input type="text" id="projectName" placeholder="如：光子嫩肤" maxlength="50">
+                        <p class="input-hint">必填，最多50字符</p>
                     </div>
                     <div class="form-group">
                         <label>类别</label>
@@ -797,12 +724,14 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>价格</label>
-                        <input type="number" id="projectPrice" placeholder="如：299">
+                        <label>价格 *</label>
+                        <input type="number" id="projectPrice" placeholder="如：299" min="1" max="999999">
+                        <p class="input-hint">必填，1-999999</p>
                     </div>
                     <div class="form-group">
                         <label>备注</label>
-                        <textarea id="projectNotes" placeholder="可选"></textarea>
+                        <textarea id="projectNotes" placeholder="可选" maxlength="200"></textarea>
+                        <p class="input-hint">最多200字符</p>
                     </div>
                     <button class="btn" onclick="addProject()">保存</button>
                 `;
@@ -810,22 +739,23 @@
                 title.textContent = '添加预约';
                 body.innerHTML = `
                     <div class="form-group">
-                        <label>选择项目</label>
+                        <label>选择项目 *</label>
                         <select id="bookingProject">
-                            ${projects.length ? projects.map(p => `<option value="${p.name}">${p.name}</option>`).join('') : '<option value="">请先添加项目</option>'}
+                            ${projects.length ? projects.map(p => `<option value="${Security.escapeHtml(p.name)}">${Security.escapeHtml(p.name)}</option>`).join('') : '<option value="">请先添加项目</option>'}
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>日期</label>
+                        <label>日期 *</label>
                         <input type="date" id="bookingDate">
                     </div>
                     <div class="form-group">
-                        <label>时间</label>
+                        <label>时间 *</label>
                         <input type="time" id="bookingTime">
                     </div>
                     <div class="form-group">
-                        <label>地点</label>
-                        <input type="text" id="bookingLocation" placeholder="如：XX美容店">
+                        <label>地点 *</label>
+                        <input type="text" id="bookingLocation" placeholder="如：XX美容店" maxlength="100">
+                        <p class="input-hint">必填，最多100字符</p>
                     </div>
                     <button class="btn" onclick="addBooking()">保存</button>
                 `;
@@ -833,14 +763,15 @@
                 title.textContent = '添加记录';
                 body.innerHTML = `
                     <div class="form-group">
-                        <label>选择项目</label>
+                        <label>选择项目 *</label>
                         <select id="photoProject">
-                            ${projects.length ? projects.map(p => `<option value="${p.name}">${p.name}</option>`).join('') : '<option value="">请先添加项目</option>'}
+                            ${projects.length ? projects.map(p => `<option value="${Security.escapeHtml(p.name)}">${Security.escapeHtml(p.name)}</option>`).join('') : '<option value="">请先添加项目</option>'}
                         </select>
                     </div>
                     <div class="form-group">
                         <label>描述</label>
-                        <textarea id="photoDesc" placeholder="如：第一次做光子嫩肤"></textarea>
+                        <textarea id="photoDesc" placeholder="如：第一次做光子嫩肤" maxlength="200"></textarea>
+                        <p class="input-hint">最多200字符</p>
                     </div>
                     <div class="form-group">
                         <label>Before照片</label>
@@ -858,8 +789,9 @@
                 title.textContent = '发布动态';
                 body.innerHTML = `
                     <div class="form-group">
-                        <label>内容</label>
-                        <textarea id="postContent" placeholder="分享你的想法..."></textarea>
+                        <label>内容 *</label>
+                        <textarea id="postContent" placeholder="分享你的想法..." maxlength="1000"></textarea>
+                        <p class="input-hint">必填，最多1000字符</p>
                     </div>
                     <div class="form-group">
                         <label>图片（可选）</label>
@@ -870,19 +802,25 @@
                 `;
             }
             
-            modal.classList.add('active');
+            document.getElementById('modal').classList.add('active');
         }
         
         function closeModal() {
             document.getElementById('modal').classList.remove('active');
         }
         
-        // 照片预览
+        // ========== 照片处理 ==========
         let beforeData = '', afterData = '', postPhotosData = [];
         
         function previewPhoto(input, type) {
             const file = input.files[0];
             if (!file) return;
+            // 验证文件大小（最大5MB）
+            if (file.size > 5 * 1024 * 1024) {
+                alert('图片大小不能超过5MB');
+                input.value = '';
+                return;
+            }
             const reader = new FileReader();
             reader.onload = e => {
                 if (type === 'before') {
@@ -903,6 +841,10 @@
             preview.innerHTML = '';
             
             Array.from(input.files).forEach(file => {
+                if (file.size > 5 * 1024 * 1024) {
+                    alert('图片大小不能超过5MB');
+                    return;
+                }
                 const reader = new FileReader();
                 reader.onload = e => {
                     postPhotosData.push(e.target.result);
@@ -912,36 +854,36 @@
             });
         }
         
-        // 添加项目
+        // ========== 添加数据（带安全验证） ==========
         function addProject() {
-            const name = document.getElementById('projectName').value;
+            const name = Security.sanitizeInput(document.getElementById('projectName').value);
             const category = document.getElementById('projectCategory').value;
             const price = document.getElementById('projectPrice').value;
-            const notes = document.getElementById('projectNotes').value;
+            const notes = Security.sanitizeInput(document.getElementById('projectNotes').value);
             
-            if (!name || !price) return alert('请填写名称和价格');
+            if (!name || !Security.validateLength(name, 1, 50)) return alert('请填写项目名称（1-50字符）');
+            if (!Security.validatePrice(price)) return alert('请填写有效价格（1-999999）');
             
             window.saveToFirestore('projects', { name, category, price, notes });
             closeModal();
         }
         
-        // 添加预约
         function addBooking() {
             const project = document.getElementById('bookingProject').value;
             const date = document.getElementById('bookingDate').value;
             const time = document.getElementById('bookingTime').value;
-            const location = document.getElementById('bookingLocation').value;
+            const location = Security.sanitizeInput(document.getElementById('bookingLocation').value);
             
             if (!project || !date || !time || !location) return alert('请填写完整信息');
+            if (!Security.validateLength(location, 1, 100)) return alert('地点最多100字符');
             
             window.saveToFirestore('bookings', { project, date, time, location, status: 'pending' });
             closeModal();
         }
         
-        // 添加拍照记录
         function addPhoto() {
             const project = document.getElementById('photoProject').value;
-            const description = document.getElementById('photoDesc').value;
+            const description = Security.sanitizeInput(document.getElementById('photoDesc').value);
             
             if (!project) return alert('请选择项目');
             
@@ -957,11 +899,10 @@
             closeModal();
         }
         
-        // 发布动态
         function addPost() {
-            const content = document.getElementById('postContent').value;
+            const content = Security.sanitizeInput(document.getElementById('postContent').value);
             
-            if (!content) return alert('请输入内容');
+            if (!content || !Security.validateLength(content, 1, 1000)) return alert('请填写内容（1-1000字符）');
             
             window.saveToFirestore('posts', {
                 content,
