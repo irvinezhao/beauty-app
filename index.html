@@ -116,9 +116,9 @@
     <div class="tabs" id="userTabs">
         <div class="tab active" data-tab="projects">项目</div>
         <div class="tab" data-tab="booking">预约</div>
+        <div class="tab" data-tab="community">社区</div>
         <div class="tab" data-tab="timeline">记录</div>
         <div class="tab" data-tab="profile">我的</div>
-        <div class="tab" data-tab="community">社区</div>
     </div>
     
     <div class="content" id="userContent">
@@ -137,10 +137,39 @@
         
         <!-- 社区页面 -->
         <div class="page" id="community">
-            <div style="padding:12px;background:var(--card-bg);border-radius:12px;margin-bottom:12px">
-                <button class="btn" onclick="openPostModal()" style="padding:10px">+ 发布新帖</button>
+            <div id="communityView"></div>
+        </div>
+        
+        <!-- 社区发帖页 -->
+        <div class="detail-page" id="postPage">
+            <div class="detail-header">
+                <button onclick="goCommunity()">←</button>
+                <span>发布新帖</span>
             </div>
-            <div id="communityPosts"></div>
+            <div class="detail-content">
+                <div class="form-group">
+                    <label>标题</label>
+                    <input type="text" id="postTitle2" placeholder="请输入标题" style="width:100%;padding:12px;border:1px solid #eee;border-radius:10px">
+                </div>
+                <div class="form-group">
+                    <label>内容</label>
+                    <textarea id="postContent2" placeholder="分享你的美容心得..." rows="6" style="width:100%;padding:12px;border:1px solid #eee;border-radius:10px"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>图片（可选）</label>
+                    <input type="file" id="postImages2" accept="image/*" multiple>
+                </div>
+                <button class="btn" onclick="submitPost2()">发布</button>
+            </div>
+        </div>
+        
+        <!-- 社区帖子详情页 -->
+        <div class="detail-page" id="postDetailPage">
+            <div class="detail-header">
+                <button onclick="goCommunity()">←</button>
+                <span>帖子详情</span>
+            </div>
+            <div class="detail-content" id="postDetailContent"></div>
         </div>
     </div>
     
@@ -816,14 +845,23 @@
         let currentPostId = null;
         
         window.renderCommunity = function() {
-            const container = document.getElementById('communityPosts');
+            const container = document.getElementById('communityView');
+            
+            container.innerHTML = `
+                <div style="padding:12px;background:var(--card-bg);border-radius:12px;margin-bottom:12px">
+                    <button class="btn" onclick="goToPost()" style="padding:10px">+ 发布新帖</button>
+                </div>
+                <div id="communityPosts"></div>
+            `;
+            
+            const postsContainer = document.getElementById('communityPosts');
             
             if (posts.length === 0) {
-                container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">💬</div><p>暂无帖子<br>快来发布第一个吧</p></div>';
+                postsContainer.innerHTML = '<div class="empty-state"><div class="empty-state-icon">💬</div><p>暂无帖子<br>快来发布第一个吧</p></div>';
                 return;
             }
             
-            container.innerHTML = posts.map(post => {
+            postsContainer.innerHTML = posts.map(post => {
                 const author = users.find(u => u.id === post.authorId) || { name: '未知用户' };
                 return `
                     <div class="admin-section" style="cursor:pointer" onclick="viewPost('${post.id}')">
@@ -841,29 +879,29 @@
             }).join('');
         };
         
-        window.openPostModal = function() {
+        window.goToPost = function() {
             if (!window.currentUser) {
                 alert('请先登录');
                 return openUserLogin();
             }
-            document.getElementById('postTitle').value = '';
-            document.getElementById('postContent').value = '';
-            document.getElementById('postImages').value = '';
-            document.getElementById('postModal').classList.add('active');
+            document.getElementById('postTitle2').value = '';
+            document.getElementById('postContent2').value = '';
+            document.getElementById('postImages2').value = '';
+            document.getElementById('postPage').classList.add('active');
         };
         
-        window.closePostModal = function() {
-            document.getElementById('postModal').classList.remove('active');
+        window.goCommunity = function() {
+            document.getElementById('postPage').classList.remove('active');
+            document.getElementById('postDetailPage').classList.remove('active');
         };
         
-        window.submitPost = async function() {
-            const title = document.getElementById('postTitle').value.trim();
-            const content = document.getElementById('postContent').value.trim();
-            const imageFiles = document.getElementById('postImages').files;
+        window.submitPost2 = async function() {
+            const title = document.getElementById('postTitle2').value.trim();
+            const content = document.getElementById('postContent2').value.trim();
+            const imageFiles = document.getElementById('postImages2').files;
             
             if (!title || !content) return alert('请填写标题和内容');
             
-            // 处理图片
             let images = [];
             for (const file of imageFiles) {
                 if (file.size > 2 * 1024 * 1024) continue;
@@ -884,7 +922,7 @@
             posts.unshift(post);
             localStorage.setItem('communityPosts', JSON.stringify(posts));
             
-            closePostModal();
+            goCommunity();
             renderCommunity();
         };
         
@@ -911,32 +949,33 @@
                 commentsHtml = '<p style="text-align:center;color:var(--text-light);padding:20px">暂无评论，快来抢沙发~</p>';
             }
             
-            document.getElementById('commentsList').innerHTML = `
+            document.getElementById('postDetailContent').innerHTML = `
                 <div style="margin-bottom:16px;padding:16px;background:var(--bg);border-radius:12px">
-                    <div style="font-weight:700;font-size:18px;margin-bottom:8px">${post.title}</div>
-                    <div style="font-size:14px;line-height:1.6;margin-bottom:12px">${post.content}</div>
+                    <div style="font-weight:700;font-size:20px;margin-bottom:8px">${post.title}</div>
+                    <div style="font-size:14px;line-height:1.8;margin-bottom:12px">${post.content}</div>
                     ${post.images && post.images.length ? `<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:12px">${post.images.map(img => `<img src="${img}" style="width:100%;border-radius:8px">`).join('')}</div>` : ''}
                     <div style="font-size:12px;color:var(--text-light)">👤 ${author.name} · ${new Date(post.createdAt).toLocaleString()}</div>
                 </div>
-                <h4 style="margin-bottom:12px">评论 (${post.comments?.length || 0})</h4>
+                
+                <h4 style="margin-bottom:12px">💬 评论 (${post.comments?.length || 0})</h4>
                 ${commentsHtml}
+                
+                <div style="margin-top:16px;padding-top:16px;border-top:1px solid #eee">
+                    <textarea id="commentText2" placeholder="写下你的评论..." rows="2" style="width:100%;padding:12px;border:1px solid #eee;border-radius:10px;margin-bottom:12px"></textarea>
+                    <button class="btn" onclick="submitComment2()">发表</button>
+                </div>
             `;
             
-            document.getElementById('commentModal').classList.add('active');
+            document.getElementById('postDetailPage').classList.add('active');
         };
         
-        window.closeCommentModal = function() {
-            document.getElementById('commentModal').classList.remove('active');
-            currentPostId = null;
-        };
-        
-        window.submitComment = function() {
+        window.submitComment2 = function() {
             if (!window.currentUser) {
                 alert('请先登录');
                 return openUserLogin();
             }
             
-            const content = document.getElementById('commentText').value.trim();
+            const content = document.getElementById('commentText2').value.trim();
             if (!content) return alert('请填写评论内容');
             
             const post = posts.find(p => p.id === currentPostId);
@@ -953,7 +992,6 @@
             
             localStorage.setItem('communityPosts', JSON.stringify(posts));
             
-            document.getElementById('commentText').value = '';
             viewPost(currentPostId); // 刷新评论
             renderCommunity(); // 更新列表显示
         };
