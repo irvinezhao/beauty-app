@@ -227,6 +227,36 @@
         </div>
     </div>
     
+    <!-- 打折弹窗 -->
+    <div class="detail-page" id="discountModal">
+        <div class="detail-header">
+            <button onclick="closeDiscountModal()">←</button>
+            <span>打折配置</span>
+        </div>
+        <div class="detail-content">
+            <div class="form-group">
+                <label>折扣类型</label>
+                <select id="discountType" onchange="toggleDiscountType()">
+                    <option value="fixed">一口价（固定金额）</option>
+                    <option value="percent">百分比折扣</option>
+                </select>
+            </div>
+            <div class="form-group" id="fixedPriceGroup">
+                <label>一口价金额</label>
+                <input type="number" id="fixedPrice" placeholder="如：199">
+            </div>
+            <div class="form-group" id="percentGroup" style="display:none">
+                <label>折扣比例（1-100）</label>
+                <input type="number" id="discountPercent" placeholder="如：80表示8折">
+            </div>
+            <div class="form-group">
+                <label>选择项目（可多选）</label>
+                <div id="discountProjectSelect" style="max-height:150px;overflow-y:auto"></div>
+            </div>
+            <button class="btn" onclick="saveDiscount()">保存</button>
+        </div>
+    </div>
+    
     <div class="booking-modal" id="bookingModal">
         <div class="booking-modal-content">
             <h3>📅 确认预约</h3>
@@ -336,6 +366,15 @@
                     <button class="admin-btn-small admin-btn-edit" onclick="openCouponModal()">+ 添加优惠券</button>
                 </h3>
                 <div id="couponList"></div>
+            </div>
+            
+            <!-- 打折配置 -->
+            <div class="admin-section">
+                <h3>
+                    🏷️ 打折配置
+                    <button class="admin-btn-small admin-btn-edit" onclick="openDiscountModal()">+ 添加折扣</button>
+                </h3>
+                <div id="discountList"></div>
             </div>
         </div>
     </div>
@@ -584,6 +623,7 @@
                 renderAdminBookings();
                 renderRechargeList();
                 renderCouponList();
+                renderDiscountList();
             } else {
                 alert('账号或密码错误');
             }
@@ -754,7 +794,11 @@
             const grid = document.getElementById('projectGrid');
             // 优先使用商家后台添加的项目，否则用默认
             const data = window.adminProjects.length > 0 ? window.adminProjects : projects;
-            grid.innerHTML = data.map(p => `<div class="project-card" onclick="showDetail('${p.id}')"><img src="${p.cover || 'https://via.placeholder.com/400x300'}" alt="${p.title}"><div class="project-info"><div class="project-title">${p.title}</div><div class="project-desc">${p.desc || ''}</div><div class="project-price">¥${p.price}</div></div></div>`).join('');
+            grid.innerHTML = data.map(p => {
+                const discountedPrice = getDiscountedPrice(p.price, p.id);
+                const hasDiscount = discountedPrice < p.price;
+                return `<div class="project-card" onclick="showDetail('${p.id}')"><img src="${p.cover || 'https://via.placeholder.com/400x300'}" alt="${p.title}"><div class="project-info"><div class="project-title">${p.title}</div><div class="project-desc">${p.desc || ''}</div><div class="project-price">${hasDiscount ? `<span style="text-decoration:line-through;color:#999;font-size:12px">¥${p.price}</span> ¥${discountedPrice}` : '¥' + p.price}</div></div></div>`;
+            }).join('');
         }
         
         function showDetail(id) {
@@ -763,6 +807,10 @@
             if (!p) return;
             const detailPage = document.getElementById('detailPage');
             const content = document.getElementById('detailContent');
+            
+            const discountedPrice = getDiscountedPrice(p.price, p.id);
+            const hasDiscount = discountedPrice < p.price;
+            
             // 支持数组或逗号分隔的图片
             let detailImages = [];
             if (Array.isArray(p.detailImages)) {
@@ -773,7 +821,7 @@
             content.innerHTML = `
                 <img src="${p.cover || 'https://via.placeholder.com/400x300'}" class="detail-cover">
                 <div class="detail-title">${p.title}</div>
-                <div class="detail-price">¥${p.price}</div>
+                <div class="detail-price">${hasDiscount ? `<span style="text-decoration:line-through;color:#999;font-size:16px;margin-right:8px">¥${p.price}</span>¥${discountedPrice}` : '¥' + p.price}</div>
                 <div class="detail-section"><h3>📝 项目介绍</h3><div class="detail-text">${(p.detailText || p.desc || '').replace(/\n/g, '<br>')}</div></div>
                 ${detailImages.length ? `<div class="detail-section"><h3>📷 效果图</h3><div class="detail-images">${detailImages.map(img => `<img src="${img.trim()}">`).join('')}</div></div>` : ''}
             `;
@@ -1251,6 +1299,111 @@
         
         // 优惠券
         let coupons = JSON.parse(localStorage.getItem('coupons') || '[]');
+        
+        // 打折配置
+        let discounts = JSON.parse(localStorage.getItem('discounts') || '[]');
+        
+        // 计算折后价
+        function getDiscountedPrice(originalPrice, projectId) {
+            const discount = discounts.find(d => d.projectIds && d.projectIds.includes(projectId));
+            if (!discount) return originalPrice;
+            
+            if (discount.type === 'fixed') {
+                return discount.fixedPrice;
+            } else if (discount.type === 'percent') {
+                return Math.round(originalPrice * discount.percent / 100);
+            }
+            return originalPrice;
+        }
+        
+        function renderDiscountList() {
+            const container = document.getElementById('discountList');
+            if (discounts.length === 0) {
+                container.innerHTML = '<p style="text-align:center;color:var(--text-light);padding:20px">暂无折扣配置</p>';
+                return;
+            }
+            container.innerHTML = discounts.map(d => {
+                let desc = '';
+                if (d.type === 'fixed') {
+                    desc = `一口价 ¥${d.fixedPrice}`;
+                } else {
+                    desc = `${d.percent}折`;
+                }
+                return `
+                    <div class="admin-list-item">
+                        <div class="admin-item-info">
+                            <h4>${desc}</h4>
+                            <p style="font-size:12px">${d.projectIds?.length || 0}个项目</p>
+                        </div>
+                        <button class="admin-btn-small admin-btn-delete" onclick="deleteDiscount('${d.id}')">删除</button>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        function openDiscountModal() {
+            // 加载项目选择
+            const select = document.getElementById('discountProjectSelect');
+            const allProjects = window.adminProjects.length > 0 ? window.adminProjects : defaultProjects;
+            select.innerHTML = allProjects.map(p => `
+                <label style="display:flex;align-items:center;gap:8px;padding:8px">
+                    <input type="checkbox" value="${p.id}" style="width:auto">
+                    ${p.title}
+                </label>
+            `).join('');
+            
+            document.getElementById('discountType').value = 'fixed';
+            document.getElementById('fixedPriceGroup').style.display = 'block';
+            document.getElementById('percentGroup').style.display = 'none';
+            document.getElementById('discountModal').classList.add('active');
+        }
+        
+        function toggleDiscountType() {
+            const type = document.getElementById('discountType').value;
+            document.getElementById('fixedPriceGroup').style.display = type === 'fixed' ? 'block' : 'none';
+            document.getElementById('percentGroup').style.display = type === 'percent' ? 'block' : 'none';
+        }
+        
+        function closeDiscountModal() {
+            document.getElementById('discountModal').classList.remove('active');
+        }
+        
+        function saveDiscount() {
+            const type = document.getElementById('discountType').value;
+            let discountData = { type };
+            
+            if (type === 'fixed') {
+                discountData.fixedPrice = parseInt(document.getElementById('fixedPrice').value);
+                if (!discountData.fixedPrice) return alert('请填写一口价');
+            } else {
+                discountData.percent = parseInt(document.getElementById('discountPercent').value);
+                if (!discountData.percent || discountData.percent < 1 || discountData.percent > 100) return alert('请填写1-100的折扣比例');
+            }
+            
+            // 获取选中的项目
+            const checkboxes = document.querySelectorAll('#discountProjectSelect input:checked');
+            const projectIds = Array.from(checkboxes).map(cb => cb.value);
+            
+            if (projectIds.length === 0) return alert('请至少选择一个项目');
+            
+            discountData.projectIds = projectIds;
+            discountData.id = Date.now().toString();
+            
+            discounts.push(discountData);
+            localStorage.setItem('discounts', JSON.stringify(discounts));
+            
+            closeDiscountModal();
+            renderDiscountList();
+            renderUserProjects(); // 刷新显示
+        }
+        
+        function deleteDiscount(id) {
+            if (!confirm('确定删除？')) return;
+            discounts = discounts.filter(d => d.id !== id);
+            localStorage.setItem('discounts', JSON.stringify(discounts));
+            renderDiscountList();
+            renderUserProjects();
+        }
         
         function renderRechargeList() {
             const container = document.getElementById('rechargeList');
