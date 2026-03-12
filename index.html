@@ -19,13 +19,13 @@
         .header-btn:hover { background: rgba(255,255,255,0.3); transform: scale(1.05); }
 
         /* Tabs: bottom nav bar, larger icons, gradient active */
-        .tabs { display: flex; background: white; position: fixed; bottom: 0; left: 0; right: 0; z-index: 99; border-top: 1px solid rgba(236,72,153,0.15); box-shadow: 0 -4px 20px rgba(236,72,153,0.1); padding-bottom: env(safe-area-inset-bottom, 0); }
+        .tabs { display: flex; background: white; position: fixed; bottom: 0; left: 0; right: 0; z-index: 99; border-top: 1px solid rgba(236,72,153,0.15); box-shadow: 0 -4px 20px rgba(236,72,153,0.1); padding-bottom: env(safe-area-inset-bottom, 0); pointer-events: auto; }
         .tab { flex: 1; padding: 12px 8px 16px; text-align: center; font-size: 11px; color: var(--text-light); cursor: pointer; white-space: nowrap; position: relative; transition: all 0.3s; }
         .tab.active { color: var(--primary); font-weight: 600; }
         .tab.active::after { content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 30px; height: 3px; background: linear-gradient(90deg, var(--primary), var(--secondary)); border-radius: 2px; }
         .tab span { font-size: 22px; display: block; margin-bottom: 2px; }
 
-        .page { display: none; padding: 16px; }
+        .page { display: none; padding: 16px; position: relative; z-index: 100; pointer-events: auto; }
         .page.active { display: block; }
 
         /* Cards: border-radius 16px, box-shadow, hover translateY -4px */
