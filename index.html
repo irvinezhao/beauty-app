@@ -696,7 +696,13 @@
             container.innerHTML = html;
         }
         
-        function selectTime(time) { document.querySelectorAll('.time-slot').forEach(el => el.classList.remove('selected')); event.target.closest('.time-slot').classList.add('selected'); selectedTime = time; setTimeout(() => document.getElementById('bookingModal').classList.add('active'), 200); }
+        function selectTime(time) { 
+            if (!window.currentUser) {
+                alert('请先登录');
+                return openUserLogin();
+            }
+            document.querySelectorAll('.time-slot').forEach(el => el.classList.remove('selected')); event.target.closest('.time-slot').classList.add('selected'); selectedTime = time; setTimeout(() => document.getElementById('bookingModal').classList.add('active'), 200); 
+        }
         function closeBookingModal() { document.getElementById('bookingModal').classList.remove('active'); selectedTime = null; renderTimeSlots(); }
         
         async function confirmBooking() {
