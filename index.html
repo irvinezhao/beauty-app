@@ -4,11 +4,32 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>美丽小站 - 美容项目管理</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        :root { --primary: #e91e63; --primary-light: #fce4ec; --primary-dark: #c2185b; --text: #333; --text-light: #666; --bg: #f5f5f5; --card-bg: #fff; --shadow: 0 2px 12px rgba(0,0,0,0.08); --radius: 16px; }
+        :root { 
+            --primary: #EC4899; 
+            --primary-light: #FDF2F8; 
+            --primary-dark: #831843; 
+            --secondary: #F9A8D4;
+            --cta: #8B5CF6;
+            --text: #1E1B4B; 
+            --text-light: #6B7280; 
+            --bg: #FDF2F8; 
+            --card-bg: #FFFFFF; 
+            --shadow: 0 4px 20px rgba(236, 72, 153, 0.12); 
+            --radius: 16px; 
+            --font-title: 'Playfair Display', serif;
+            --font-body: 'Inter', sans-serif;
+        }
         [data-theme="dark"] { --text: #f5f5f5; --text-light: #aaa; --bg: #1a1a1a; --card-bg: #2d2d2d; --shadow: 0 2px 12px rgba(0,0,0,0.3); }
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: var(--text); line-height: 1.5; padding-bottom: 80px; transition: background 0.3s, color 0.3s; }
+        body { font-family: var(--font-body), -apple-system, BlinkMacSystemFont, sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; padding-bottom: 80px; transition: all 0.3s ease; }
+        h1, h2, h3, h4 { font-family: var(--font-title), serif; font-weight: 600; }
+        .header { background: linear-gradient(135deg, var(--primary) 0%, var(--cta) 100%); }
+        .btn { transition: all 0.2s ease; }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(236, 72, 153, 0.3); }
         .header { background: linear-gradient(135deg, var(--primary) 0%, #ff6b9d 100%); color: white; padding: 20px; position: sticky; top: 0; z-index: 100; }
         .header-content { display: flex; justify-content: space-between; align-items: center; }
         .header h1 { font-size: 20px; font-weight: 600; }
@@ -178,6 +199,34 @@
         <div class="detail-content" id="detailContent"></div>
     </div>
     
+    <!-- 充值方案弹窗 -->
+    <div class="detail-page" id="rechargeModal">
+        <div class="detail-header">
+            <button onclick="closeRechargeModal()">←</button>
+            <span>充值方案</span>
+        </div>
+        <div class="detail-content">
+            <div class="form-group"><label>充值金额</label><input type="number" id="rechargeAmount" placeholder="如：1000"></div>
+            <div class="form-group"><label>赠送金额</label><input type="number" id="rechargeBonus" placeholder="如：100"></div>
+            <button class="btn" onclick="saveRecharge()">保存</button>
+        </div>
+    </div>
+    
+    <!-- 优惠券弹窗 -->
+    <div class="detail-page" id="couponModal">
+        <div class="detail-header">
+            <button onclick="closeCouponModal()">←</button>
+            <span>优惠券</span>
+        </div>
+        <div class="detail-content">
+            <div class="form-group"><label>优惠券名称</label><input type="text" id="couponName" placeholder="如：满100减20"></div>
+            <div class="form-group"><label>优惠金额</label><input type="number" id="couponDiscount" placeholder="如：20"></div>
+            <div class="form-group"><label>使用门槛</label><input type="number" id="couponMinSpend" placeholder="如：100（0为无门槛）"></div>
+            <div class="form-group"><label>有效期（天）</label><input type="number" id="couponExpireDays" placeholder="如：30"></div>
+            <button class="btn" onclick="saveCoupon()">保存</button>
+        </div>
+    </div>
+    
     <div class="booking-modal" id="bookingModal">
         <div class="booking-modal-content">
             <h3>📅 确认预约</h3>
@@ -269,6 +318,24 @@
                 <div class="time-slots" id="adminTimeSlots"></div>
                 <h4 style="font-size:14px;margin:16px 0 12px">📋 预约列表</h4>
                 <div id="adminBookingList"></div>
+            </div>
+            
+            <!-- 充值管理 -->
+            <div class="admin-section">
+                <h3>
+                    💰 充值管理
+                    <button class="admin-btn-small admin-btn-edit" onclick="openRechargeModal()">+ 添加充值方案</button>
+                </h3>
+                <div id="rechargeList"></div>
+            </div>
+            
+            <!-- 优惠券管理 -->
+            <div class="admin-section">
+                <h3>
+                    🎫 优惠券管理
+                    <button class="admin-btn-small admin-btn-edit" onclick="openCouponModal()">+ 添加优惠券</button>
+                </h3>
+                <div id="couponList"></div>
             </div>
         </div>
     </div>
@@ -515,6 +582,8 @@
                 document.getElementById('serviceHoursDisplay').textContent = `${bookingSettings.startTime}:00 - ${bookingSettings.endTime}:00`;
                 document.getElementById('serviceDurationDisplay').textContent = bookingSettings.duration;
                 renderAdminBookings();
+                renderRechargeList();
+                renderCouponList();
             } else {
                 alert('账号或密码错误');
             }
@@ -1176,6 +1245,118 @@
         
         // 用户管理
         let users = JSON.parse(localStorage.getItem('users') || '[]');
+        
+        // 充值方案
+        let rechargePlans = JSON.parse(localStorage.getItem('rechargePlans') || '[]');
+        
+        // 优惠券
+        let coupons = JSON.parse(localStorage.getItem('coupons') || '[]');
+        
+        function renderRechargeList() {
+            const container = document.getElementById('rechargeList');
+            if (rechargePlans.length === 0) {
+                container.innerHTML = '<p style="text-align:center;color:var(--text-light);padding:20px">暂无充值方案</p>';
+                return;
+            }
+            container.innerHTML = rechargePlans.map(p => `
+                <div class="admin-list-item">
+                    <div class="admin-item-info">
+                        <h4>充¥${p.amount} 送¥${p.bonus}</h4>
+                        <p style="font-size:12px">¥${p.amount + p.bonus}到账</p>
+                    </div>
+                    <button class="admin-btn-small admin-btn-delete" onclick="deleteRecharge('${p.id}')">删除</button>
+                </div>
+            `).join('');
+        }
+        
+        function openRechargeModal() {
+            document.getElementById('rechargeAmount').value = '';
+            document.getElementById('rechargeBonus').value = '';
+            document.getElementById('rechargeModal').classList.add('active');
+        }
+        
+        function closeRechargeModal() {
+            document.getElementById('rechargeModal').classList.remove('active');
+        }
+        
+        function saveRecharge() {
+            const amount = parseInt(document.getElementById('rechargeAmount').value);
+            const bonus = parseInt(document.getElementById('rechargeBonus').value) || 0;
+            if (!amount || amount <= 0) return alert('请填写充值金额');
+            
+            rechargePlans.push({
+                id: Date.now().toString(),
+                amount,
+                bonus
+            });
+            localStorage.setItem('rechargePlans', JSON.stringify(rechargePlans));
+            closeRechargeModal();
+            renderRechargeList();
+        }
+        
+        function deleteRecharge(id) {
+            if (!confirm('确定删除？')) return;
+            rechargePlans = rechargePlans.filter(p => p.id !== id);
+            localStorage.setItem('rechargePlans', JSON.stringify(rechargePlans));
+            renderRechargeList();
+        }
+        
+        function renderCouponList() {
+            const container = document.getElementById('couponList');
+            if (coupons.length === 0) {
+                container.innerHTML = '<p style="text-align:center;color:var(--text-light);padding:20px">暂无优惠券</p>';
+                return;
+            }
+            container.innerHTML = coupons.map(c => `
+                <div class="admin-list-item">
+                    <div class="admin-item-info">
+                        <h4>${c.name}</h4>
+                        <p style="font-size:12px">满¥${c.minSpend}减¥${c.discount} · ${c.expireDays}天有效</p>
+                    </div>
+                    <button class="admin-btn-small admin-btn-delete" onclick="deleteCoupon('${c.id}')">删除</button>
+                </div>
+            `).join('');
+        }
+        
+        function openCouponModal() {
+            document.getElementById('couponName').value = '';
+            document.getElementById('couponDiscount').value = '';
+            document.getElementById('couponMinSpend').value = '';
+            document.getElementById('couponExpireDays').value = '';
+            document.getElementById('couponModal').classList.add('active');
+        }
+        
+        function closeCouponModal() {
+            document.getElementById('couponModal').classList.remove('active');
+        }
+        
+        function saveCoupon() {
+            const name = document.getElementById('couponName').value.trim();
+            const discount = parseInt(document.getElementById('couponDiscount').value);
+            const minSpend = parseInt(document.getElementById('couponMinSpend').value) || 0;
+            const expireDays = parseInt(document.getElementById('couponExpireDays').value) || 30;
+            
+            if (!name || !discount) return alert('请填写名称和优惠金额');
+            
+            coupons.push({
+                id: Date.now().toString(),
+                name,
+                discount,
+                minSpend,
+                expireDays,
+                createdAt: new Date().toISOString()
+            });
+            localStorage.setItem('coupons', JSON.stringify(coupons));
+            closeCouponModal();
+            renderCouponList();
+        }
+        
+        function deleteCoupon(id) {
+            if (!confirm('确定删除？')) return;
+            coupons = coupons.filter(c => c.id !== id);
+            localStorage.setItem('coupons', JSON.stringify(coupons));
+            renderCouponList();
+        }
         
         function renderUserStats() {
             const totalUsers = users.length;
