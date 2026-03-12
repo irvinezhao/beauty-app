@@ -117,7 +117,7 @@ const db = firebase.database();
 function saveToFirebase(path, data) { db.ref(path).push().set(data); }
 
 function syncData() {
-    db.ref("projects").on("value", s => { if(s.val()) { projects = Object.values(s.val()); localStorage.setItem("adminProjects", JSON.stringify(projects)); renderUserProjects(); }});
+    db.ref("projects").on("value", s => { if(s.val()) { projects = Object.values(s.val()); localStorage.setItem("adminProjects", JSON.stringify(projects)); if(typeof renderUserProjects==="function") renderUserProjects(); }});
     db.ref("rechargePlans").on("value", s => { if(s.val()) { rechargePlans = Object.values(s.val()); localStorage.setItem("rechargePlans", JSON.stringify(rechargePlans)); }});
     db.ref("users").on("value", s => { if(s.val()) { users = Object.values(s.val()); localStorage.setItem("users", JSON.stringify(users)); }});
     db.ref("bookings").on("value", s => { if(s.val()) { adminBookings = Object.values(s.val()); localStorage.setItem("adminBookings", JSON.stringify(adminBookings)); }});
