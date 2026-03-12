@@ -271,7 +271,10 @@
     <!-- 用户登录弹窗 -->
     <div class="login-page" id="userLoginPage" style="z-index:3000">
         <div class="login-card">
-            <h2>👤 用户登录</h2>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+                <h2>👤 用户登录</h2>
+                <button onclick="closeUserLogin()" style="background:none;border:none;font-size:24px;cursor:pointer">×</button>
+            </div>
             <p>登录后可查看预约记录</p>
             
             <div class="form-group"><label>手机号</label><input type="tel" id="userLoginPhone" placeholder="请输入手机号"></div>
@@ -288,7 +291,10 @@
     
     <div class="login-page" id="loginPage" style="z-index:2500">
         <div class="login-card">
-            <h2>🔐 商家后台</h2>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+                <h2>🔐 商家后台</h2>
+                <button onclick="closeAdminLogin()" style="background:none;border:none;font-size:24px;cursor:pointer">×</button>
+            </div>
             <p id="loginSubtitle">请输入手机号登录</p>
             
             <!-- 手机号登录 -->
@@ -658,6 +664,10 @@
             document.getElementById('userLoginPage').classList.remove('active');
         };
         
+        window.closeAdminLogin = function() {
+            document.getElementById('loginPage').classList.remove('active');
+        };
+        
         window.sendUserCode = function() {
             const phone = document.getElementById('userLoginPhone').value.trim();
             if (!/^1\d{10}$/.test(phone)) return alert('请输入正确的手机号');
@@ -723,6 +733,7 @@
         };
         
         window.userLogout = function() {
+            if (!confirm('确定要退出登录吗？')) return;
             window.currentUser = null;
             localStorage.removeItem('currentUser');
             document.getElementById('userLoginBtn').textContent = '登录';
