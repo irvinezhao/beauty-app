@@ -6,288 +6,117 @@
     <title>美丽小站 - 美容预约管理</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
     <style>
-        :root { --primary: #EC4899; --primary-light: #FDF2F8; --primary-dark: #831843; --secondary: #F9A8D4; --cta: #8B5CF6; --text: #1E1B4B; --text-light: #6B7280; --bg: #FDF2F8; --card: #FFF; --shadow: 0 4px 20px rgba(236,72,153,0.12); --radius: 16px; }
+        :root { --primary: #EC4899; --primary-light: #FDF2F8; --primary-dark: #831843; --secondary: #8B5CF6; --text: #1E1B4B; --text-light: #6B7280; --bg: #FDF2F8; --card: #FFF; --shadow: 0 4px 20px rgba(236,72,153,0.12); --radius: 16px; }
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; padding-bottom: 70px; transition: all 0.3s; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; padding-bottom: 70px; }
         h1,h2,h3 { font-family: 'Playfair Display', serif; }
-        
-        /* Header */
-        .header { background: linear-gradient(135deg, var(--primary), var(--cta)); color: white; padding: 16px; position: sticky; top: 0; z-index: 100; display: flex; justify-content: space-between; align-items: center; }
+
+        .header { background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; padding: 16px; position: sticky; top: 0; z-index: 100; display: flex; justify-content: space-between; align-items: center; }
         .header h1 { font-size: 18px; }
         .header-btns { display: flex; gap: 8px; }
         .header-btn { background: rgba(255,255,255,0.2); border: none; color: white; padding: 6px 12px; border-radius: 20px; font-size: 12px; cursor: pointer; }
-        
-        /* Tabs */
-        .tabs { display: flex; background: var(--card); position: sticky; top: 54px; z-index: 99; border-bottom: 1px solid #eee; overflow-x: auto; }
-        .tab { flex: 1; padding: 14px 8px; text-align: center; font-size: 13px; color: var(--text-light); cursor: pointer; white-space: nowrap; }
-        .tab.active { color: var(--primary); font-weight: 600; position: relative; }
-        .tab.active::after { content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 30px; height: 3px; background: var(--primary); border-radius: 2px; }
-        
-        /* Content */
+
+        .tabs { display: flex; background: linear-gradient(180deg, #FFF 0%, #FDF2F8 100%); position: sticky; top: 54px; z-index: 99; border-bottom: 1px solid rgba(236,72,153,0.1); overflow-x: auto; }
+        .tab { flex: 1; padding: 14px 8px; text-align: center; font-size: 13px; color: var(--text-light); cursor: pointer; white-space: nowrap; position: relative; }
+        .tab.active { color: var(--primary); font-weight: 600; }
+        .tab.active::after { content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 40px; height: 3px; background: linear-gradient(90deg, var(--primary), var(--secondary)); border-radius: 2px; }
+        .tab span { font-size: 20px; display: block; margin-bottom: 2px; }
+
         .page { display: none; padding: 16px; }
         .page.active { display: block; }
-        
-        /* Grid */
+
         .grid { column-count: 2; column-gap: 12px; }
-        .card { break-inside: avoid; background: var(--card); border-radius: var(--radius); margin-bottom: 12px; overflow: hidden; box-shadow: var(--shadow); }
-        .card-img { width: 100%; display: block; }
+        .card { break-inside: avoid; background: var(--card); border-radius: var(--radius); margin-bottom: 12px; overflow: hidden; box-shadow: var(--shadow); transition: all 0.3s; cursor: pointer; }
+        .card:hover { transform: translateY(-4px); box-shadow: 0 8px 30px rgba(236,72,153,0.2); }
+        .card-img { width: 100%; display: block; height: 150px; object-fit: cover; }
         .card-body { padding: 12px; }
-        .card-title { font-weight: 600; margin-bottom: 4px; }
+        .card-title { font-weight: 600; margin-bottom: 4px; font-family: 'Playfair Display', serif; }
         .card-desc { font-size: 12px; color: var(--text-light); margin-bottom: 8px; }
-        .card-price { font-size: 18px; font-weight: 700; color: var(--primary); }
-        
-        /* Booking */
+        .card-price { font-size: 18px; font-weight: 700; background: linear-gradient(135deg, var(--primary), var(--secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .discount-badge { background: linear-gradient(135deg, #EF4444, #F97316); color: white; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+
         .date-scroll { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 12px; margin-bottom: 12px; }
-        .date-item { min-width: 50px; padding: 8px; background: var(--card); border-radius: 12px; text-align: center; cursor: pointer; box-shadow: var(--shadow); }
-        .date-item.active { background: var(--primary); color: white; }
+        .date-item { min-width: 60px; padding: 10px 8px; background: var(--card); border-radius: 12px; text-align: center; cursor: pointer; box-shadow: var(--shadow); transition: all 0.3s; }
+        .date-item.active { background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; box-shadow: 0 4px 15px rgba(236,72,153,0.3); }
         .time-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-        .time-slot { padding: 12px; background: var(--card); border-radius: 12px; text-align: center; cursor: pointer; box-shadow: var(--shadow); }
+        .time-slot { padding: 12px; background: var(--card); border-radius: 12px; text-align: center; cursor: pointer; box-shadow: var(--shadow); transition: all 0.3s; }
+        .time-slot:hover { transform: scale(1.05); }
         .time-slot.booked { background: #f0f0f0; color: #999; cursor: not-allowed; }
-        .time-slot.selected { background: var(--primary); color: white; }
-        
-        /* Timeline */
+        .time-slot.selected { background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; box-shadow: 0 4px 15px rgba(236,72,153,0.4); }
+
         .timeline { position: relative; padding-left: 20px; border-left: 2px solid var(--primary); }
-        .timeline-item { position: relative; margin-bottom: 20px; padding: 12px; background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow); }
-        .timeline-item::before { content: ''; position: absolute; left: -24px; top: 16px; width: 10px; height: 10px; background: var(--primary); border-radius: 50%; }
-        .timeline-date { font-size: 12px; color: var(--primary); font-weight: 600; margin-bottom: 6px; }
+        .timeline-item { position: relative; margin-bottom: 20px; padding: 16px; background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow); }
+        .timeline-item::before { content: ''; position: absolute; left: -24px; top: 20px; width: 10px; height: 10px; background: linear-gradient(135deg, var(--primary), var(--secondary)); border-radius: 50%; }
+        .timeline-date { font-size: 14px; color: var(--primary); font-weight: 600; margin-bottom: 8px; }
+        .timeline-content { background: var(--primary-light); padding: 12px; border-radius: 10px; }
         .tag { display: inline-block; padding: 4px 10px; background: var(--primary-light); color: var(--primary-dark); border-radius: 20px; font-size: 11px; margin-right: 4px; }
-        
-        /* Profile */
+
         .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 16px; }
-        .stat-box { background: var(--card); padding: 16px; border-radius: var(--radius); text-align: center; box-shadow: var(--shadow); }
-        .stat-num { font-size: 24px; font-weight: 700; color: var(--primary); }
+        .stat-box { background: linear-gradient(135deg, #FDF2F8, #F3E8FF); padding: 16px; border-radius: var(--radius); text-align: center; box-shadow: 0 4px 15px rgba(236,72,153,0.1); }
+        .stat-num { font-size: 28px; font-weight: 700; background: linear-gradient(135deg, var(--primary), var(--secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .stat-label { font-size: 12px; color: var(--text-light); }
-        
-        /* Modal */
+
+        .profile-avatar { width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; display: flex; align-items: center; justify-content: center; font-size: 32px; font-weight: 700; margin: 0 auto 16px; border: 4px solid white; box-shadow: 0 4px 20px rgba(236,72,153,0.3); cursor: pointer; overflow: hidden; }
+        .profile-name { font-size: 24px; font-weight: 700; text-align: center; margin-bottom: 8px; font-family: 'Playfair Display', serif; }
+        .profile-phone { text-align: center; color: #6B7280; }
+
         .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 200; align-items: center; justify-content: center; padding: 20px; }
         .modal.active { display: flex; }
-        .modal-content { background: var(--card); border-radius: 20px; padding: 24px; width: 100%; max-width: 400px; max-height: 90vh; overflow-y: auto; }
-        .modal-header { display: flex; justify-content: space-between; margin-bottom: 16px; }
-        .modal-close { font-size: 24px; cursor: pointer; }
-        
-        /* Form */
+        .modal-content { background: var(--card); border-radius: 20px; padding: 24px; width: 100%; max-width: 400px; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(236,72,153,0.2); }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+        .modal-close { font-size: 24px; cursor: pointer; color: var(--text-light); }
+
         .form-group { margin-bottom: 16px; }
         .form-group label { display: block; font-size: 13px; color: var(--text-light); margin-bottom: 6px; }
-        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 12px; border: 1px solid #eee; border-radius: 10px; font-size: 14px; background: var(--bg); }
-        .btn { background: var(--primary); color: white; border: none; padding: 14px; border-radius: 12px; font-size: 15px; font-weight: 600; width: 100%; cursor: pointer; }
-        .btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(236,72,153,0.3); }
-        
-        /* Admin */
-        .admin-panel { display: none; }
-        .admin-panel.active { display: block; }
-        .section { background: var(--card); border-radius: var(--radius); padding: 16px; margin-bottom: 16px; box-shadow: var(--shadow); }
-        .section-title { font-size: 16px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
-        .item-row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #eee; }
-        .item-row:last-child { border: none; }
-        
-        /* Community */
-        .post-card { background: var(--card); border-radius: var(--radius); padding: 16px; margin-bottom: 12px; box-shadow: var(--shadow); cursor: pointer; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 14px; border: 2px solid #F3E8FF; border-radius: 12px; font-size: 14px; background: var(--bg); transition: all 0.3s; }
+        .form-group input:focus, .form-group textarea:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(236,72,153,0.1); outline: none; }
+
+        .btn { background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; border: none; padding: 14px; border-radius: 12px; font-size: 15px; font-weight: 600; width: 100%; cursor: pointer; box-shadow: 0 4px 15px rgba(236,72,153,0.3); transition: all 0.3s; }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(236,72,153,0.4); }
+
+        .login-card { background: linear-gradient(180deg, #FFF, #FDF2F8); border-radius: 24px; padding: 32px; text-align: center; box-shadow: 0 20px 60px rgba(236,72,153,0.2); }
+        .login-title { color: var(--primary); margin-bottom: 8px; font-family: 'Playfair Display', serif; }
+
+        .post-card { background: var(--card); border-radius: 16px; padding: 16px; margin-bottom: 12px; box-shadow: var(--shadow); transition: all 0.3s; cursor: pointer; }
+        .post-card:hover { box-shadow: 0 8px 30px rgba(236,72,153,0.15); }
         .post-title { font-weight: 600; margin-bottom: 8px; }
         .post-meta { font-size: 12px; color: var(--text-light); }
-        
-        /* Login */
-        .login-card { background: white; border-radius: 20px; padding: 32px; text-align: center; }
-        .login-title { color: var(--primary); margin-bottom: 8px; }
-        
-        /* Detail */
+        .post-content { margin: 12px 0; color: var(--text); }
+        .comment { background: var(--bg); padding: 12px; border-radius: 8px; margin: 8px 0; }
+        .comment-author { font-weight: 600; font-size: 13px; color: var(--primary); }
+
+        .section { background: var(--card); border-radius: var(--radius); padding: 16px; margin-bottom: 16px; box-shadow: var(--shadow); }
+        .section-title { font-size: 16px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; font-family: 'Playfair Display', serif; }
+        .item-row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #eee; align-items: center; }
+        .item-row:last-child { border: none; }
+
         .detail-view { display: none; position: fixed; inset: 0; background: var(--bg); z-index: 150; overflow-y: auto; }
         .detail-view.active { display: block; }
-        .detail-header { background: var(--primary); color: white; padding: 16px; display: flex; align-items: center; gap: 12px; }
-        .detail-cover { width: 100%; border-radius: 0 0 20px 20px; margin-bottom: 16px; }
+        .detail-header { background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; padding: 16px; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; }
+        .detail-cover { width: 100%; height: 250px; object-fit: cover; }
         .detail-content { padding: 16px; }
-        .detail-price { font-size: 28px; font-weight: 700; color: var(--primary); margin: 16px 0; }
-        
+        .detail-price { font-size: 28px; font-weight: 700; background: linear-gradient(135deg, var(--primary), var(--secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin: 16px 0; }
+
+        .admin-panel { display: none; position: fixed; inset: 0; background: var(--bg); z-index: 180; overflow-y: auto; }
+        .admin-panel.active { display: block; }
+        .admin-header { background: linear-gradient(135deg, #1a1a2e, #16213e); color: white; padding: 16px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; }
+        .admin-nav { display: flex; overflow-x: auto; background: white; border-bottom: 1px solid #eee; }
+        .admin-nav-item { padding: 12px 16px; white-space: nowrap; cursor: pointer; color: var(--text-light); }
+        .admin-nav-item.active { color: var(--primary); font-weight: 600; border-bottom: 2px solid var(--primary); }
+        .admin-content { padding: 16px; }
+        .admin-section { background: white; border-radius: 16px; padding: 16px; margin-bottom: 16px; box-shadow: var(--shadow); }
+
         .empty { text-align: center; padding: 40px; color: var(--text-light); }
-    
-        /* 增强样式 */
-        .card { border-radius: 16px; box-shadow: 0 4px 20px rgba(236,72,153,0.12); transition: all 0.3s; }
-        .card:hover { transform: translateY(-4px); box-shadow: 0 8px 30px rgba(236,72,153,0.2); }
-        
-        .project-card { border-radius: 16px; overflow: hidden; }
-        .project-card img { transition: transform 0.3s; }
-        .project-card:hover img { transform: scale(1.05); }
-        .project-price { 
-            background: linear-gradient(135deg, #EC4899, #8B5CF6); 
-            -webkit-background-clip: text; 
-            -webkit-text-fill-color: transparent;
-            font-weight: 700;
-        }
-        .discount-badge {
-            background: linear-gradient(135deg, #EF4444, #F97316);
-            color: white;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-        
-        .tabs { 
-            background: linear-gradient(180deg, #FFF 0%, #FDF2F8 100%);
-            border-bottom: 1px solid rgba(236,72,153,0.1);
-        }
-        .tab.active { 
-            color: #EC4899; 
-            font-weight: 600;
-        }
-        .tab.active::after {
-            content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); 
-            width: 40px; height: 3px; 
-            background: linear-gradient(90deg, #EC4899, #8B5CF6); 
-            border-radius: 2px;
-        }
-        .tab span { font-size: 20px; display: block; margin-bottom: 2px; }
-        
-        .header {
-            background: linear-gradient(135deg, #EC4899 0%, #8B5CF6 100%);
-        }
-        
-        .btn {
-            background: linear-gradient(135deg, #EC4899, #8B5CF6);
-            border: none;
-            box-shadow: 0 4px 15px rgba(236,72,153,0.3);
-            transition: all 0.3s;
-        }
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(236,72,153,0.4);
-        }
-        
-        .stat-box {
-            background: linear-gradient(135deg, #FDF2F8, #F3E8FF);
-            border-radius: 16px;
-            padding: 16px;
-            text-align: center;
-            box-shadow: 0 4px 15px rgba(236,72,153,0.1);
-        }
-        .stat-num {
-            font-size: 28px;
-            font-weight: 700;
-            background: linear-gradient(135deg, #EC4899, #8B5CF6);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        
-        .profile-avatar {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #EC4899, #8B5CF6);
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 32px;
-            font-weight: 700;
-            margin: 0 auto 16px;
-            border: 4px solid white;
-            box-shadow: 0 4px 20px rgba(236,72,153,0.3);
-        }
-        .profile-name { font-size: 24px; font-weight: 700; text-align: center; margin-bottom: 8px; }
-        .profile-phone { text-align: center; color: #6B7280; }
-        
-        .date-item {
-            border-radius: 12px;
-            transition: all 0.3s;
-            min-width: 60px;
-        }
-        .date-item.active {
-            background: linear-gradient(135deg, #EC4899, #8B5CF6);
-            color: white;
-            box-shadow: 0 4px 15px rgba(236,72,153,0.3);
-        }
-        
-        .time-slot {
-            border-radius: 12px;
-            transition: all 0.3s;
-        }
-        .time-slot:hover { transform: scale(1.05); }
-        .time-slot.selected {
-            background: linear-gradient(135deg, #EC4899, #8B5CF6);
-            color: white;
-            box-shadow: 0 4px 15px rgba(236,72,153,0.4);
-        }
-        
-        .modal-content {
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(236,72,153,0.2);
-        }
-        
-        .form-group input, .form-group textarea, .form-group select {
-            border-radius: 12px;
-            border: 2px solid #F3E8FF;
-            padding: 14px;
-            transition: all 0.3s;
-        }
-        .form-group input:focus, .form-group textarea:focus {
-            border-color: #EC4899;
-            box-shadow: 0 0 0 3px rgba(236,72,153,0.1);
-            outline: none;
-        }
-        
-        .login-card {
-            background: linear-gradient(180deg, #FFF, #FDF2F8);
-            border-radius: 24px;
-            box-shadow: 0 20px 60px rgba(236,72,153,0.2);
-        }
-        
-        .menu-item {
-            padding: 16px;
-            border-radius: 12px;
-            transition: all 0.3s;
-        }
-        .menu-item:hover {
-            background: linear-gradient(135deg, #FDF2F8, #F3E8FF);
-        }
-        
-        .post-card {
-            border-radius: 16px;
-            transition: all 0.3s;
-        }
-        .post-card:hover {
-            box-shadow: 0 8px 30px rgba(236,72,153,0.15);
-        }
-        
-        .admin-panel {
-            background: linear-gradient(180deg, #FDF2F8, #FFF);
-        }
-        
-        h1, h2, h3, .project-title {
-            font-family: 'Playfair Display', serif;
-        }
+        .menu-item { padding: 16px; border-radius: 12px; transition: all 0.3s; display: flex; align-items: center; gap: 12px; cursor: pointer; }
+        .menu-item:hover { background: linear-gradient(135deg, #FDF2F8, #F3E8FF); }
+        .menu-icon { font-size: 24px; }
 
-
-        .profile-section { background: white; border-radius: 16px; padding: 20px; margin-bottom: 16px; box-shadow: 0 4px 15px rgba(236,72,153,0.1); }
-        .profile-section h3 { margin-bottom: 12px; font-size: 16px; }
-
-</style>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
-<script>
-const firebaseConfig = {
-    apiKey: "AIzaSyBOPa-J7SpDyOSdWiy7gsA5re01Xd-FuvI",
-    authDomain: "beauty-app-6527c.firebaseapp.com",
-    projectId: "beauty-app-6527c",
-    storageBucket: "beauty-app-6527c.firebasestorage.app",
-    messagingSenderId: "396685995260",
-    appId: "1:396685995260:web:0bb1a0676b339378a5bb79",
-    databaseURL: "https://beauty-app-6527c-default-rtdb.asia-southeast1.firebasedatabase.app"
-};
-firebase.initializeApp(firebaseConfig);
-const db = firebase.database();
-
-function saveToFirebase(path, data) { db.ref(path).push().set(data); }
-
-function syncData() {
-    db.ref("projects").on("value", s => { if(s.val()) { projects = Object.values(s.val()); localStorage.setItem("adminProjects", JSON.stringify(projects)); if(typeof renderProjects==="function") renderProjects(); }});
-    db.ref("rechargePlans").on("value", s => { if(s.val()) { rechargePlans = Object.values(s.val()); localStorage.setItem("rechargePlans", JSON.stringify(rechargePlans)); }});
-    db.ref("users").on("value", s => { if(s.val()) { users = Object.values(s.val()); localStorage.setItem("users", JSON.stringify(users)); }});
-    db.ref("bookings").on("value", s => { if(s.val()) { bookings = Object.values(s.val()); adminBookings = bookings; localStorage.setItem("bookings", JSON.stringify(bookings)); localStorage.setItem("adminBookings", JSON.stringify(bookings)); if(typeof renderProfile==="function") renderProfile(); }});
-    db.ref("coupons").on("value", s => { if(s.val()) { coupons = Object.values(s.val()); localStorage.setItem("coupons", JSON.stringify(coupons)); }});
-    db.ref("posts").on("value", s => { if(s.val()) { posts = Object.values(s.val()); localStorage.setItem("communityPosts", JSON.stringify(posts)); if(typeof renderPosts==="function") renderPosts(); }});
-    db.ref("settings").on("value", s => { if(s.val()) { if(s.val().bookingSettings) { bookingSettings = s.val().bookingSettings; localStorage.setItem("bookingSettings", JSON.stringify(bookingSettings)); } }});
-}
-</script>
-
+        .coupon-card { background: linear-gradient(135deg, var(--primary-light), #F3E8FF); border-radius: 12px; padding: 12px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
+        .coupon-value { font-size: 20px; font-weight: 700; color: var(--primary); }
+        .recharge-card { background: linear-gradient(135deg, #FDF2F8, #F3E8FF); border-radius: 12px; padding: 16px; margin-bottom: 12px; text-align: center; cursor: pointer; transition: all 0.3s; }
+        .recharge-card:hover { transform: scale(1.02); }
+        .recharge-amount { font-size: 24px; font-weight: 700; color: var(--primary); }
+    </style>
 </head>
 <body>
     <!-- Header -->
@@ -298,52 +127,55 @@ function syncData() {
             <button class="header-btn" onclick="setRoute('admin')">商家</button>
         </div>
     </div>
-    
+
     <!-- Tabs -->
     <div class="tabs">
-        <div class="tab active" data-tab="projects">项目</div>
-        <div class="tab" data-tab="booking">预约</div>
-        <div class="tab" data-tab="community">社区</div>
-        <div class="tab" data-tab="timeline">记录</div>
-        <div class="tab" data-tab="profile">我的</div>
+        <div class="tab" data-tab="projects"><span>📋</span>项目</div>
+        <div class="tab" data-tab="booking"><span>📅</span>预约</div>
+        <div class="tab" data-tab="community"><span>💬</span>社区</div>
+        <div class="tab" data-tab="timeline"><span>📔</span>日记</div>
+        <div class="tab" data-tab="profile"><span>👤</span>我的</div>
     </div>
-    
-    <!-- Pages -->
-    <div class="page active" id="projects">
+
+    <!-- Projects Page -->
+    <div class="page" id="projects">
         <div class="grid" id="projectGrid"></div>
     </div>
-    
+
+    <!-- Booking Page -->
     <div class="page" id="booking">
+        <h3 style="margin-bottom:12px;font-family:'Playfair Display',serif">选择日期</h3>
         <div class="date-scroll" id="dateScroll"></div>
+        <h3 style="margin:16px 0 12px;font-family:'Playfair Display',serif">选择时间</h3>
         <div class="time-grid" id="timeSlots"></div>
     </div>
-    
+
+    <!-- Community Page -->
     <div class="page" id="community">
         <button class="btn" style="margin-bottom:16px" onclick="openPostModal()">+ 发布帖子</button>
         <div id="postList"></div>
     </div>
-    
+
+    <!-- Timeline Page -->
     <div class="page" id="timeline">
         <div class="timeline" id="timelineList"></div>
     </div>
-    
+
+    <!-- Profile Page -->
     <div class="page" id="profile">
         <div id="profileContent"></div>
-        <div class="section" id="myBookings"></div>
-        <div class="section" id="myCoupons"></div>
-        <button class="btn" style="background:#f44336" onclick="userLogout()">退出登录</button>
     </div>
-    
+
     <!-- Detail View -->
     <div class="detail-view" id="detailView">
         <div class="detail-header">
             <button onclick="closeDetail()" style="background:none;border:none;color:white;font-size:24px">←</button>
-            <span>项目详情</span>
+            <span id="detailTitle">项目详情</span>
         </div>
         <div class="detail-content" id="detailContent"></div>
     </div>
-    
-    <!-- Modals -->
+
+    <!-- User Login Modal -->
     <div class="modal" id="userLoginModal">
         <div class="login-card">
             <h2 class="login-title">👤 用户登录</h2>
@@ -351,74 +183,65 @@ function syncData() {
             <div class="form-group">
                 <div style="display:flex;gap:8px">
                     <input type="text" id="userCode" placeholder="验证码" style="flex:1">
-                    <button onclick="sendUserCode()" style="background:var(--primary);color:white;border:none;padding:12px;border-radius:10px">发送</button>
+                    <button onclick="sendUserCode()" style="background:var(--primary);color:white;border:none;padding:12px;border-radius:10px;cursor:pointer">发送</button>
                 </div>
             </div>
             <button class="btn" onclick="doUserLogin()">登录</button>
-            <button onclick="closeModal('userLoginModal')" style="margin-top:12px;background:none;border:none;color:var(--text-light)">取消</button>
+            <button onclick="closeModal('userLoginModal')" style="margin-top:12px;background:none;border:none;color:var(--text-light);cursor:pointer">取消</button>
         </div>
     </div>
-    
+
+    <!-- Admin Login Modal -->
     <div class="modal" id="adminModal">
         <div class="login-card">
             <h2 class="login-title">🔐 商家后台</h2>
             <div class="form-group"><input type="text" id="adminUser" placeholder="账号"></div>
-            <div class="form-group"><form><input type="password" id="adminPass" placeholder="密码"></form></div>
+            <div class="form-group"><input type="password" id="adminPass" placeholder="密码"></div>
             <button class="btn" onclick="doAdminLogin()">登录</button>
-            <button onclick="closeModal('adminModal')" style="margin-top:12px;background:none;border:none;color:var(--text-light)">取消</button>
+            <button onclick="closeModal('adminModal')" style="margin-top:12px;background:none;border:none;color:var(--text-light);cursor:pointer">取消</button>
         </div>
     </div>
-    
+
+    <!-- Booking Modal -->
     <div class="modal" id="bookingModal">
         <div class="modal-content">
             <div class="modal-header"><h3>确认预约</h3><span class="modal-close" onclick="closeModal('bookingModal')">×</span></div>
             <div class="form-group"><input type="text" id="bookName" placeholder="姓名"></div>
             <div class="form-group"><input type="tel" id="bookPhone" placeholder="手机号"></div>
             <div class="form-group"><textarea id="bookNote" placeholder="备注" rows="2"></textarea></div>
-            <button class="btn" onclick="confirmBooking()">确认</button>
+            <button class="btn" onclick="confirmBooking()">确认预约</button>
         </div>
     </div>
-    
+
+    <!-- Post Modal -->
     <div class="modal" id="postModal">
         <div class="modal-content">
             <div class="modal-header"><h3>发布帖子</h3><span class="modal-close" onclick="closeModal('postModal')">×</span></div>
             <div class="form-group"><input type="text" id="postTitle" placeholder="标题"></div>
-            <div class="form-group"><textarea id="postContent" placeholder="内容" rows="4"></textarea></div>
+            <div class="form-group"><textarea id="postContent" placeholder="分享你的美容心得..." rows="4"></textarea></div>
             <button class="btn" onclick="submitPost()">发布</button>
         </div>
     </div>
-    
-    <!-- Admin Panel -->
-    <div class="admin-panel" id="adminPanel">
-        <div class="header" style="background:linear-gradient(135deg,#1a1a2e,#16213e)">
-            <h1>🏪 商家后台</h1>
-            <button class="header-btn" onclick="adminLogout()">退出</button>
-        </div>
-        <div style="padding:16px">
-            <div class="section">
-                <div class="section-title">👥 用户管理 <span id="userCount">0</span></div>
-                <div id="adminUserList"></div>
-            </div>
-            <div class="section">
-                <div class="section-title">📝 项目管理 <button onclick="openProjectForm()" style="background:var(--primary);color:white;border:none;padding:4px 12px;border-radius:8px;font-size:12px">+添加</button></div>
-                <div id="adminProjectList"></div>
-            </div>
-            <div class="section">
-                <div class="section-title">📅 预约列表</div>
-                <div id="adminBookingList"></div>
-            </div>
-            <div class="section">
-                <div class="section-title">💰 充值/优惠券/打折</div>
-                <div class="form-group"><input type="text" id="rechargePlan" placeholder="充值方案 如:1000,100"></div>
-                <button class="btn" style="margin-bottom:8px" onclick="addRecharge()">添加充值</button>
-                <div class="form-group"><input type="text" id="couponRule" placeholder="优惠券 如:满100减20,100,30"></div>
-                <button class="btn" style="margin-bottom:8px" onclick="addCoupon()">添加优惠券</button>
-                <div class="form-group"><input type="text" id="discountRule" placeholder="打折 如:项目ID,80(折扣)"></div>
-                <button class="btn" onclick="addDiscount()">添加折扣</button>
-            </div>
+
+    <!-- Recharge Modal -->
+    <div class="modal" id="rechargeModal">
+        <div class="modal-content">
+            <div class="modal-header"><h3>💰 充值</h3><span class="modal-close" onclick="closeRecharge()">×</span></div>
+            <div id="rechargeList"></div>
         </div>
     </div>
-    
+
+    <!-- Edit Profile Modal -->
+    <div class="modal" id="editProfileModal">
+        <div class="modal-content">
+            <div class="modal-header"><h3>✏️ 修改资料</h3><span class="modal-close" onclick="closeModal('editProfileModal')">×</span></div>
+            <div class="form-group"><label>昵称</label><input type="text" id="editName" placeholder="请输入昵称"></div>
+            <div class="form-group"><label>手机号</label><input type="tel" id="editPhone" placeholder="请输入手机号"></div>
+            <button class="btn" onclick="saveProfile()">保存</button>
+        </div>
+    </div>
+
+    <!-- Project Form Modal -->
     <div class="modal" id="projectFormModal">
         <div class="modal-content">
             <div class="modal-header"><h3>项目</h3><span class="modal-close" onclick="closeModal('projectFormModal')">×</span></div>
@@ -429,438 +252,1020 @@ function syncData() {
             <button class="btn" onclick="saveProject()">保存</button>
         </div>
     </div>
-    
+
+    <!-- Admin Panel -->
+    <div class="admin-panel" id="adminPanel">
+        <div class="admin-header">
+            <h1>🏪 商家后台</h1>
+            <button class="header-btn" onclick="adminLogout()">退出</button>
+        </div>
+        <div class="admin-nav">
+            <div class="admin-nav-item active" data-admin="users">用户</div>
+            <div class="admin-nav-item" data-admin="projects">项目</div>
+            <div class="admin-nav-item" data-admin="bookings">预约</div>
+            <div class="admin-nav-item" data-admin="recharge">充值</div>
+            <div class="admin-nav-item" data-admin="coupons">优惠券</div>
+            <div class="admin-nav-item" data-admin="discounts">打折</div>
+        </div>
+        <div class="admin-content" id="adminContent"></div>
+    </div>
+
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     <script>
-        // Data
-        let projects = JSON.parse(localStorage.getItem('adminProjects')) || [
+    const firebaseConfig = {
+        apiKey: "AIzaSyBOPa-J7SpDyOSdWiy7gsA5re01Xd-FuvI",
+        authDomain: "beauty-app-6527c.firebaseapp.com",
+        projectId: "beauty-app-6527c",
+        storageBucket: "beauty-app-6527c.firebasestorage.app",
+        messagingSenderId: "396685995260",
+        appId: "1:396685995260:web:0bb1a0676b339378a5bb79",
+        databaseURL: "https://beauty-app-6527c-default-rtdb.asia-southeast1.firebasedatabase.app"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    // Data
+    let projects = [];
+    let users = [];
+    let bookings = [];
+    let posts = [];
+    let rechargePlans = [];
+    let coupons = [];
+    let discounts = [];
+    let timelineEntries = [];
+
+    let currentUser = null;
+    let isAdmin = false;
+    let selectedDate = null;
+    let selectedTime = null;
+    let selectedProject = null;
+
+    // Firebase sync functions
+    function saveToFirebase(path, data) {
+        db.ref(path).push().set(data);
+    }
+
+    function updateFirebase(path, key, data) {
+        db.ref(path + '/' + key).set(data);
+    }
+
+    function syncData() {
+        // Projects
+        db.ref("projects").on("value", snapshot => {
+            const val = snapshot.val();
+            if (val) {
+                projects = Object.values(val);
+                localStorage.setItem("projects", JSON.stringify(projects));
+                renderProjects();
+            }
+        });
+
+        // Users
+        db.ref("users").on("value", snapshot => {
+            const val = snapshot.val();
+            if (val) {
+                users = Object.values(val);
+                localStorage.setItem("users", JSON.stringify(users));
+            }
+        });
+
+        // Bookings
+        db.ref("bookings").on("value", snapshot => {
+            const val = snapshot.val();
+            if (val) {
+                bookings = Object.values(val);
+                localStorage.setItem("bookings", JSON.stringify(bookings));
+                if (currentUser) renderProfile();
+            }
+        });
+
+        // Posts
+        db.ref("posts").on("value", snapshot => {
+            const val = snapshot.val();
+            if (val) {
+                posts = Object.values(val);
+                localStorage.setItem("posts", JSON.stringify(posts));
+                renderPosts();
+            }
+        });
+
+        // Recharge Plans
+        db.ref("rechargePlans").on("value", snapshot => {
+            const val = snapshot.val();
+            if (val) {
+                rechargePlans = Object.values(val);
+                localStorage.setItem("rechargePlans", JSON.stringify(rechargePlans));
+            }
+        });
+
+        // Coupons
+        db.ref("coupons").on("value", snapshot => {
+            const val = snapshot.val();
+            if (val) {
+                coupons = Object.values(val);
+                localStorage.setItem("coupons", JSON.stringify(coupons));
+            }
+        });
+
+        // Discounts
+        db.ref("discounts").on("value", snapshot => {
+            const val = snapshot.val();
+            if (val) {
+                discounts = Object.values(val);
+                localStorage.setItem("discounts", JSON.stringify(discounts));
+                renderProjects();
+            }
+        });
+
+        // Timeline
+        db.ref("timeline").on("value", snapshot => {
+            const val = snapshot.val();
+            if (val) {
+                timelineEntries = Object.values(val);
+                localStorage.setItem("timeline", JSON.stringify(timelineEntries));
+                renderTimeline();
+            }
+        });
+    }
+
+    // Load from localStorage first
+    function loadLocalData() {
+        projects = JSON.parse(localStorage.getItem('projects')) || [
             {id:1,title:'光子嫩肤',desc:'IPL光子技术，改善肤色',price:899,cover:'https://images.unsplash.com/photo-1616394584738-fc6e612e71b9?w=400'},
             {id:2,title:'水光针',desc:'深层补水锁水',price:1280,cover:'https://images.unsplash.com/photo-1512290923902-8a9f81dc236c?w=400'},
-            {id:3,title:'果酸换肤',desc:'温和去除老化角质',price:680,cover:'https://images.unsplash.com/photo-1515377905703-c4788e51af15?w=400'}
+            {id:3,title:'果酸换肤',desc:'温和去除老化角质',price:680,cover:'https://images.unsplash.com/photo-1515377905703-c4788e51af15?w=400'},
+            {id:4,title:'热玛吉',desc:'紧致提升，抗衰老',price:3980,cover:'https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=400'},
+            {id:5,title:'小气泡清洁',desc:'深层清洁毛孔',price:199,cover:'https://images.unsplash.com/photo-1519699047748-de8e44100de5?w=400'},
+            {id:6,title:'纹眉',desc:'半永久自然眉',price:1680,cover:'https://images.unsplash.com/photo-1519415510236-718bdfcd89c8?w=400'}
         ];
-        let users = JSON.parse(localStorage.getItem('users')) || [];
-        let bookings = JSON.parse(localStorage.getItem('bookings')) || [];
-        let posts = JSON.parse(localStorage.getItem('posts')) || [];
-        let rechargePlans = JSON.parse(localStorage.getItem('rechargePlans')) || [];
-        let coupons = JSON.parse(localStorage.getItem('coupons')) || [];
-        let discounts = JSON.parse(localStorage.getItem('discounts')) || [];
-        
-        let currentUser = JSON.parse(localStorage.getItem('currentUser')) || null;
-        let isAdmin = localStorage.getItem('isAdmin') === 'true';
-        let selectedDate = null, selectedTime = null;
-        
-        // Init
-        document.getElementById('userBtn').textContent = currentUser ? currentUser.name || '我的' : '登录';
-        if(isAdmin) showAdminPanel();
-        renderProjects(); renderCalendar(); renderPosts(); renderTimeline(); renderProfile();
-        
-        // 路由功能
-        function getRoute() { return location.hash.slice(1) || 'projects'; }
-        function setRoute(route) { location.hash = route; }
-        function renderRoute() {
-            const route = getRoute();
-            document.querySelectorAll('.tabs .tab').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            const tab = document.querySelector('.tabs .tab[data-tab="' + route + '"]');
-            if(tab) tab.classList.add('active');
-            const page = document.getElementById(route);
-            if(page) page.classList.add('active');
-            if(route === 'admin') { if(!isLoggedIn) { openAdmin(); } else { document.getElementById('adminPanel').classList.add('active'); } }
-        }
-        window.addEventListener('hashchange', renderRoute);
-        document.querySelectorAll('.tabs .tab').forEach(tab => {
-            tab.addEventListener('click', () => { setRoute(tab.dataset.tab); });
-        });
-        if(!location.hash) location.hash = 'projects';
+        users = JSON.parse(localStorage.getItem('users')) || [];
+        bookings = JSON.parse(localStorage.getItem('bookings')) || [];
+        posts = JSON.parse(localStorage.getItem('posts')) || [];
+        rechargePlans = JSON.parse(localStorage.getItem('rechargePlans')) || [
+            {id:1,amount:500,bonus:50},
+            {id:2,amount:1000,bonus:150},
+            {id:3,amount:2000,bonus:400},
+            {id:4,amount:5000,bonus:1200}
+        ];
+        coupons = JSON.parse(localStorage.getItem('coupons')) || [
+            {id:1,name:'满200减30',min:200,val:30},
+            {id:2,name:'满500减80',min:500,val:80}
+        ];
+        discounts = JSON.parse(localStorage.getItem('discounts')) || [];
+        timelineEntries = JSON.parse(localStorage.getItem('timeline')) || [];
+    }
 
-        syncData();
-        
-        // Tabs
-        document.querySelectorAll('.tab').forEach(t => t.onclick = () => {
+    // Init
+    loadLocalData();
+    currentUser = JSON.parse(localStorage.getItem('currentUser')) || null;
+    isAdmin = localStorage.getItem('isAdmin') === 'true';
+
+    document.getElementById('userBtn').textContent = currentUser ? (currentUser.name || '我的') : '登录';
+    if (isAdmin) showAdminPanel();
+
+    renderProjects();
+    renderCalendar();
+    renderPosts();
+    renderTimeline();
+    renderProfile();
+
+    // Route handling
+    function getRoute() { return location.hash.slice(1) || 'projects'; }
+    function setRoute(route) { location.hash = route; }
+
+    function renderRoute() {
+        const route = getRoute();
+        document.querySelectorAll('.tab').forEach(t => {
+            t.classList.remove('active');
+            if (t.dataset.tab === route) t.classList.add('active');
+        });
+        document.querySelectorAll('.page').forEach(p => {
+            p.classList.remove('active');
+            if (p.id === route) p.classList.add('active');
+        });
+        if (route === 'admin') {
+            if (!isAdmin) {
+                openAdmin();
+            } else {
+                document.getElementById('adminPanel').classList.add('active');
+            }
+        } else {
+            document.getElementById('adminPanel').classList.remove('active');
+        }
+    }
+
+    window.addEventListener('hashchange', renderRoute);
+    document.querySelectorAll('.tab').forEach(tab => {
+        tab.addEventListener('click', () => setRoute(tab.dataset.tab));
+    });
+    if (!location.hash) location.hash = 'projects';
+
+    // Tab click handlers
+    document.querySelectorAll('.tab').forEach(t => {
+        t.addEventListener('click', () => {
             document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
             document.querySelectorAll('.page').forEach(x => x.classList.remove('active'));
             t.classList.add('active');
             document.getElementById(t.dataset.tab).classList.add('active');
         });
-        
-        // Projects
-        function renderProjects() {
-            const grid = document.getElementById('projectGrid');
-            grid.innerHTML = projects.map(p => {
-                const disc = discounts.find(d => d.id == p.id);
-                const price = disc ? (disc.type==='fixed'?disc.val:p.price*disc.val/100) : p.price;
-                return `<div class="card" onclick="showDetail(${p.id})"><img src="${p.cover}" class="card-img"><div class="card-body"><div class="card-title">${p.title}</div><div class="card-desc">${p.desc}</div><div class="card-price">¥${price}${disc?'<small style="color:#999;text-decoration:line-through">¥'+p.price+'</small>':''}</div></div></div>`;
-            }).join('');
-        }
-        
-        function showDetail(id) {
-            const p = projects.find(x => x.id == id);
-            const disc = discounts.find(d => d.id == id);
-            const price = disc ? (disc.type==='fixed'?disc.val:p.price*disc.val/100) : p.price;
-            document.getElementById('detailContent').innerHTML = `<img src="${p.cover}" class="detail-cover"><h2>${p.title}</h2><div class="detail-price">¥${price}</div><p>${p.desc}</p><button class="btn" style="margin-top:16px" onclick="selectProjectForBooking(${p.id})">立即预约</button>`;
-            document.getElementById('detailView').classList.add('active');
-        }
-        
-        function closeDetail() { document.getElementById('detailView').classList.remove('active'); }
-        
-        // Calendar
-        function renderCalendar() {
-            const scroll = document.getElementById('dateScroll');
-            let html = '';
-            for(let i=0;i<14;i++){
-                const d = new Date(); d.setDate(d.getDate()+i);
-                const day = ['日','一','二','三','四','五','六'][d.getDay()];
-                const date = d.toISOString().split('T')[0];
-                html += `<div class="date-item ${i===0?'active':''}" onclick="selectDate('${date}',this)"><div>周${day}</div><div style="font-weight:600">${d.getDate()}</div></div>`;
+    });
+
+    // Projects
+    function renderProjects() {
+        const grid = document.getElementById('projectGrid');
+        grid.innerHTML = projects.map(p => {
+            const disc = discounts.find(d => d.projectId == p.id);
+            let price = p.price;
+            let discountBadge = '';
+            if (disc) {
+                if (disc.type === 'percent') {
+                    price = Math.round(p.price * disc.val / 100);
+                    discountBadge = `<span class="discount-badge">${disc.val}折</span>`;
+                } else {
+                    price = p.price - disc.val;
+                    discountBadge = `<span class="discount-badge">减${disc.val}元</span>`;
+                }
             }
-            scroll.innerHTML = html;
-            selectedDate = new Date().toISOString().split('T')[0];
-            renderTimeSlots();
+            return `<div class="card" onclick="showDetail(${p.id})">
+                <img src="${p.cover}" class="card-img">
+                <div class="card-body">
+                    <div class="card-title">${p.title}</div>
+                    <div class="card-desc">${p.desc}</div>
+                    <div class="card-price">¥${price}${disc ? `<small style="color:#999;text-decoration:line-through;margin-left:8px">¥${p.price}</small>` : ''}</div>
+                    ${discountBadge}
+                </div>
+            </div>`;
+        }).join('');
+    }
+
+    function showDetail(id) {
+        const p = projects.find(x => x.id == id);
+        const disc = discounts.find(d => d.projectId == id);
+        let price = p.price;
+        if (disc) {
+            price = disc.type === 'percent' ? Math.round(p.price * disc.val / 100) : p.price - disc.val;
         }
-        
-        function selectDate(date, el) {
-            document.querySelectorAll('.date-item').forEach(x => x.classList.remove('active'));
-            el.classList.add('active');
-            selectedDate = date;
-            renderTimeSlots();
+        document.getElementById('detailTitle').textContent = p.title;
+        document.getElementById('detailContent').innerHTML = `
+            <img src="${p.cover}" class="detail-cover">
+            <h2 style="font-family:'Playfair Display',serif">${p.title}</h2>
+            <div class="detail-price">¥${price}</div>
+            <p style="color:var(--text-light);margin-bottom:20px">${p.desc}</p>
+            <button class="btn" onclick="selectProjectForBooking(${p.id})">立即预约</button>
+        `;
+        document.getElementById('detailView').classList.add('active');
+    }
+
+    function closeDetail() {
+        document.getElementById('detailView').classList.remove('active');
+    }
+
+    // Calendar
+    function renderCalendar() {
+        const scroll = document.getElementById('dateScroll');
+        let html = '';
+        for (let i = 0; i < 14; i++) {
+            const d = new Date();
+            d.setDate(d.getDate() + i);
+            const day = ['日', '一', '二', '三', '四', '五', '六'][d.getDay()];
+            const date = d.toISOString().split('T')[0];
+            html += `<div class="date-item ${i === 0 ? 'active' : ''}" onclick="selectDate('${date}',this)">
+                <div>周${day}</div>
+                <div style="font-weight:600">${d.getDate()}</div>
+            </div>`;
         }
-        
-        function renderTimeSlots() {
-            let html = '';
-            for(let h=10;h<=21;h++){
-                const booked = bookings.some(b => b.date === selectedDate && b.time === h+':00');
-                html += `<div class="time-slot ${booked?'booked':''}" onclick="${booked?'':`selectTime('${h}:00',this)`}"><div>${h}:00</div><div style="font-size:11px">${booked?'已约':'可预约'}</div></div>`;
-            }
-            document.getElementById('timeSlots').innerHTML = html;
+        scroll.innerHTML = html;
+        selectedDate = new Date().toISOString().split('T')[0];
+        renderTimeSlots();
+    }
+
+    function selectDate(date, el) {
+        document.querySelectorAll('.date-item').forEach(x => x.classList.remove('active'));
+        el.classList.add('active');
+        selectedDate = date;
+        renderTimeSlots();
+    }
+
+    function renderTimeSlots() {
+        const container = document.getElementById('timeSlots');
+        let html = '';
+        for (let h = 10; h <= 21; h++) {
+            const time = h + ':00';
+            const booked = bookings.some(b => b.date === selectedDate && b.time === time);
+            html += `<div class="time-slot ${booked ? 'booked' : ''}" onclick="${booked ? '' : `selectTime('${time}',this)`}">
+                <div>${time}</div>
+                <div style="font-size:11px">${booked ? '已约' : '可预约'}</div>
+            </div>`;
         }
-        
-        function selectTime(time, el) {
-            document.querySelectorAll('.time-slot').forEach(x => x.classList.remove('selected'));
-            el.classList.add('selected');
-            selectedTime = time;
-            if(!currentUser) return openUserLogin();
-            document.getElementById('bookName').value = currentUser.phone || '';
-            document.getElementById('bookPhone').value = currentUser.phone || '';
-            document.getElementById('bookingModal').classList.add('active');
+        container.innerHTML = html;
+    }
+
+    function selectTime(time, el) {
+        if (!currentUser) return openUserLogin();
+        document.querySelectorAll('.time-slot').forEach(x => x.classList.remove('selected'));
+        el.classList.add('selected');
+        selectedTime = time;
+        document.getElementById('bookName').value = currentUser.name || '';
+        document.getElementById('bookPhone').value = currentUser.phone || '';
+        document.getElementById('bookingModal').classList.add('active');
+    }
+
+    function confirmBooking() {
+        const name = document.getElementById('bookName').value;
+        const phone = document.getElementById('bookPhone').value;
+        if (!name || !phone) return alert('请填写信息');
+        const book = {
+            id: Date.now(),
+            date: selectedDate,
+            time: selectedTime,
+            name: name,
+            phone: phone,
+            note: document.getElementById('bookNote').value,
+            projectId: selectedProject,
+            projectName: selectedProject ? projects.find(p => p.id == selectedProject)?.title : '',
+            status: 'pending'
+        };
+        bookings.push(book);
+        localStorage.setItem('bookings', JSON.stringify(bookings));
+        saveToFirebase('bookings', book);
+
+        // Add to timeline
+        const entry = {
+            id: Date.now(),
+            userId: currentUser.phone,
+            date: selectedDate,
+            time: selectedTime,
+            type: 'booking',
+            content: '预约服务: ' + (book.projectName || '未知项目'),
+            status: 'pending'
+        };
+        timelineEntries.push(entry);
+        localStorage.setItem('timeline', JSON.stringify(timelineEntries));
+        saveToFirebase('timeline', entry);
+
+        closeModal('bookingModal');
+        renderTimeSlots();
+        renderTimeline();
+        renderProfile();
+        alert('预约成功！');
+    }
+
+    function selectProjectForBooking(pid) {
+        selectedProject = pid;
+        setRoute('booking');
+        closeDetail();
+    }
+
+    // Community
+    function renderPosts() {
+        const list = document.getElementById('postList');
+        if (!posts.length) {
+            list.innerHTML = '<div class="empty">暂无帖子，快来发布吧~</div>';
+            return;
         }
-        
-        function confirmBooking() {
-            const name = document.getElementById('bookName').value;
-            const phone = document.getElementById('bookPhone').value;
-            if(!name||!phone) return alert('请填写信息');
-            const book = {id:Date.now(),date:selectedDate,time:selectedTime,name,phone,note:document.getElementById('bookNote').value};
-            bookings.push(book);
-            localStorage.setItem('bookings',JSON.stringify(bookings)); saveToFirebase('bookings', book);
-            closeModal('bookingModal');
-            renderTimeSlots();
-            alert('预约成功！'); renderProfile(); if(typeof syncData==='function') syncData();
-        }
-        
-        // Community
-        function renderPosts() {
-            const list = document.getElementById('postList');
-            if(!posts.length) return list.innerHTML = '<div class="empty">暂无帖子</div>';
-            list.innerHTML = posts.map(p => `<div class="post-card" onclick="viewPost(${p.id})"><div class="post-title">${p.title}</div><div class="post-meta">${p.author} · ${p.comments?.length||0}评论</div></div>`).join('');
-        }
-        
-        function openPostModal() {
-            if(!currentUser) return openUserLogin();
-            document.getElementById('postModal').classList.add('active');
-        }
-        
-        function submitPost() {
-            const title = document.getElementById('postTitle').value;
-            const content = document.getElementById('postContent').value;
-            if(!title||!content) return alert('请填写内容');
-            posts.unshift({id:Date.now(),title,content,author:currentUser.name||'用户',time:new Date().toLocaleDateString(),comments:[]});
-            localStorage.setItem('posts',JSON.stringify(posts)); saveToFirebase('posts', {id:Date.now(),title,content,author:currentUser.name||'用户',time:new Date().toLocaleDateString(),comments:[]});
-            closeModal('postModal');
-            renderPosts();
-            document.getElementById('postTitle').value = '';
-            document.getElementById('postContent').value = '';
-        }
-        
-        function viewPost(id) {
-            const p = posts.find(x => x.id == id);
-            let html = `<h3>${p.title}</h3><p style="margin:12px 0">${p.content}</p><p style="color:var(--text-light);font-size:12px">${p.author} · ${p.time}</p>`;
-            if(p.comments?.length){
-                p.comments.forEach(c => { html += `<div style="background:var(--bg);padding:12px;border-radius:8px;margin:8px 0"><div style="font-weight:600;font-size:13px">${c.author}</div><div>${c.content}</div></div>`; });
-            }
-            if(currentUser){
-                html += `<div style="margin-top:16px"><input type="text" id="commentInput" placeholder="评论" style="flex:1;padding:10px;border:1px solid #eee;border-radius:8px"><button onclick="addComment(${p.id})" style="background:var(--primary);color:white;border:none;padding:10px 16px;border-radius:8px">发送</button></div>`;
-            }
-            document.getElementById('detailContent').innerHTML = html;
-            document.getElementById('detailView').classList.add('active');
-        }
-        
-        function addComment(pid) {
-            const p = posts.find(x => x.id == pid);
-            const input = document.getElementById('commentInput');
-            if(!input.value) return;
-            if(!p.comments) p.comments = [];
-            p.comments.push({author:currentUser.name||'用户',content:input.value});
-            localStorage.setItem('posts',JSON.stringify(posts)); saveToFirebase('posts', {id:Date.now(),title,content,author:currentUser.name||'用户',time:new Date().toLocaleDateString(),comments:[]});
-            viewPost(pid);
-        }
-        
-        // Timeline
-        function renderTimeline() {
-            const list = document.getElementById('timelineList');
-            const myBooks = bookings.filter(b => currentUser && b.phone === currentUser.phone);
-            if(!myBooks.length) return list.innerHTML = '<div class="empty">暂无记录</div>';
-            const grouped = {};
-            myBooks.forEach(b => { if(!grouped[b.date]) grouped[b.date] = []; grouped[b.date].push(b); });
-            let html = '';
-            Object.keys(grouped).sort().reverse().forEach(date => {
-                html += `<div class="timeline-item"><div class="timeline-date">${date}</div>${grouped[date].map(b => `<span class="tag">${b.time} ${b.name}</span>`).join('')}</div>`;
+        list.innerHTML = posts.map(p => `
+            <div class="post-card" onclick="viewPost(${p.id})">
+                <div class="post-title">${p.title}</div>
+                <div class="post-content">${p.content.substring(0, 80)}...</div>
+                <div class="post-meta">${p.author} · ${p.comments?.length || 0}评论 · ${p.time}</div>
+            </div>
+        `).join('');
+    }
+
+    function openPostModal() {
+        if (!currentUser) return openUserLogin();
+        document.getElementById('postModal').classList.add('active');
+    }
+
+    function submitPost() {
+        const title = document.getElementById('postTitle').value;
+        const content = document.getElementById('postContent').value;
+        if (!title || !content) return alert('请填写内容');
+        const post = {
+            id: Date.now(),
+            title: title,
+            content: content,
+            author: currentUser.name || '用户',
+            time: new Date().toLocaleDateString(),
+            comments: []
+        };
+        posts.unshift(post);
+        localStorage.setItem('posts', JSON.stringify(posts));
+        saveToFirebase('posts', post);
+        closeModal('postModal');
+        renderPosts();
+        document.getElementById('postTitle').value = '';
+        document.getElementById('postContent').value = '';
+    }
+
+    function viewPost(id) {
+        const p = posts.find(x => x.id == id);
+        let html = `
+            <h2 style="font-family:'Playfair Display',serif;margin-bottom:12px">${p.title}</h2>
+            <p style="margin:12px 0;color:var(--text)">${p.content}</p>
+            <p style="color:var(--text-light);font-size:12px">${p.author} · ${p.time}</p>
+        `;
+
+        if (p.comments && p.comments.length) {
+            html += '<h4 style="margin-top:16px">评论</h4>';
+            p.comments.forEach(c => {
+                html += `<div class="comment"><div class="comment-author">${c.author}</div><div>${c.content}</div></div>`;
             });
-            list.innerHTML = html;
         }
-        
-        // Profile
-        function renderProfile() {
-            const c = document.getElementById("profileContent");
-            if(!currentUser) {
-                c.innerHTML = '<div class="empty">请先登录</div>';
-                return;
-            }
-            const myBooks = bookings.filter(b => b.phone === currentUser.phone);
-            
-            let html = "";
-            
-            // 1. 个人信息
-            html += '<div class="profile-section">';
-            html += '<div class="profile-avatar" style="cursor:pointer" onclick="editAvatar()">' + (currentUser.avatar ? '<img src="' + currentUser.avatar + '" style="width:100%;height:100%;border-radius:50%;object-fit:cover">' : (currentUser.name?.charAt(0) || '?')) + '</div>';
-            html += '<div class="profile-name">' + (currentUser.name || '用户') + '</div>';
-            html += '<div class="profile-phone">📱 ' + (currentUser.phone || '') + '</div>';
-            html += '<button class="btn" style="margin-top:12px" onclick="editProfile()">✏️ 修改资料</button>';
-            html += '</div>';
-            
-            // 2. 我的预约
-            html += '<div class="profile-section"><h3>📅 我的预约</h3>';
-            if(myBooks.length) {
-                html += myBooks.map(b => '<div class="item-row"><span>' + b.date + ' ' + b.time + '</span><span>' + b.name + '</span></div>').join('');
-            } else {
-                html += '<div class="empty">暂无预约</div>';
-            }
-            html += '</div>';
-            
-            // 3. 余额及充值
-            html += '<div class="profile-section">';
-            html += '<h3>💰 余额</h3>';
-            html += '<div style="text-align:center;padding:16px 0">';
-            html += '<div style="font-size:36px;font-weight:700;color:#EC4899">¥' + (currentUser.balance||0) + '</div>';
-            html += '<div style="color:#666;font-size:14px">累计消费 ¥' + (currentUser.totalSpent||0) + '</div>';
-            html += '</div>';
-            html += '<button class="btn" onclick="showRecharge()">💳 充值</button>';
-            html += '</div>';
-            
-            // 4. 可用优惠券
-            html += '<div class="profile-section"><h3>🎫 可用优惠券</h3>';
-            if(coupons.length) {
-                html += coupons.map(c => '<div class="item-row"><span>' + c.name + '</span><span>¥' + c.val + '</span></div>').join('');
-            } else {
-                html += '<div class="empty">暂无</div>';
-            }
-            html += '</div>';
-            
-            // 5. 退出登录
-            html += '<div class="profile-section"><button class="btn" style="background:#6B7280" onclick="userLogout()">🚪 退出登录</button></div>';
-            
-            c.innerHTML = html;
+
+        if (currentUser) {
+            html += `<div style="margin-top:16px;display:flex;gap:8px">
+                <input type="text" id="commentInput" placeholder="评论" style="flex:1;padding:10px;border:1px solid #eee;border-radius:8px">
+                <button onclick="addComment(${p.id})" style="background:var(--primary);color:white;border:none;padding:10px 16px;border-radius:8px;cursor:pointer">发送</button>
+            </div>`;
         }
-        
-        window.editAvatar = function() {
-            const input = document.createElement('input');
-            input.type = 'file';
-            input.accept = 'image/*';
-            input.onchange = async function() {
-                const file = this.files[0];
-                if(!file) return;
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    currentUser.avatar = e.target.result;
-                    localStorage.setItem('currentUser', JSON.stringify(currentUser));
-                    renderProfile();
-                };
-                reader.readAsDataURL(file);
-            };
-            input.click();
+
+        document.getElementById('detailTitle').textContent = '帖子详情';
+        document.getElementById('detailContent').innerHTML = html;
+        document.getElementById('detailView').classList.add('active');
+    }
+
+    function addComment(pid) {
+        const p = posts.find(x => x.id == pid);
+        const input = document.getElementById('commentInput');
+        if (!input.value) return;
+        if (!p.comments) p.comments = [];
+        const comment = {
+            author: currentUser.name || '用户',
+            content: input.value
+        };
+        p.comments.push(comment);
+        localStorage.setItem('posts', JSON.stringify(posts));
+        saveToFirebase('posts', p);
+        viewPost(pid);
+    }
+
+    // Timeline
+    function renderTimeline() {
+        const list = document.getElementById('timelineList');
+        if (!currentUser) {
+            list.innerHTML = '<div class="empty">请先登录查看美容日记</div>';
+            return;
         }
-        
-        window.showRecharge = function() {
-            const list = document.getElementById('rechargeList');
-            const plans = JSON.parse(localStorage.getItem("rechargePlans")) || [];
-            if(!plans.length) {
-                list.innerHTML = '<div class="empty">暂无可用充值方案</div>';
-            } else {
-                list.innerHTML = plans.map(p => '<div class="item-row"><div><strong>充¥' + p.amount + ' 送¥' + (p.bonus||0) + '</strong></div><button class="btn" style="width:auto;padding:8px 16px" onclick="doRecharge(' + p.amount + ')">充值</button></div>').join('');
-            }
-            document.getElementById('rechargeModal').classList.add('active');
+        const myEntries = timelineEntries.filter(e => e.userId === currentUser.phone);
+        if (!myEntries.length) {
+            list.innerHTML = '<div class="empty">暂无美容记录</div>';
+            return;
         }
-        
-        window.closeRecharge = function() {
-            document.getElementById('rechargeModal').classList.remove('active');
+        const grouped = {};
+        myEntries.forEach(e => {
+            if (!grouped[e.date]) grouped[e.date] = [];
+            grouped[e.date].push(e);
+        });
+
+        let html = '';
+        Object.keys(grouped).sort().reverse().forEach(date => {
+            html += `<div class="timeline-item">
+                <div class="timeline-date">${date}</div>
+                ${grouped[date].map(e => `
+                    <div class="timeline-content">
+                        <span class="tag">${e.time}</span>
+                        ${e.content}
+                        <span class="tag" style="background:${e.status === 'completed' ? '#10B981' : '#F59E0B'};color:white">${e.status === 'completed' ? '已完成' : '待服务'}</span>
+                    </div>
+                `).join('')}
+            </div>`;
+        });
+        list.innerHTML = html;
+    }
+
+    // Profile
+    function renderProfile() {
+        const c = document.getElementById('profileContent');
+        if (!currentUser) {
+            c.innerHTML = '<div class="empty">请先登录</div>';
+            return;
         }
-        
-        window.doRecharge = function(amount) {
-            if(!confirm('确认充值 ¥' + amount + '？')) return;
-            currentUser.balance = (currentUser.balance || 0) + amount;
-            currentUser.totalSpent = (currentUser.totalSpent || 0) + amount;
-            localStorage.setItem('currentUser', JSON.stringify(currentUser));
-            if(typeof saveToFirebase !== 'undefined') saveToFirebase('users', currentUser);
-            closeRecharge();
-            renderProfile();
-            alert('充值成功！');
+
+        const myBooks = bookings.filter(b => b.phone === currentUser.phone);
+
+        let html = '';
+
+        // Avatar & Info
+        html += `<div class="section">
+            <div class="profile-avatar" onclick="editAvatar()">${currentUser.avatar ? '<img src="' + currentUser.avatar + '" style="width:100%;height:100%;object-fit:cover">' : (currentUser.name?.charAt(0) || '?')}</div>
+            <div class="profile-name">${currentUser.name || '用户'}</div>
+            <div class="profile-phone">📱 ${currentUser.phone || ''}</div>
+            <button class="btn" style="margin-top:12px" onclick="openEditProfile()">✏️ 修改资料</button>
+        </div>`;
+
+        // Stats
+        html += `<div class="stat-grid">
+            <div class="stat-box">
+                <div class="stat-num">¥${currentUser.balance || 0}</div>
+                <div class="stat-label">余额</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-num">${myBooks.length}</div>
+                <div class="stat-label">预约</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-num">¥${currentUser.totalSpent || 0}</div>
+                <div class="stat-label">累计消费</div>
+            </div>
+        </div>`;
+
+        // Recharge
+        html += `<div class="section">
+            <div class="section-title">💰 充值</div>
+            <button class="btn" onclick="showRecharge()">立即充值</button>
+        </div>`;
+
+        // My Bookings
+        html += `<div class="section">
+            <div class="section-title">📅 我的预约</div>`;
+        if (myBooks.length) {
+            html += myBooks.map(b => `
+                <div class="item-row">
+                    <div>
+                        <div style="font-weight:600">${b.projectName || '美容服务'}</div>
+                        <div style="font-size:12px;color:var(--text-light)">${b.date} ${b.time}</div>
+                    </div>
+                    <span class="tag" style="background:${b.status === 'completed' ? '#10B981' : '#F59E0B'};color:white">${b.status === 'completed' ? '已完成' : '待服务'}</span>
+                </div>
+            `).join('');
+        } else {
+            html += '<div class="empty">暂无预约</div>';
         }
-            
-            // 可用优惠券
-            profileHTML += '<div class="profile-section"><h3>🎫 可用优惠券</h3>';
-            if(coupons.length) {
-                profileHTML += coupons.map(c => `<div class="item-row"><span>${c.name}</span><span>¥${c.val}</span></div>`).join('');
-            } else {
-                profileHTML += '<div class="empty">暂无</div>';
-            }
-            profileHTML += '</div>';
-            
-            // 退出登录
-            profileHTML += '<div class="profile-section"><button class="btn" style="background:#6B7280" onclick="userLogout()">🚪 退出登录</button></div>';
-            
-            if(!plans.length) {
-                html += '<div class="empty">暂无可用充值方案</div>';
-            } else {
-                plans.forEach(p => {
-                    html += '<div class="item-row"><div><strong>充¥' + p.amount + ' 送¥' + (p.bonus||0) + '</strong></div><button class="btn" style="width:auto;padding:8px 16px" onclick="doRecharge(' + p.amount + ')">充值</button></div>';
-                });
-            }
-            html += '</div>';
-            document.getElementById('myCoupons').innerHTML = html;
-            document.getElementById('myCoupons').classList.add('active');
+        html += '</div>';
+
+        // Coupons
+        html += `<div class="section">
+            <div class="section-title">🎫 可用优惠券</div>`;
+        if (coupons.length) {
+            html += coupons.map(c => `
+                <div class="coupon-card">
+                    <div>
+                        <div style="font-weight:600">${c.name}</div>
+                        <div style="font-size:12px;color:var(--text-light)">满${c.min}元</div>
+                    </div>
+                    <div class="coupon-value">¥${c.val}</div>
+                </div>
+            `).join('');
+        } else {
+            html += '<div class="empty">暂无可用优惠券</div>';
         }
-        
-        window.doRecharge = function(amount) {
-            if(!confirm('确认充值 ¥' + amount + '？')) return;
-            currentUser.balance = (currentUser.balance || 0) + amount; currentUser.totalSpent = (currentUser.totalSpent || 0) + amount;
-            localStorage.setItem('currentUser', JSON.stringify(currentUser)); saveToFirebase('users', currentUser);
-            renderProfile();
-            alert('充值成功！');
-        }
-        
-        window.editProfile = function() {
-            const newName = prompt('请输入新名字:', currentUser.name || '');
-            if(newName !== null) {
-                currentUser.name = newName;
-                localStorage.setItem('currentUser', JSON.stringify(currentUser)); saveToFirebase('users', currentUser);
-                const idx = users.findIndex(u => u.id === currentUser.id);
-                if(idx >= 0) { users[idx].name = newName; localStorage.setItem('users', JSON.stringify(users)); }
+        html += '</div>';
+
+        // Logout
+        html += `<div class="section">
+            <button class="btn" style="background:#6B7280" onclick="userLogout()">🚪 退出登录</button>
+        </div>`;
+
+        c.innerHTML = html;
+    }
+
+    function editAvatar() {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = 'image/*';
+        input.onchange = function() {
+            const file = this.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                currentUser.avatar = e.target.result;
+                localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                updateUserInFirebase();
                 renderProfile();
-            }
+            };
+            reader.readAsDataURL(file);
+        };
+        input.click();
+    }
+
+    function openEditProfile() {
+        document.getElementById('editName').value = currentUser.name || '';
+        document.getElementById('editPhone').value = currentUser.phone || '';
+        document.getElementById('editProfileModal').classList.add('active');
+    }
+
+    function saveProfile() {
+        const name = document.getElementById('editName').value;
+        const phone = document.getElementById('editPhone').value;
+        if (!name) return alert('请输入昵称');
+        currentUser.name = name;
+        currentUser.phone = phone;
+        localStorage.setItem('currentUser', JSON.stringify(currentUser));
+        updateUserInFirebase();
+        closeModal('editProfileModal');
+        renderProfile();
+        document.getElementById('userBtn').textContent = name;
+    }
+
+    function updateUserInFirebase() {
+        const idx = users.findIndex(u => u.phone === currentUser.phone);
+        if (idx >= 0) {
+            users[idx] = { ...users[idx], ...currentUser };
+            localStorage.setItem('users', JSON.stringify(users));
         }
-        
-        // Login
-        function openUserLogin() { document.getElementById('userLoginModal').classList.add('active'); }
-        function openAdmin() { document.getElementById('adminModal').classList.add('active'); }
-        
-        function sendUserCode() {
-            const phone = document.getElementById('userPhone').value;
-            if(!/^1\d{10}$/.test(phone)) return alert('手机号格式错误');
-            alert('验证码: 123456 (测试)');
+    }
+
+    function showRecharge() {
+        const list = document.getElementById('rechargeList');
+        if (!rechargePlans.length) {
+            list.innerHTML = '<div class="empty">暂无可用充值方案</div>';
+        } else {
+            list.innerHTML = rechargePlans.map(p => `
+                <div class="recharge-card" onclick="doRecharge(${p.amount}, ${p.bonus || 0})">
+                    <div class="recharge-amount">充¥${p.amount}</div>
+                    <div style="color:var(--secondary)">送¥${p.bonus || 0}</div>
+                </div>
+            `).join('');
         }
-        
-        function doUserLogin() {
-            const phone = document.getElementById('userPhone').value;
-            const code = document.getElementById('userCode').value;
-            if(code !== '123456') return alert('验证码错误');
-            let user = users.find(u => u.phone === phone);
-            if(!user){ user = {id:Date.now(),phone,name:'用户'+phone.slice(-4),balance:0,tags:[]}; users.push(user); localStorage.setItem('users',JSON.stringify(users)); saveToFirebase('users', user); }
-            currentUser = user;
-            localStorage.setItem('currentUser',JSON.stringify(user));
-            closeModal('userLoginModal');
-            document.getElementById('userBtn').textContent = user.name;
-            renderProfile();
+        document.getElementById('rechargeModal').classList.add('active');
+    }
+
+    function closeRecharge() {
+        document.getElementById('rechargeModal').classList.remove('active');
+    }
+
+    function doRecharge(amount, bonus) {
+        if (!confirm(`确认充值 ¥${amount}？将获得 ¥${bonus} 赠送`)) return;
+        currentUser.balance = (currentUser.balance || 0) + amount + bonus;
+        currentUser.totalSpent = (currentUser.totalSpent || 0) + amount;
+        localStorage.setItem('currentUser', JSON.stringify(currentUser));
+        updateUserInFirebase();
+        closeRecharge();
+        renderProfile();
+        alert('充值成功！');
+    }
+
+    // Login
+    function openUserLogin() {
+        document.getElementById('userLoginModal').classList.add('active');
+    }
+
+    function sendUserCode() {
+        const phone = document.getElementById('userPhone').value;
+        if (!/^1\d{10}$/.test(phone)) return alert('手机号格式错误');
+        alert('验证码: 123456 (测试验证码)');
+    }
+
+    function doUserLogin() {
+        const phone = document.getElementById('userPhone').value;
+        const code = document.getElementById('userCode').value;
+        if (code !== '123456') return alert('验证码错误');
+
+        let user = users.find(u => u.phone === phone);
+        if (!user) {
+            user = {
+                id: Date.now(),
+                phone: phone,
+                name: '用户' + phone.slice(-4),
+                balance: 0,
+                totalSpent: 0,
+                tags: []
+            };
+            users.push(user);
+            localStorage.setItem('users', JSON.stringify(users));
+            saveToFirebase('users', user);
         }
-        
-        function userLogout() {
-            currentUser = null;
-            localStorage.removeItem('currentUser');
-            document.getElementById('userBtn').textContent = '登录';
-            renderProfile();
-            alert('已退出');
-        }
-        
-        function doAdminLogin() {
-            const user = document.getElementById('adminUser').value;
-            const pass = document.getElementById('adminPass').value;
-            if(user==='admin' && pass==='beauty123'){
-                isAdmin = true;
-                localStorage.setItem('isAdmin','true');
-                closeModal('adminModal');
-                showAdminPanel();
-            }else{ alert('账号或密码错误'); }
-        }
-        
-        function adminLogout() {
-            isAdmin = false;
-            localStorage.setItem('isAdmin','false');
-            document.getElementById('adminPanel').classList.remove('active');
-        }
-        
-        function showAdminPanel() {
-            document.getElementById('adminPanel').classList.add('active');
-            document.getElementById('userCount').textContent = users.length;
-            document.getElementById('adminUserList').innerHTML = users.map(u => `<div class="item-row"><span>${u.name}</span><span>¥${u.balance||0}</span></div>`).join('') || '<div class="empty">暂无用户</div>';
-            document.getElementById('adminProjectList').innerHTML = projects.map(p => `<div class="item-row"><span>${p.title}</span><span>¥${p.price}</span></div>`).join('') || '<div class="empty">暂无项目</div>';
-            document.getElementById('adminBookingList').innerHTML = bookings.map(b => `<div class="item-row"><span>${b.date} ${b.time}</span><span>${b.name}</span></div>`).join('') || '<div class="empty">暂无预约</div>';
-        }
-        
-        function openProjectForm() {
-            document.getElementById('projectFormModal').classList.add('active');
-        }
-        
-        function saveProject() {
-            const title = document.getElementById('projTitle').value;
-            const price = document.getElementById('projPrice').value;
-            if(!title||!price) return alert('请填写名称和价格');
-            projects.push({id:Date.now(),title,price,desc:document.getElementById('projDesc').value,cover:document.getElementById('projCover').value||'https://via.placeholder.com/400x300'});
-            localStorage.setItem('projects',JSON.stringify(projects));
-            closeModal('projectFormModal');
-            renderProjects();
+
+        currentUser = user;
+        localStorage.setItem('currentUser', JSON.stringify(user));
+        closeModal('userLoginModal');
+        document.getElementById('userBtn').textContent = user.name;
+        renderProfile();
+        renderTimeline();
+    }
+
+    function userLogout() {
+        currentUser = null;
+        localStorage.removeItem('currentUser');
+        document.getElementById('userBtn').textContent = '登录';
+        renderProfile();
+        renderTimeline();
+        alert('已退出登录');
+    }
+
+    // Admin
+    function openAdmin() {
+        document.getElementById('adminModal').classList.add('active');
+    }
+
+    function doAdminLogin() {
+        const user = document.getElementById('adminUser').value;
+        const pass = document.getElementById('adminPass').value;
+        if (user === 'admin' && pass === 'beauty123') {
+            isAdmin = true;
+            localStorage.setItem('isAdmin', 'true');
+            closeModal('adminModal');
             showAdminPanel();
+        } else {
+            alert('账号或密码错误');
         }
-        
-        function selectProjectForBooking(pid) {
-            document.querySelectorAll('.tab')[1].click();
-            closeDetail();
+    }
+
+    function adminLogout() {
+        isAdmin = false;
+        localStorage.setItem('isAdmin', 'false');
+        document.getElementById('adminPanel').classList.remove('active');
+        location.hash = 'projects';
+    }
+
+    function showAdminPanel() {
+        document.getElementById('adminPanel').classList.add('active');
+        renderAdminUsers();
+    }
+
+    // Admin nav
+    document.querySelectorAll('.admin-nav-item').forEach(item => {
+        item.addEventListener('click', () => {
+            document.querySelectorAll('.admin-nav-item').forEach(i => i.classList.remove('active'));
+            item.classList.add('active');
+            const tab = item.dataset.admin;
+            renderAdminTab(tab);
+        });
+    });
+
+    function renderAdminTab(tab) {
+        const content = document.getElementById('adminContent');
+        switch(tab) {
+            case 'users':
+                renderAdminUsers();
+                break;
+            case 'projects':
+                renderAdminProjects();
+                break;
+            case 'bookings':
+                renderAdminBookings();
+                break;
+            case 'recharge':
+                renderAdminRecharge();
+                break;
+            case 'coupons':
+                renderAdminCoupons();
+                break;
+            case 'discounts':
+                renderAdminDiscounts();
+                break;
         }
-        
-        function addRecharge() {
-            const val = document.getElementById('rechargePlan').value;
-            if(!val) return;
-            rechargePlans.push({val});
-            localStorage.setItem('rechargePlans',JSON.stringify(rechargePlans));
-            alert('添加成功');
+    }
+
+    function renderAdminUsers() {
+        const content = document.getElementById('adminContent');
+        content.innerHTML = `
+            <div class="admin-section">
+                <div class="section-title">用户列表 <span>${users.length}人</span></div>
+                ${users.map(u => `
+                    <div class="item-row">
+                        <div>
+                            <div style="font-weight:600">${u.name}</div>
+                            <div style="font-size:12px;color:var(--text-light)">${u.phone}</div>
+                        </div>
+                        <div>
+                            <div>余额: ¥${u.balance || 0}</div>
+                            <div style="font-size:12px;color:var(--text-light)">累计: ¥${u.totalSpent || 0}</div>
+                        </div>
+                    </div>
+                `).join('') || '<div class="empty">暂无用户</div>'}
+            </div>
+        `;
+    }
+
+    function renderAdminProjects() {
+        const content = document.getElementById('adminContent');
+        content.innerHTML = `
+            <div class="admin-section">
+                <div class="section-title">
+                    项目列表
+                    <button onclick="openProjectForm()" style="background:var(--primary);color:white;border:none;padding:6px 12px;border-radius:8px;cursor:pointer">+ 添加</button>
+                </div>
+                ${projects.map(p => `
+                    <div class="item-row">
+                        <div style="display:flex;align-items:center;gap:12px">
+                            <img src="${p.cover}" style="width:50px;height:50px;border-radius:8px;object-fit:cover">
+                            <div>
+                                <div style="font-weight:600">${p.title}</div>
+                                <div style="font-size:12px;color:var(--text-light)">${p.desc}</div>
+                            </div>
+                        </div>
+                        <div style="font-weight:700;color:var(--primary)">¥${p.price}</div>
+                    </div>
+                `).join('') || '<div class="empty">暂无项目</div>'}
+            </div>
+        `;
+    }
+
+    function renderAdminBookings() {
+        const content = document.getElementById('adminContent');
+        content.innerHTML = `
+            <div class="admin-section">
+                <div class="section-title">预约列表 <span>${bookings.length}条</span></div>
+                ${bookings.map(b => `
+                    <div class="item-row">
+                        <div>
+                            <div style="font-weight:600">${b.name}</div>
+                            <div style="font-size:12px;color:var(--text-light)">${b.phone}</div>
+                        </div>
+                        <div>
+                            <div>${b.date} ${b.time}</div>
+                            <div style="font-size:12px">${b.projectName || '美容服务'}</div>
+                        </div>
+                        <span class="tag" style="background:${b.status === 'completed' ? '#10B981' : '#F59E0B'};color:white" onclick="toggleBookingStatus(${b.id})">${b.status === 'completed' ? '完成' : '待服务'}</span>
+                    </div>
+                `).join('') || '<div class="empty">暂无预约</div>'}
+            </div>
+        `;
+    }
+
+    function toggleBookingStatus(id) {
+        const book = bookings.find(b => b.id == id);
+        if (book) {
+            book.status = book.status === 'completed' ? 'pending' : 'completed';
+            localStorage.setItem('bookings', JSON.stringify(bookings));
+
+            // Update timeline
+            const entry = timelineEntries.find(e => e.date === book.date && e.time === book.time && e.userId === book.phone);
+            if (entry) {
+                entry.status = book.status;
+                localStorage.setItem('timeline', JSON.stringify(timelineEntries));
+            }
+
+            renderAdminBookings();
+            renderTimeline();
         }
-        
-        function addCoupon() {
-            const val = document.getElementById('couponRule').value;
-            if(!val) return;
-            const parts = val.split(',');
-            coupons.push({name:parts[0],min:parts[1],val:parts[2]});
-            localStorage.setItem('coupons',JSON.stringify(coupons));
-            alert('添加成功');
-        }
-        
-        function addDiscount() {
-            const val = document.getElementById('discountRule').value;
-            if(!val) return;
-            const parts = val.split(',');
-            discounts.push({id:parts[0],type:'percent',val:parts[1]});
-            localStorage.setItem('discounts',JSON.stringify(discounts));
-            renderProjects();
-            alert('添加成功');
-        }
-        
-        function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+    }
+
+    function renderAdminRecharge() {
+        const content = document.getElementById('adminContent');
+        content.innerHTML = `
+            <div class="admin-section">
+                <div class="section-title">充值方案</div>
+                <div class="form-group">
+                    <input type="number" id="rechargeAmount" placeholder="充值金额">
+                </div>
+                <div class="form-group">
+                    <input type="number" id="rechargeBonus" placeholder="赠送金额">
+                </div>
+                <button class="btn" onclick="addRechargePlan()">添加方案</button>
+                <div style="margin-top:16px">
+                    ${rechargePlans.map(p => `
+                        <div class="item-row">
+                            <span>充¥${p.amount} 送¥${p.bonus || 0}</span>
+                            <button onclick="deleteRechargePlan(${p.id})" style="background:#EF4444;color:white;border:none;padding:4px 8px;border-radius:4px;cursor:pointer">删除</button>
+                        </div>
+                    `).join('') || '<div class="empty">暂无方案</div>'}
+                </div>
+            </div>
+        `;
+    }
+
+    function addRechargePlan() {
+        const amount = parseInt(document.getElementById('rechargeAmount').value);
+        const bonus = parseInt(document.getElementById('rechargeBonus').value) || 0;
+        if (!amount) return alert('请输入充值金额');
+        const plan = { id: Date.now(), amount, bonus };
+        rechargePlans.push(plan);
+        localStorage.setItem('rechargePlans', JSON.stringify(rechargePlans));
+        saveToFirebase('rechargePlans', plan);
+        renderAdminRecharge();
+    }
+
+    function deleteRechargePlan(id) {
+        rechargePlans = rechargePlans.filter(p => p.id !== id);
+        localStorage.setItem('rechargePlans', JSON.stringify(rechargePlans));
+        renderAdminRecharge();
+    }
+
+    function renderAdminCoupons() {
+        const content = document.getElementById('adminContent');
+        content.innerHTML = `
+            <div class="admin-section">
+                <div class="section-title">优惠券</div>
+                <div class="form-group">
+                    <input type="text" id="couponName" placeholder="名称 如:满200减30">
+                </div>
+                <div class="form-group">
+                    <input type="number" id="couponMin" placeholder="最低消费">
+                </div>
+                <div class="form-group">
+                    <input type="number" id="couponVal" placeholder="优惠金额">
+                </div>
+                <button class="btn" onclick="addCouponRule()">添加优惠券</button>
+                <div style="margin-top:16px">
+                    ${coupons.map(c => `
+                        <div class="coupon-card">
+                            <div>
+                                <div style="font-weight:600">${c.name}</div>
+                                <div style="font-size:12px">满${c.min}元</div>
+                            </div>
+                            <div class="coupon-value">¥${c.val}</div>
+                            <button onclick="deleteCoupon(${c.id})" style="background:#EF4444;color:white;border:none;padding:4px 8px;border-radius:4px;cursor:pointer">删除</button>
+                        </div>
+                    `).join('') || '<div class="empty">暂无优惠券</div>'}
+                </div>
+            </div>
+        `;
+    }
+
+    function addCouponRule() {
+        const name = document.getElementById('couponName').value;
+        const min = parseInt(document.getElementById('couponMin').value);
+        const val = parseInt(document.getElementById('couponVal').value);
+        if (!name || !min || !val) return alert('请填写完整');
+        const coupon = { id: Date.now(), name, min, val };
+        coupons.push(coupon);
+        localStorage.setItem('coupons', JSON.stringify(coupons));
+        saveToFirebase('coupons', coupon);
+        renderAdminCoupons();
+    }
+
+    function deleteCoupon(id) {
+        coupons = coupons.filter(c => c.id !== id);
+        localStorage.setItem('coupons', JSON.stringify(coupons));
+        renderAdminCoupons();
+    }
+
+    function renderAdminDiscounts() {
+        const content = document.getElementById('adminContent');
+        content.innerHTML = `
+            <div class="admin-section">
+                <div class="section-title">项目折扣</div>
+                <div class="form-group">
+                    <select id="discountProject">
+                        <option value="">选择项目</option>
+                        ${projects.map(p => `<option value="${p.id}">${p.title} (¥${p.price})</option>`).join('')}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <input type="number" id="discountVal" placeholder="折扣(如80=8折, 或直接减金额)">
+                </div>
+                <div style="display:flex;gap:8px">
+                    <button class="btn" onclick="addDiscount('percent')">设置折扣</button>
+                    <button class="btn" style="background:var(--secondary)" onclick="addDiscount('fixed')">立减</button>
+                </div>
+                <div style="margin-top:16px">
+                    ${discounts.map(d => {
+                        const p = projects.find(proj => proj.id == d.projectId);
+                        return `
+                            <div class="item-row">
+                                <span>${p?.title || '未知'} - ${d.type === 'percent' ? d.val + '折' : '减' + d.val + '元'}</span>
+                                <button onclick="deleteDiscount(${d.id})" style="background:#EF4444;color:white;border:none;padding:4px 8px;border-radius:4px;cursor:pointer">删除</button>
+                            </div>
+                        `;
+                    }).join('') || '<div class="empty">暂无折扣</div>'}
+                </div>
+            </div>
+        `;
+    }
+
+    function addDiscount(type) {
+        const projectId = document.getElementById('discountProject').value;
+        const val = parseInt(document.getElementById('discountVal').value);
+        if (!projectId || !val) return alert('请选择项目并输入值');
+        const discount = { id: Date.now(), projectId, type, val };
+        discounts.push(discount);
+        localStorage.setItem('discounts', JSON.stringify(discounts));
+        saveToFirebase('discounts', discount);
+        renderAdminDiscounts();
+        renderProjects();
+    }
+
+    function deleteDiscount(id) {
+        discounts = discounts.filter(d => d.id !== id);
+        localStorage.setItem('discounts', JSON.stringify(discounts));
+        renderAdminDiscounts();
+        renderProjects();
+    }
+
+    function openProjectForm() {
+        document.getElementById('projectFormModal').classList.add('active');
+    }
+
+    function saveProject() {
+        const title = document.getElementById('projTitle').value;
+        const price = parseInt(document.getElementById('projPrice').value);
+        if (!title || !price) return alert('请填写名称和价格');
+        const project = {
+            id: Date.now(),
+            title: title,
+            price: price,
+            desc: document.getElementById('projDesc').value,
+            cover: document.getElementById('projCover').value || 'https://via.placeholder.com/400x300'
+        };
+        projects.push(project);
+        localStorage.setItem('projects', JSON.stringify(projects));
+        saveToFirebase('projects', project);
+        closeModal('projectFormModal');
+        renderProjects();
+        renderAdminProjects();
+    }
+
+    function closeModal(id) {
+        document.getElementById(id).classList.remove('active');
+    }
+
+    // Start sync
+    syncData();
     </script>
-<div class="modal" id="rechargeModal"><div class="modal-content"><div class="modal-header"><h3>💰 充值</h3><span class="modal-close" onclick="closeRecharge()">×</span></div><div id="rechargeList"></div></div></div>
 </body>
 </html>
