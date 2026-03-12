@@ -1,6 +1,45 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
+
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <script>
+        // Firebase配置 - 请替换为你自己的配置
+        const firebaseConfig = {
+            apiKey: "AIzaSyDemo-key-replace-with-yours",
+            authDomain: "beauty-app-demo.firebaseapp.com",
+            databaseURL: "https://beauty-app-demo-default-rtdb.firebaseio.com",
+            projectId: "beauty-app-demo",
+            storageBucket: "beauty-app-demo.appspot.com",
+            messagingSenderId: "123456789",
+            appId: "1:123456789:web:abcdef"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+        
+        // 同步充值方案
+        function syncRechargePlans() {
+            db.ref('rechargePlans').on('value', (snapshot) => {
+                const data = snapshot.val();
+                if(data) {
+                    const plans = Object.values(data);
+                    localStorage.setItem('rechargePlans', JSON.stringify(plans));
+                }
+            });
+        }
+        
+        function saveRechargeToFirebase(plan) {
+            db.ref('rechargePlans').push(plan);
+        }
+        
+        function deleteRechargeFromFirebase(id) {
+            db.ref('rechargePlans').orderByChild('id').equalTo(id).once('value', (snapshot) => {
+                snapshot.forEach(child => child.ref.remove());
+            });
+        }
+    </script>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>美丽小站 - 美容美甲预约平台</title>
@@ -233,6 +272,7 @@
         function initDarkMode() { const s = localStorage.getItem('theme'); if (s === 'dark') { document.documentElement.setAttribute('data-theme', 'dark'); document.getElementById('darkModeBtn').textContent = '☀️'; } }
         function toggleDarkMode() { const html = document.documentElement; const isDark = html.getAttribute('data-theme') === 'dark'; if (isDark) { html.removeAttribute('data-theme'); localStorage.setItem('theme', 'light'); document.getElementById('darkModeBtn').textContent = '🌙'; } else { html.setAttribute('data-theme', 'dark'); localStorage.setItem('theme', 'dark'); document.getElementById('darkModeBtn').textContent = '☀️'; } }
         initDarkMode();
+        syncRechargePlans();
         // 路由
         function getRoute() { return location.hash.slice(1) || 'projects'; }
         function setRoute(route) { location.hash = route; }
@@ -316,8 +356,8 @@
         function renderRechargeList() { const c = document.getElementById('rechargeList'); c.innerHTML = rechargePlans.length ? rechargePlans.map(p => '<div class="admin-list-item"><div class="admin-item-info"><h4>充¥' + p.amount + ' 送¥' + p.bonus + '</h4><p style="font-size:12px">¥' + (p.amount + p.bonus) + '到账</p></div><button class="admin-btn-small admin-btn-delete" onclick="deleteRecharge(\'' + p.id + '\')">删除</button></div>').join('') : '<p style="text-align:center;color:var(--text-light);padding:20px">暂无充值方案</p>'; }
         window.openRechargeModal = function() { document.getElementById('rechargeAmount').value = ''; document.getElementById('rechargeBonus').value = ''; document.getElementById('rechargeModal').classList.add('active'); };
         window.closeRechargeModal = function() { document.getElementById('rechargeModal').classList.remove('active'); };
-        window.saveRecharge = function() { const a = parseInt(document.getElementById('rechargeAmount').value); const b = parseInt(document.getElementById('rechargeBonus').value) || 0; if (!a || a <= 0) return showToast('请填写充值金额'); rechargePlans.push({ id: Date.now().toString(), amount: a, bonus: b }); localStorage.setItem('rechargePlans', JSON.stringify(rechargePlans)); closeRechargeModal(); renderRechargeList(); showToast('充值方案已保存'); };
-        window.deleteRecharge = function(id) { if (!confirm('确定删除？')) return; rechargePlans = rechargePlans.filter(p => p.id !== id); localStorage.setItem('rechargePlans', JSON.stringify(rechargePlans)); renderRechargeList(); };
+        window.saveRecharge = function() { const a = parseInt(document.getElementById('rechargeAmount').value); const b = parseInt(document.getElementById('rechargeBonus').value) || 0; if (!a || a <= 0) return showToast('请填写充值金额'); const plan = { id: Date.now().toString(), amount: a, bonus: b }; rechargePlans.push(plan); localStorage.setItem('rechargePlans', JSON.stringify(rechargePlans)); saveRechargeToFirebase(plan); closeRechargeModal(); renderRechargeList(); showToast('充值方案已保存'); };
+        window.deleteRecharge = function(id) { if (!confirm('确定删除？')) return; rechargePlans = rechargePlans.filter(p => p.id !== id); localStorage.setItem('rechargePlans', JSON.stringify(rechargePlans)); deleteRechargeFromFirebase(id); renderRechargeList(); };
         function renderCouponList() { const c = document.getElementById('couponList'); c.innerHTML = coupons.length ? coupons.map(c => '<div class="admin-list-item"><div class="admin-item-info"><h4>' + c.name + '</h4><p style="font-size:12px">满¥' + c.minSpend + '减¥' + c.discount + ' · ' + c.expireDays + '天有效</p></div><button class="admin-btn-small admin-btn-delete" onclick="deleteCoupon(\'' + c.id + '\')">删除</button></div>').join('') : '<p style="text-align:center;color:var(--text-light);padding:20px">暂无优惠券</p>'; }
         window.openCouponModal = function() { document.getElementById('couponName').value = ''; document.getElementById('couponDiscount').value = ''; document.getElementById('couponMinSpend').value = ''; document.getElementById('couponExpireDays').value = ''; document.getElementById('couponModal').classList.add('active'); };
         window.closeCouponModal = function() { document.getElementById('couponModal').classList.remove('active'); };
