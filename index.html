@@ -181,9 +181,9 @@
                 <div class="form-group"><label>价格 *</label><input type="number" id="projectPrice" placeholder="899"></div>
                 <div class="form-group"><label>类别</label><select id="projectCategory"><option value="护肤">护肤</option><option value="美容">美容</option><option value="美甲">美甲</option><option value="美发">美发</option></select></div>
             </div>
-            <div class="form-group"><label>封面图片URL</label><input type="url" id="projectCover" placeholder="https://..."></div>
+            <div class="form-group"><label>封面图片</label><input type="file" id="projectCover" accept="image/*"></div>
             <div class="form-group"><label>详细介绍</label><textarea id="projectDetailText" placeholder="详细介绍内容" rows="4"></textarea></div>
-            <div class="form-group"><label>详情图片URL（多张用逗号分隔）</label><input type="url" id="projectDetailImages" placeholder="https://..., https://..."></div>
+            <div class="form-group"><label>详情图片（可多选）</label><input type="file" id="projectDetailImages" accept="image/*" multiple></div>
             <button class="btn" onclick="saveProject()">保存</button>
             <button class="btn btn-secondary" onclick="closeProjectModal()">取消</button>
         </div>
@@ -304,7 +304,20 @@
             if (!p) return;
             const detailPage = document.getElementById('detailPage');
             const content = document.getElementById('detailContent');
-            content.innerHTML = `<img src="${p.cover || 'https://via.placeholder.com/400x300'}" class="detail-cover"><div class="detail-title">${p.title}</div><div class="detail-price">¥${p.price}</div><div class="detail-section"><h3>📝 项目介绍</h3><div class="detail-text">${(p.detailText || p.desc || '').replace(/\n/g, '<br>')}</div></div>${p.detailImages ? `<div class="detail-section"><h3>📷 效果图</h3><div class="detail-images">${p.detailImages.split(',').map(img => `<img src="${img.trim()}">`).join('')}</div></div>` : ''}`;
+            // 支持数组或逗号分隔的图片
+            let detailImages = [];
+            if (Array.isArray(p.detailImages)) {
+                detailImages = p.detailImages;
+            } else if (p.detailImages) {
+                detailImages = p.detailImages.split(',');
+            }
+            content.innerHTML = `
+                <img src="${p.cover || 'https://via.placeholder.com/400x300'}" class="detail-cover">
+                <div class="detail-title">${p.title}</div>
+                <div class="detail-price">¥${p.price}</div>
+                <div class="detail-section"><h3>📝 项目介绍</h3><div class="detail-text">${(p.detailText || p.desc || '').replace(/\n/g, '<br>')}</div></div>
+                ${detailImages.length ? `<div class="detail-section"><h3>📷 效果图</h3><div class="detail-images">${detailImages.map(img => `<img src="${img.trim()}">`).join('')}</div></div>` : ''}
+            `;
             detailPage.classList.add('active');
         }
         
@@ -375,9 +388,10 @@
             document.getElementById('projectDesc').value = project ? project.desc : '';
             document.getElementById('projectPrice').value = project ? project.price : '';
             document.getElementById('projectCategory').value = project ? project.category : '护肤';
-            document.getElementById('projectCover').value = project ? project.cover : '';
+            // 文件输入不能预设值，清空并提示
+            document.getElementById('projectCover').value = '';
             document.getElementById('projectDetailText').value = project ? project.detailText : '';
-            document.getElementById('projectDetailImages').value = project ? project.detailImages : '';
+            document.getElementById('projectDetailImages').value = '';
             document.getElementById('projectModal').classList.add('active');
         }
         
@@ -385,11 +399,66 @@
         
         function editProject(id) { const p = window.adminProjects.find(item => item.id === id); if (p) openProjectModal(p); }
         
-        function saveProject() {
+        // 图片转Base64
+        function fileToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+        }
+        
+        // 处理多张图片
+        async function handleDetailImages(files) {
+            const base64Images = [];
+            for (const file of files) {
+                if (file.size > 2 * 1024 * 1024) {
+                    alert('图片不能超过2MB');
+                    continue;
+                }
+                const base64 = await fileToBase64(file);
+                base64Images.push(base64);
+            }
+            return base64Images;
+        }
+        
+        async function saveProject() {
             const title = document.getElementById('projectName').value.trim();
             const price = document.getElementById('projectPrice').value;
             if (!title || !price) return alert('请填写名称和价格');
-            window.saveProjectToFirestore({ title, desc: document.getElementById('projectDesc').value, price: parseInt(price), category: document.getElementById('projectCategory').value, cover: document.getElementById('projectCover').value, detailText: document.getElementById('projectDetailText').value, detailImages: document.getElementById('projectDetailImages').value });
+            
+            // 处理封面图片
+            let coverBase64 = '';
+            const coverFile = document.getElementById('projectCover').files[0];
+            if (coverFile) {
+                if (coverFile.size > 2 * 1024 * 1024) return alert('封面图片不能超过2MB');
+                coverBase64 = await fileToBase64(coverFile);
+            } else {
+                // 如果没选新图片，保留原来的
+                const existingProject = window.adminProjects.find(p => p.id === window.editingProjectId);
+                if (existingProject) coverBase64 = existingProject.cover || '';
+            }
+            
+            // 处理详情图片
+            const detailFiles = document.getElementById('projectDetailImages').files;
+            let detailImagesBase64 = [];
+            if (detailFiles.length > 0) {
+                detailImagesBase64 = await handleDetailImages(detailFiles);
+            } else {
+                const existingProject = window.adminProjects.find(p => p.id === window.editingProjectId);
+                if (existingProject) detailImagesBase64 = existingProject.detailImages || [];
+            }
+            
+            window.saveProjectToFirestore({ 
+                title, 
+                desc: document.getElementById('projectDesc').value, 
+                price: parseInt(price), 
+                category: document.getElementById('projectCategory').value, 
+                cover: coverBase64, 
+                detailText: document.getElementById('projectDetailText').value, 
+                detailImages: detailImagesBase64 
+            });
         }
         
         renderUserProjects();
