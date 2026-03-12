@@ -15,55 +15,6 @@
             databaseURL: "https://beauty-app-6527c-default-rtdb.asia-southeast1.firebasedatabase.app"
         };
         firebase.initializeApp(firebaseConfig);
-        const db = firebase.database();
-        
-        // 默认数据
-        const defaultProjects = [
-            {id:'1',title:'光子嫩肤',desc:'IPL光子技术，改善肤色',price:899,cover:'https://images.unsplash.com/photo-1616394584738-fc6e612e71b9?w=400',category:'护肤'},
-            {id:'2',title:'水光针',desc:'深层补水锁水',price:1280,cover:'https://images.unsplash.com/photo-1512290923902-8a9f81dc236c?w=400',category:'护肤'},
-            {id:'3',title:'果酸换肤',desc:'温和去除老化角质',price:680,cover:'https://images.unsplash.com/photo-1515377905703-c4788e51af15?w=400',category:'美容'},
-            {id:'4',title:'面部SPA',desc:'深层清洁+补水护理',price:458,cover:'https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=400',category:'护肤'},
-            {id:'5',title:'美甲套餐',desc:'精致美甲设计',price:288,cover:'https://images.unsplash.com/photo-1604654894610-df63bc536371?w=400',category:'美甲'},
-            {id:'6',title:'纹眉',desc:'半永久自然眉形',price:1680,cover:'https://images.unsplash.com/photo-1519699047748-de8e44100de5?w=400',category:'美容'}
-        ];
-        const defaultRechargePlans = [
-            {id:'1',amount:500,bonus:50},
-            {id:'2',amount:1000,bonus:150},
-            {id:'3',amount:2000,bonus:400}
-        ];
-        
-        // 保存到Firebase
-        function saveToFirebase(path, data) {
-            const ref = db.ref(path).push();
-            ref.set(data);
-        }
-        
-        // 初始化默认数据
-        function initDefaults() {
-            db.ref('projects').once('value', s => { if(!s.val()) defaultProjects.forEach(p => saveToFirebase('projects', p)); });
-            db.ref('rechargePlans').once('value', s => { if(!s.val()) defaultRechargePlans.forEach(p => saveToFirebase('rechargePlans', p)); });
-        }
-    </script>
-
-
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
-    <script>
-        // Firebase配置 - 请替换为你自己的配置
-        const firebaseConfig = {
-            apiKey: "AIzaSyBOPa-J7SpDyOSdWiy7gsA5re01Xd-FuvI",
-            authDomain: "beauty-app-6527c.firebaseapp.com",
-            projectId: "beauty-app-6527c",
-            storageBucket: "beauty-app-6527c.firebasestorage.app",
-            messagingSenderId: "396685995260",
-            appId: "1:396685995260:web:0bb1a0676b339378a5bb79",
-            databaseURL: "https://beauty-app-6527c-default-rtdb.firebaseio.com"
-        };
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.database();
-
-        // 默认数据
-        const defaultProjects = [
             {id:'1',title:'光子嫩肤',desc:'IPL光子技术，改善肤色',price:899,cover:'https://images.unsplash.com/photo-1616394584738-fc6e612e71b9?w=400',category:'护肤'},
             {id:'2',title:'水光针',desc:'深层补水锁水',price:1280,cover:'https://images.unsplash.com/photo-1512290923902-8a9f81dc236c?w=400',category:'护肤'},
             {id:'3',title:'果酸换肤',desc:'温和去除老化角质',price:680,cover:'https://images.unsplash.com/photo-1515377905703-c4788e51af15?w=400',category:'美容'},
