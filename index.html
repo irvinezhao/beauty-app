@@ -167,7 +167,7 @@
         <h1>✨ 美丽小站</h1>
         <div class="header-right">
             <button class="admin-btn" id="userLoginBtn" onclick="openUserLogin()">登录</button>
-            <button class="admin-btn" onclick="openAdminLogin()">商家入口</button>
+            <button class="admin-btn" onclick="setRoute('admin')">商家入口</button>
             <button class="dark-btn" id="darkModeBtn" onclick="toggleDarkMode()" title="切换深色模式">🌙</button>
         </div>
     </div>
@@ -240,10 +240,12 @@
             const route = getRoute();
             document.querySelectorAll('.tabs .tab').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById('adminPage').classList.remove('active');
             const tab = document.querySelector('.tabs .tab[data-tab="' + route + '"]');
             if(tab) tab.classList.add('active');
             const page = document.getElementById(route);
             if(page) page.classList.add('active');
+            if(route === 'admin') { if(!isLoggedIn) { openAdminLogin(); location.hash = 'projects'; } else { document.getElementById('adminPage').classList.add('active'); } }
         }
         window.addEventListener('hashchange', renderRoute);
         document.querySelectorAll('#userTabs .tab, .tabs .tab').forEach(tab => { tab.addEventListener('click', () => { setRoute(tab.dataset.tab); }); });
@@ -256,7 +258,7 @@
         window.userLogin = function() { const p = document.getElementById('userLoginPhone').value.trim(); const c = document.getElementById('userLoginCode').value.trim(); if (!p || !c) return showToast('请填写手机号和验证码'); const s = verificationCodes[p]; if (!s) return showToast('请先获取验证码'); if (Date.now() > s.expires) return showToast('验证码已过期'); if (s.code !== c) return showToast('验证码错误'); let u = users.find(u => u.phone === p); if (!u) { u = { id: Date.now().toString(), name: '用户' + p.slice(-4), phone: p, balance: 0, totalSpent: 0, tags: [], createdAt: new Date().toISOString() }; users.push(u); localStorage.setItem('users', JSON.stringify(users)); } window.currentUser = u; localStorage.setItem('currentUser', JSON.stringify(u)); document.getElementById('userLoginBtn').textContent = u.name; document.getElementById('userLoginBtn').onclick = userLogout; showToast('登录成功！'); closeUserLogin(); renderProfile(); };
         window.userLogout = function() { if (!confirm('确定要退出登录吗？')) return; window.currentUser = null; localStorage.removeItem('currentUser'); document.getElementById('userLoginBtn').textContent = '登录'; document.getElementById('userLoginBtn').onclick = openUserLogin; renderProfile(); };
 
-        window.logoutAdmin = function() { isLoggedIn = false; localStorage.setItem('adminLoggedIn', 'false'); document.getElementById('adminPage').classList.remove('active'); };
+        window.logoutAdmin = function() { isLoggedIn = false; localStorage.setItem('adminLoggedIn', 'false'); setRoute('projects'); };
         function openAdminPage() { document.getElementById('adminPage').classList.add('active'); renderAdminProjects(); renderAdminBookingCalendar(); document.getElementById('serviceHoursDisplay').textContent = bookingSettings.startTime + ':00 - ' + bookingSettings.endTime + ':00'; document.getElementById('serviceDurationDisplay').textContent = bookingSettings.duration; renderAdminBookings(); renderRechargeList(); renderCouponList(); renderDiscountList(); renderUserStats(); }
         if (window.currentUser) { document.getElementById('userLoginBtn').textContent = window.currentUser.name; document.getElementById('userLoginBtn').onclick = userLogout; }
         if (isLoggedIn) openAdminPage();
@@ -266,7 +268,7 @@
         window.renderUserRechargeList = function() { const c = document.getElementById('userRechargeList'); const plans = JSON.parse(localStorage.getItem("rechargePlans")) || []; if(!plans.length) { c.innerHTML = '<p style="text-align:center;color:var(--text-light);padding:20px">暂无可用充值方案</p>'; return; } c.innerHTML = plans.map(p => '<div style="display:flex;justify-content:space-between;align-items:center;padding:16px;background:var(--bg);border-radius:12px;margin-bottom:12px"><div><div style="font-weight:600">充¥' + p.amount + ' 送¥' + p.bonus + '</div><div style="font-size:12px;color:var(--primary)">到账 ¥' + (p.amount + p.bonus) + '</div></div><button class="btn" style="width:auto;padding:8px 20px" onclick="doUserRecharge(' + p.amount + ')">充值</button></div>').join(''); };
         window.doUserRecharge = function(amount) { if(!window.currentUser) return openUserLogin(); if(!confirm('确认充值 ¥' + amount + '？')) return; const u = window.currentUser; u.balance = (u.balance || 0) + amount; localStorage.setItem('currentUser', JSON.stringify(u)); const idx = users.findIndex(x => x.id === u.id); if(idx >= 0) { users[idx].balance = u.balance; localStorage.setItem('users', JSON.stringify(users)); } showToast('充值成功！'); renderProfile(); closeUserRechargeModal(); };
 
-        window.loginWithPassword = function() { const u = document.getElementById('loginUsername').value.trim(); const pw = document.getElementById('loginPassword').value; if (u === ADMIN_USER.username && pw === ADMIN_USER.password) { isLoggedIn = true; localStorage.setItem('adminLoggedIn', 'true'); closeAdminLogin(); openAdminPage(); } else { showToast('账号或密码错误'); } };
+        window.loginWithPassword = function() { const u = document.getElementById('loginUsername').value.trim(); const pw = document.getElementById('loginPassword').value; if (u === ADMIN_USER.username && pw === ADMIN_USER.password) { isLoggedIn = true; localStorage.setItem('adminLoggedIn', 'true'); closeAdminLogin(); setRoute('admin'); } else { showToast('账号或密码错误'); } };
         function renderUserProjects() { const g = document.getElementById('projectGrid'); const d = JSON.parse(localStorage.getItem('adminProjects')) || defaultProjects; g.innerHTML = d.map(p => { const dp = getDiscountedPrice(p.price, p.id); const hd = dp < p.price; return '<div class="project-card" onclick="showDetail(\'' + p.id + '\')">' + (hd ? '<span class="discount-badge">特惠</span>' : '') + '<img src="' + (p.cover || 'https://via.placeholder.com/400x300') + '"><div class="project-info"><div class="project-title">' + p.title + '</div><div class="project-desc">' + (p.desc || '') + '</div><div class="project-price">' + (hd ? '<span style="text-decoration:line-through;color:#999;font-size:12px;margin-right:8px">¥' + p.price + '</span>' : '') + '¥' + dp + '</div></div></div>'; }).join(''); }
         window.showDetail = function(id) { const d = JSON.parse(localStorage.getItem('adminProjects')) || defaultProjects; const p = d.find(item => String(item.id) === String(id)); if (!p) return; const dp = getDiscountedPrice(p.price, p.id); const hd = dp < p.price; let di = []; if (Array.isArray(p.detailImages)) di = p.detailImages; else if (p.detailImages) di = p.detailImages.split(','); document.getElementById('detailContent').innerHTML = '<img src="' + (p.cover || 'https://via.placeholder.com/400x300') + '" class="detail-cover"><div class="detail-title">' + p.title + '</div><div class="detail-price">' + (hd ? '<span style="text-decoration:line-through;color:#999;font-size:16px;margin-right:8px">¥' + p.price + '</span>' : '') + '¥' + dp + '</div><div class="detail-section"><h3>📝 项目介绍</h3><div class="detail-text">' + (p.detailText || p.desc || '').replace(/\n/g, '<br>') + '</div></div>' + (di.length ? '<div class="detail-section"><h3>📷 效果图</h3><div class="detail-images">' + di.map(i => '<img src="' + i.trim() + '">').join('') + '</div></div>' : '') + '<button class="btn" style="margin-top:20px" onclick="bookProject(\'' + p.id + '\')">立即预约</button>'; document.getElementById('detailPage').classList.add('active'); };
         window.closeDetail = function() { document.getElementById('detailPage').classList.remove('active'); };
