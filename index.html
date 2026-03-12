@@ -166,9 +166,75 @@
                 <div id="adminProjectList"></div>
             </div>
             <div class="admin-section">
-                <h3>预约管理</h3>
+                <h3>
+                    预约设置
+                    <button class="admin-btn-small admin-btn-edit" onclick="openSettingsModal()">⚙️ 设置</button>
+                </h3>
+                <div style="padding:12px;background:var(--bg);border-radius:12px;margin-bottom:12px">
+                    <p style="font-size:13px;margin-bottom:8px">📅 服务时间：<span id="serviceHoursDisplay">10:00 - 22:00</span></p>
+                    <p style="font-size:13px">⏱️ 服务时长：<span id="serviceDurationDisplay">60</span>分钟/次</p>
+                </div>
+                <h4 style="font-size:14px;margin-bottom:12px">📆 预约日历</h4>
+                <div class="booking-date" id="adminBookingDate"></div>
+                <div class="time-slots" id="adminTimeSlots"></div>
+                <h4 style="font-size:14px;margin:16px 0 12px">📋 预约列表</h4>
                 <div id="adminBookingList"></div>
             </div>
+        </div>
+    </div>
+    
+    <!-- 设置弹窗 -->
+    <div class="project-modal" id="settingsModal">
+        <div class="project-modal-content">
+            <h3>⚙️ 预约设置</h3>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>开始时间</label>
+                    <select id="serviceStartTime">
+                        <option value="6">06:00</option>
+                        <option value="7">07:00</option>
+                        <option value="8">08:00</option>
+                        <option value="9">09:00</option>
+                        <option value="10" selected>10:00</option>
+                        <option value="11">11:00</option>
+                        <option value="12">12:00</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>结束时间</label>
+                    <select id="serviceEndTime">
+                        <option value="18">18:00</option>
+                        <option value="19">19:00</option>
+                        <option value="20">20:00</option>
+                        <option value="21">21:00</option>
+                        <option value="22" selected>22:00</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>服务时长（分钟）</label>
+                <select id="serviceDuration">
+                    <option value="30">30分钟</option>
+                    <option value="45">45分钟</option>
+                    <option value="60" selected>60分钟</option>
+                    <option value="90">90分钟</option>
+                    <option value="120">120分钟</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>休业日（可多选）</label>
+                <div style="display:flex;flex-wrap:wrap;gap:8px">
+                    <label style="display:flex;align-items:center;gap:4px"><input type="checkbox" id="offDay0" value="0"> 周日</label>
+                    <label style="display:flex;align-items:center;gap:4px"><input type="checkbox" id="offDay1" value="1"> 周一</label>
+                    <label style="display:flex;align-items:center;gap:4px"><input type="checkbox" id="offDay2" value="2"> 周二</label>
+                    <label style="display:flex;align-items:center;gap:4px"><input type="checkbox" id="offDay3" value="3"> 周三</label>
+                    <label style="display:flex;align-items:center;gap:4px"><input type="checkbox" id="offDay4" value="4"> 周四</label>
+                    <label style="display:flex;align-items:center;gap:4px"><input type="checkbox" id="offDay5" value="5"> 周五</label>
+                    <label style="display:flex;align-items:center;gap:4px"><input type="checkbox" id="offDay6" value="6"> 周六</label>
+                </div>
+            </div>
+            <button class="btn" onclick="saveSettings()">保存设置</button>
+            <button class="btn btn-secondary" onclick="closeSettingsModal()">取消</button>
         </div>
     </div>
     
@@ -199,6 +265,17 @@
         
         let isLoggedIn = false;
         
+        // 预约设置
+        let bookingSettings = JSON.parse(localStorage.getItem('bookingSettings')) || {
+            startTime: 10,
+            endTime: 22,
+            duration: 60,
+            offDays: []
+        };
+        
+        // 休业日
+        let closedDates = JSON.parse(localStorage.getItem('closedDates')) || {};
+        
         function initDarkMode() {
             const saved = localStorage.getItem('theme');
             if (saved === 'dark') { document.documentElement.setAttribute('data-theme', 'dark'); document.getElementById('darkModeBtn').textContent = '☀️'; }
@@ -226,6 +303,9 @@
                 document.getElementById('loginPage').classList.remove('active');
                 document.getElementById('adminPage').classList.add('active');
                 renderAdminProjects();
+                renderAdminBookingCalendar();
+                document.getElementById('serviceHoursDisplay').textContent = `${bookingSettings.startTime}:00 - ${bookingSettings.endTime}:00`;
+                document.getElementById('serviceDurationDisplay').textContent = bookingSettings.duration;
                 renderAdminBookings();
             } else {
                 errorEl.style.display = 'block';
@@ -374,11 +454,154 @@
             list.innerHTML = data.map(p => `<div class="admin-list-item"><div class="admin-item-info"><h4>${p.title}</h4><p>¥${p.price} · ${p.category || '未分类'}</p></div><div class="admin-item-actions"><button class="admin-btn-small admin-btn-edit" onclick="editProject('${p.id}')">编辑</button><button class="admin-btn-small admin-btn-delete" onclick="deleteProjectFromFirestore('${p.id}')">删除</button></div></div>`).join('');
         }
         
+        // 商家后台预约日历
+        let adminSelectedDate = null;
+        
+        function renderAdminBookingCalendar() {
+            const container = document.getElementById('adminBookingDate');
+            const week = [];
+            const today = new Date();
+            for (let i = 0; i < 14; i++) {
+                const date = new Date(today);
+                date.setDate(today.getDate() + i);
+                const dayOfWeek = date.getDay();
+                const isOffDay = bookingSettings.offDays.includes(dayOfWeek);
+                week.push({ 
+                    day: ['日','一','二','三','四','五','六'][dayOfWeek], 
+                    num: date.getDate(), 
+                    full: date.toISOString().split('T')[0],
+                    isOffDay,
+                    month: date.getMonth() + 1
+                });
+            }
+            
+            container.innerHTML = week.map((d, i) => {
+                const isSelected = adminSelectedDate === d.full;
+                const isClosed = d.isOffDay || closedDates[d.full];
+                return `<div class="date-item ${isSelected?'active':''} ${isClosed?'booked':''}" onclick="selectAdminDate('${d.full}', ${i})"><div class="date-day">${d.month}/${d.num} 周${d.day}</div><div class="date-num">${isClosed?'休':'可'}</div></div>`;
+            }).join('');
+            
+            if (!adminSelectedDate) {
+                adminSelectedDate = week.find(d => !d.isOffDay && !closedDates[d.full])?.full || week[0].full;
+            }
+            renderAdminTimeSlots();
+        }
+        
+        function selectAdminDate(date, index) {
+            adminSelectedDate = date;
+            document.querySelectorAll('#adminBookingDate .date-item').forEach((el, i) => {
+                el.classList.toggle('active', i === index);
+            });
+            renderAdminTimeSlots();
+        }
+        
+        function renderAdminTimeSlots() {
+            const container = document.getElementById('adminTimeSlots');
+            if (!adminSelectedDate) return;
+            
+            const isClosed = closedDates[adminSelectedDate];
+            if (isClosed) {
+                container.innerHTML = '<p style="text-align:center;color:var(--text-light);padding:20px">今日已休业</p>';
+                return;
+            }
+            
+            const slots = [];
+            for (let hour = bookingSettings.startTime; hour < bookingSettings.endTime; hour++) {
+                slots.push({ hour, time: `${hour}:00` });
+            }
+            
+            // 找出该日期的预约
+            const dayBookings = window.adminBookings.filter(b => b.date === adminSelectedDate);
+            
+            container.innerHTML = slots.map(slot => {
+                const booking = dayBookings.find(b => b.time === slot.time);
+                if (booking) {
+                    return `<div class="time-slot booked" style="text-align:left;padding:12px"><div style="font-weight:600">${slot.time}</div><div style="font-size:12px">${booking.name}</div><div style="font-size:11px;color:#666">${booking.phone}</div></div>`;
+                }
+                return `<div class="time-slot"><div class="slot-time">${slot.time}</div><div class="slot-status">可预约</div></div>`;
+            }).join('');
+        }
+        
         function renderAdminBookings() {
             const list = document.getElementById('adminBookingList');
-            const data = window.adminBookings;
-            if (data.length === 0) { list.innerHTML = '<p style="color:var(--text-light);text-align:center;padding:20px">暂无预约</p>'; return; }
-            list.innerHTML = data.map(b => `<div class="admin-list-item"><div class="admin-item-info"><h4>${b.name}</h4><p>${b.date} ${b.time} · ${b.phone}</p></div></div>`).join('');
+            if (!adminSelectedDate) return;
+            
+            const dayBookings = window.adminBookings.filter(b => b.date === adminSelectedDate);
+            if (dayBookings.length === 0) { 
+                list.innerHTML = '<p style="color:var(--text-light);text-align:center;padding:20px">当日暂无预约</p>'; 
+                return; 
+            }
+            
+            list.innerHTML = dayBookings.map(b => `
+                <div class="admin-list-item">
+                    <div class="admin-item-info">
+                        <h4>${b.name}</h4>
+                        <p>${b.time} · ${b.phone}</p>
+                        ${b.note ? `<p style="font-size:11px;color:#999">备注：${b.note}</p>` : ''}
+                    </div>
+                    <div class="admin-item-actions">
+                        <button class="admin-btn-small admin-btn-delete" onclick="deleteBooking('${b.id}')">删除</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function deleteBooking(id) {
+            if (!confirm('确定删除该预约？')) return;
+            window.adminBookings = window.adminBookings.filter(b => b.id !== id);
+            localStorage.setItem('adminBookings', JSON.stringify(window.adminBookings));
+            renderAdminTimeSlots();
+            renderAdminBookings();
+        }
+        
+        // 设置弹窗
+        function openSettingsModal() {
+            document.getElementById('serviceStartTime').value = bookingSettings.startTime;
+            document.getElementById('serviceEndTime').value = bookingSettings.endTime;
+            document.getElementById('serviceDuration').value = bookingSettings.duration;
+            
+            // 清空并重新设置休业日checkbox
+            for (let i = 0; i <= 6; i++) {
+                document.getElementById('offDay' + i).checked = bookingSettings.offDays.includes(i);
+            }
+            
+            document.getElementById('settingsModal').classList.add('active');
+        }
+        
+        function closeSettingsModal() {
+            document.getElementById('settingsModal').classList.remove('active');
+        }
+        
+        function saveSettings() {
+            bookingSettings.startTime = parseInt(document.getElementById('serviceStartTime').value);
+            bookingSettings.endTime = parseInt(document.getElementById('serviceEndTime').value);
+            bookingSettings.duration = parseInt(document.getElementById('serviceDuration').value);
+            
+            bookingSettings.offDays = [];
+            for (let i = 0; i <= 6; i++) {
+                if (document.getElementById('offDay' + i).checked) {
+                    bookingSettings.offDays.push(i);
+                }
+            }
+            
+            localStorage.setItem('bookingSettings', JSON.stringify(bookingSettings));
+            
+            // 更新显示
+            document.getElementById('serviceHoursDisplay').textContent = `${bookingSettings.startTime}:00 - ${bookingSettings.endTime}:00`;
+            document.getElementById('serviceDurationDisplay').textContent = bookingSettings.duration;
+            
+            closeSettingsModal();
+            renderAdminBookingCalendar();
+        }
+        
+        function toggleClosedDate(date) {
+            if (closedDates[date]) {
+                delete closedDates[date];
+            } else {
+                closedDates[date] = true;
+            }
+            localStorage.setItem('closedDates', JSON.stringify(closedDates));
+            renderAdminBookingCalendar();
         }
         
         function openProjectModal(project = null) {
