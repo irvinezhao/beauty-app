@@ -15,18 +15,29 @@
             --card-bg: #fff;
             --shadow: 0 2px 8px rgba(0,0,0,0.08);
             --radius: 12px;
+            --border-color: #eee;
         }
-        
+
+        [data-theme="dark"] {
+            --text: #e0e0e0;
+            --text-light: #999;
+            --bg: #1a1a1a;
+            --card-bg: #2d2d2d;
+            --shadow: 0 2px 8px rgba(0,0,0,0.3);
+            --border-color: #444;
+        }
+
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        
+
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: var(--bg);
             color: var(--text);
             line-height: 1.6;
             padding-bottom: 80px;
+            transition: background 0.3s, color 0.3s;
         }
-        
+
         .header {
             background: linear-gradient(135deg, var(--primary) 0%, #ff6b9d 100%);
             color: white;
@@ -35,22 +46,22 @@
             top: 0;
             z-index: 100;
         }
-        
+
         .header-content {
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
-        
+
         .header h1 { font-size: 22px; font-weight: 600; }
         .header p { font-size: 13px; opacity: 0.9; margin-top: 4px; }
-        
+
         .user-info {
             display: flex;
             align-items: center;
             gap: 8px;
         }
-        
+
         .user-avatar {
             width: 36px;
             height: 36px;
@@ -61,7 +72,7 @@
             justify-content: center;
             font-size: 18px;
         }
-        
+
         .logout-btn {
             background: rgba(255,255,255,0.2);
             border: none;
@@ -71,7 +82,18 @@
             font-size: 12px;
             cursor: pointer;
         }
-        
+
+        .dark-mode-btn {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 16px;
+            font-size: 12px;
+            cursor: pointer;
+            margin-left: 4px;
+        }
+
         .tabs {
             display: flex;
             background: var(--card-bg);
@@ -79,9 +101,10 @@
             position: sticky;
             top: 68px;
             z-index: 99;
-            border-bottom: 1px solid #eee;
+            border-bottom: 1px solid var(--border-color);
+            transition: background 0.3s;
         }
-        
+
         .tab {
             flex: 1;
             padding: 14px 8px;
@@ -91,7 +114,7 @@
             cursor: pointer;
             position: relative;
         }
-        
+
         .tab.active { color: var(--primary); font-weight: 500; }
         .tab.active::after {
             content: '';
@@ -104,20 +127,21 @@
             background: var(--primary);
             border-radius: 2px;
         }
-        
+
         .content { padding: 16px; }
-        
+
         .page { display: none; }
         .page.active { display: block; }
-        
+
         .card {
             background: var(--card-bg);
             border-radius: var(--radius);
             padding: 16px;
             margin-bottom: 12px;
             box-shadow: var(--shadow);
+            transition: background 0.3s, box-shadow 0.3s;
         }
-        
+
         .btn {
             background: var(--primary);
             color: white;
@@ -129,23 +153,23 @@
             cursor: pointer;
             width: 100%;
         }
-        
+
         .btn:active { opacity: 0.9; }
-        
+
         .btn-wechat {
             background: #07C160;
             margin-bottom: 12px;
         }
-        
+
         .btn-google {
             background: #4285F4;
             margin-bottom: 12px;
         }
-        
+
         .btn-anonymous {
             background: #666;
         }
-        
+
         .fab {
             position: fixed;
             bottom: 24px;
@@ -163,17 +187,18 @@
             cursor: pointer;
             z-index: 90;
         }
-        
+
         .project-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
             padding: 12px 0;
-            border-bottom: 1px solid #f5f5f5;
+            border-bottom: 1px solid var(--border-color);
+            transition: border-color 0.3s;
         }
-        
+
         .project-item:last-child { border-bottom: none; }
-        
+
         .project-name { font-weight: 500; }
         .project-price { color: var(--primary); font-weight: 600; }
         .project-category {
@@ -184,9 +209,9 @@
             border-radius: 10px;
             margin-left: 8px;
         }
-        
+
         .booking-card { border-left: 3px solid var(--primary); }
-        
+
         .booking-status {
             display: inline-block;
             padding: 4px 10px;
@@ -194,65 +219,69 @@
             font-size: 12px;
             margin-left: 8px;
         }
-        
+
         .status-pending { background: #fff3e0; color: #f57c00; }
         .status-confirmed { background: #e8f5e9; color: #43a047; }
         .status-completed { background: #e3f2fd; color: #1976d2; }
-        
+
         .photo-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 8px;
             margin-top: 12px;
         }
-        
+
         .photo-item {
             aspect-ratio: 1;
             border-radius: 8px;
             overflow: hidden;
-            background: #f5f5f5;
+            background: var(--border-color);
+            transition: background 0.3s;
         }
-        
+
         .photo-item img { width: 100%; height: 100%; object-fit: cover; }
-        
-        .post-item { padding: 16px 0; border-bottom: 1px solid #f0f0f0; }
+
+        .post-item { padding: 16px 0; border-bottom: 1px solid var(--border-color); transition: border-color 0.3s; }
         .post-item:last-child { border-bottom: none; }
         .post-time { font-size: 12px; color: var(--text-light); margin-bottom: 8px; }
         .post-content { font-size: 14px; }
-        
+
         .post-images {
             display: flex;
             gap: 8px;
             margin-top: 10px;
             flex-wrap: wrap;
         }
-        
+
         .post-images img { width: 80px; height: 80px; object-fit: cover; border-radius: 8px; }
-        
+
         .form-group { margin-bottom: 16px; }
-        
+
         .form-group label {
             display: block;
             font-size: 13px;
             color: var(--text-light);
             margin-bottom: 6px;
         }
-        
+
         .form-group input,
         .form-group select,
         .form-group textarea {
             width: 100%;
             padding: 12px;
-            border: 1px solid #eee;
+            border: 1px solid var(--border-color);
             border-radius: 8px;
             font-size: 14px;
+            background: var(--card-bg);
+            color: var(--text);
+            transition: background 0.3s, border-color 0.3s, color 0.3s;
         }
-        
+
         .form-group textarea { min-height: 80px; resize: vertical; }
-        
+
         .empty { text-align: center; padding: 40px 20px; color: var(--text-light); }
         .empty-icon { font-size: 48px; margin-bottom: 12px; }
-        
+
         .modal {
             display: none;
             position: fixed;
@@ -265,32 +294,34 @@
             align-items: center;
             justify-content: center;
         }
-        
+
         .modal.active { display: flex; }
-        
+
         .modal-content {
-            background: white;
+            background: var(--card-bg);
             border-radius: 16px;
             padding: 24px;
             width: 90%;
             max-width: 400px;
             max-height: 80vh;
             overflow-y: auto;
+            color: var(--text);
+            transition: background 0.3s;
         }
-        
+
         .modal-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 20px;
         }
-        
+
         .modal-header h3 { font-size: 18px; }
         .modal-close { font-size: 24px; color: #999; cursor: pointer; }
-        
+
         .photo-preview { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
         .photo-preview img { width: 60px; height: 60px; object-fit: cover; border-radius: 8px; }
-        
+
         .sync-status {
             position: fixed;
             top: 80px;
@@ -304,9 +335,9 @@
             z-index: 200;
             display: none;
         }
-        
+
         .sync-status.show { display: block; }
-        
+
         .delete-btn {
             background: #ff5252;
             color: white;
@@ -317,7 +348,7 @@
             cursor: pointer;
             margin-left: 8px;
         }
-        
+
         .login-page {
             display: none;
             position: fixed;
@@ -332,23 +363,25 @@
             flex-direction: column;
             padding: 20px;
         }
-        
+
         .login-page.active { display: flex; }
-        
+
         .login-card {
-            background: white;
+            background: var(--card-bg);
             border-radius: 20px;
             padding: 32px;
             width: 100%;
             max-width: 320px;
             text-align: center;
+            color: var(--text);
+            transition: background 0.3s, color 0.3s;
         }
-        
+
         .login-card h2 { color: var(--primary); margin-bottom: 8px; }
         .login-card p { color: var(--text-light); font-size: 14px; margin-bottom: 24px; }
-        
+
         .app-hidden { display: none !important; }
-        
+
         .input-hint { font-size: 11px; color: #999; margin-top: 4px; }
     </style>
 </head>
@@ -364,7 +397,7 @@
             <p style="font-size:12px;margin-top:16px;color:#999">登录即表示同意用户协议</p>
         </div>
     </div>
-    
+
     <!-- 主应用 -->
     <div id="appContent" class="app-hidden">
         <div class="header">
@@ -373,19 +406,21 @@
                     <h1>✨ 美丽小站</h1>
                     <p>美容项目管理 · 预约 · 记录</p>
                 </div>
-                <div class="user-info" id="userInfo"></div>
+                <div class="user-info" id="userInfo">
+                    <button class="dark-mode-btn" id="darkModeBtn" title="切换深色模式">🌙</button>
+                </div>
             </div>
         </div>
-        
+
         <div class="sync-status" id="syncStatus">☁️ 同步中...</div>
-        
+
         <div class="tabs">
             <div class="tab active" data-tab="projects">项目</div>
             <div class="tab" data-tab="bookings">预约</div>
             <div class="tab" data-tab="photos">拍照</div>
             <div class="tab" data-tab="posts">动态</div>
         </div>
-        
+
         <div class="content">
             <div class="page active" id="projects">
                 <div id="projectList"></div>
@@ -400,10 +435,10 @@
                 <div id="postList"></div>
             </div>
         </div>
-        
+
         <div class="fab" onclick="openModal()">+</div>
     </div>
-    
+
     <!-- Modal -->
     <div class="modal" id="modal">
         <div class="modal-content">
@@ -414,13 +449,13 @@
             <div id="modalBody"></div>
         </div>
     </div>
-    
+
     <!-- Firebase SDK -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, signInWithPopup, signOut, onAuthStateChanged, GoogleAuthProvider, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
         import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc, query, orderBy, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-        
+
         const firebaseConfig = {
             apiKey: "AIzaSyBOPa-J7SpDyOSdWiy7gsA5re01Xd-FuvI",
             authDomain: "beauty-app-6527c.firebaseapp.com",
@@ -429,20 +464,20 @@
             messagingSenderId: "396685995260",
             appId: "1:396685995260:web:0bb1a0676b339378a5bb79"
         };
-        
+
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
-        
+
         const googleProvider = new GoogleAuthProvider();
-        
+
         window.store = { projects: [], bookings: [], photos: [], posts: [] };
         window.currentUser = null;
-        
+
         window.showSync = (show) => {
             document.getElementById('syncStatus').classList.toggle('show', show);
         };
-        
+
         window.updateUserUI = (user) => {
             const userInfo = document.getElementById('userInfo');
             if (user) {
@@ -453,20 +488,23 @@
                     <span>${displayName}${provider}</span>
                     <div class="user-avatar">${avatar}</div>
                     <button class="logout-btn" id="logoutBtn">退出</button>
+                    <button class="dark-mode-btn" id="darkModeBtn" title="切换深色模式">🌙</button>
                 `;
                 document.getElementById('logoutBtn').addEventListener('click', () => signOut(auth));
+                initDarkMode();
             } else {
-                userInfo.innerHTML = '';
+                userInfo.innerHTML = '<button class="dark-mode-btn" id="darkModeBtn" title="切换深色模式">🌙</button>';
+                initDarkMode();
             }
         };
-        
+
         let unsubscribes = [];
-        
+
         window.subscribeToUserData = (userId) => {
             unsubscribes.forEach(unsub => unsub());
             unsubscribes = [];
             window.store = { projects: [], bookings: [], photos: [], posts: [] };
-            
+
             ['projects', 'bookings', 'photos', 'posts'].forEach(col => {
                 const q = query(collection(db, col), where('userId', '==', userId), orderBy('createdAt', 'desc'));
                 const unsub = onSnapshot(q, (snapshot) => {
@@ -478,7 +516,7 @@
                 unsubscribes.push(unsub);
             });
         };
-        
+
         window.loginWithGoogle = async () => {
             try {
                 window.showSync(true);
@@ -489,7 +527,7 @@
                 window.showSync(false);
             }
         };
-        
+
         window.loginAnonymously = async () => {
             try {
                 window.showSync(true);
@@ -500,7 +538,7 @@
                 window.showSync(false);
             }
         };
-        
+
         window.saveToFirestore = async (collectionName, data) => {
             if (!window.currentUser) { alert('请先登录'); return; }
             window.showSync(true);
@@ -515,14 +553,14 @@
                 alert('保存失败: ' + e.message);
             }
         };
-        
+
         window.deleteFromFirestore = async (collectionName, docId) => {
             if (!confirm('确定删除?')) return;
             window.showSync(true);
             try { await deleteDoc(doc(db, collectionName, docId)); }
             catch (e) { console.error('Error deleting document: ', e); alert('删除失败: ' + e.message); }
         };
-        
+
         onAuthStateChanged(auth, (user) => {
             window.currentUser = user;
             if (user) {
@@ -537,15 +575,41 @@
             }
             window.showSync(false);
         });
-        
+
         document.getElementById('googleLoginBtn').addEventListener('click', window.loginWithGoogle);
         document.getElementById('anonymousLoginBtn').addEventListener('click', window.loginAnonymously);
         document.getElementById('wechatLoginBtn').addEventListener('click', () => alert('微信登录需要配置微信开放平台，请先使用Google或游客登录'));
-        
+
         window.showSync(true);
     </script>
-    
+
     <script>
+        // ========== 深色模式 ==========
+        function initDarkMode() {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark') {
+                document.documentElement.setAttribute('data-theme', 'dark');
+            }
+
+            const btn = document.getElementById('darkModeBtn');
+            if (btn) {
+                btn.onclick = toggleDarkMode;
+            }
+        }
+
+        function toggleDarkMode() {
+            const html = document.documentElement;
+            const isDark = html.getAttribute('data-theme') === 'dark';
+
+            if (isDark) {
+                html.removeAttribute('data-theme');
+                localStorage.setItem('theme', 'light');
+            } else {
+                html.setAttribute('data-theme', 'dark');
+                localStorage.setItem('theme', 'dark');
+            }
+        }
+
         // ========== 安全工具函数 ==========
         const Security = {
             // HTML转义 - 防止XSS
@@ -555,41 +619,41 @@
                 div.textContent = text;
                 return div.innerHTML;
             },
-            
+
             // 验证输入长度
             validateLength(value, min, max) {
                 return value.length >= min && value.length <= max;
             },
-            
+
             // 验证价格（正整数）
             validatePrice(value) {
                 const num = parseInt(value);
                 return !isNaN(num) && num > 0 && num <= 999999;
             },
-            
+
             // 验证日期格式
             validateDate(value) {
                 return /^\d{4}-\d{2}-\d{2}$/.test(value);
             },
-            
+
             // 验证时间格式
             validateTime(value) {
                 return /^(\d{2}):(\d{2})$/.test(value);
             },
-            
+
             // 清理输入（去除控制字符）
             sanitizeInput(value) {
                 if (!value) return '';
                 return value.replace(/[\x00-\x1F\x7F]/g, '').trim();
             },
-            
+
             // 验证URL（可选）
             validateUrl(value) {
                 if (!value) return true;
                 try { new URL(value); return true; } catch { return false; }
             }
         };
-        
+
         // ========== Tab切换 ==========
         document.querySelectorAll('.tab').forEach(tab => {
             tab.addEventListener('click', () => {
@@ -599,7 +663,7 @@
                 document.getElementById(tab.dataset.tab).classList.add('active');
             });
         });
-        
+
         // ========== 渲染函数 ==========
         function renderProjects() {
             const container = document.getElementById('projectList');
@@ -620,13 +684,13 @@
                             <button class="delete-btn" onclick="deleteFromFirestore('projects', '${p.id}')">删除</button>
                         </div>
                     </div>
-                    ${p.notes ? `<p style="font-size:12px;color:#666;margin-top:8px">${Security.escapeHtml(p.notes)}</p>` : ''}
+                    ${p.notes ? `<p style="font-size:12px;color:var(--text-light);margin-top:8px">${Security.escapeHtml(p.notes)}</p>` : ''}
                 </div>
             `).join('');
         }
-        
+
         function renderBookings() {
-            const container = document.getElementById('bookingList');
+            const containerById('booking = document.getElementList');
             const bookings = window.store.bookings || [];
             if (!bookings.length) {
                 container.innerHTML = '<div class="empty"><div class="empty-icon">📅</div><p>暂无预约<br>点击+添加</p></div>';
@@ -641,12 +705,12 @@
                         </div>
                         <button class="delete-btn" onclick="deleteFromFirestore('bookings', '${b.id}')">删除</button>
                     </div>
-                    <p style="font-size:13px;color:#666;margin-top:8px">📅 ${Security.escapeHtml(b.date)} ${Security.escapeHtml(b.time)}</p>
-                    <p style="font-size:13px;color:#666">📍 ${Security.escapeHtml(b.location)}</p>
+                    <p style="font-size:13px;color:var(--text-light);margin-top:8px">📅 ${Security.escapeHtml(b.date)} ${Security.escapeHtml(b.time)}</p>
+                    <p style="font-size:13px;color:var(--text-light)">📍 ${Security.escapeHtml(b.location)}</p>
                 </div>
             `).join('');
         }
-        
+
         function renderPhotos() {
             const container = document.getElementById('photoList');
             const photos = window.store.photos || [];
@@ -660,16 +724,16 @@
                         <span class="project-name">${Security.escapeHtml(p.project)}</span>
                         <button class="delete-btn" onclick="deleteFromFirestore('photos', '${p.id}')">删除</button>
                     </div>
-                    ${p.description ? `<p style="font-size:12px;color:#666;margin:8px 0">${Security.escapeHtml(p.description)}</p>` : ''}
+                    ${p.description ? `<p style="font-size:12px;color:var(--text-light);margin:8px 0">${Security.escapeHtml(p.description)}</p>` : ''}
                     <div class="photo-grid">
                         ${p.before ? `<div class="photo-item"><img src="${p.before}" alt="before"></div>` : ''}
                         ${p.after ? `<div class="photo-item"><img src="${p.after}" alt="after"></div>` : ''}
                     </div>
-                    <p style="font-size:11px;color:#999;margin-top:8px">${Security.escapeHtml(p.date)}</p>
+                    <p style="font-size:11px;color:var(--text-light);margin-top:8px">${Security.escapeHtml(p.date)}</p>
                 </div>
             `).join('');
         }
-        
+
         function renderPosts() {
             const container = document.getElementById('postList');
             const posts = window.store.posts || [];
@@ -688,23 +752,23 @@
                 </div>
             `).join('');
         }
-        
+
         window.renderAll = function() {
             renderProjects();
             renderBookings();
             renderPhotos();
             renderPosts();
         };
-        
+
         // ========== Modal ==========
         let currentModal = '';
-        
+
         function openModal(type = 'project') {
             currentModal = type;
             const title = document.getElementById('modalTitle');
             const body = document.getElementById('modalBody');
             const projects = window.store.projects || [];
-            
+
             if (type === 'project') {
                 title.textContent = '添加项目';
                 body.innerHTML = `
@@ -801,17 +865,17 @@
                     <button class="btn" onclick="addPost()">发布</button>
                 `;
             }
-            
+
             document.getElementById('modal').classList.add('active');
         }
-        
+
         function closeModal() {
             document.getElementById('modal').classList.remove('active');
         }
-        
+
         // ========== 照片处理 ==========
         let beforeData = '', afterData = '', postPhotosData = [];
-        
+
         function previewPhoto(input, type) {
             const file = input.files[0];
             if (!file) return;
@@ -833,13 +897,13 @@
             };
             reader.readAsDataURL(file);
         }
-        
+
         function previewPostPhotos() {
             const input = document.getElementById('postImages');
             const preview = document.getElementById('postPhotosPreview');
             postPhotosData = [];
             preview.innerHTML = '';
-            
+
             Array.from(input.files).forEach(file => {
                 if (file.size > 5 * 1024 * 1024) {
                     alert('图片大小不能超过5MB');
@@ -853,40 +917,40 @@
                 reader.readAsDataURL(file);
             });
         }
-        
+
         // ========== 添加数据（带安全验证） ==========
         function addProject() {
             const name = Security.sanitizeInput(document.getElementById('projectName').value);
             const category = document.getElementById('projectCategory').value;
             const price = document.getElementById('projectPrice').value;
             const notes = Security.sanitizeInput(document.getElementById('projectNotes').value);
-            
+
             if (!name || !Security.validateLength(name, 1, 50)) return alert('请填写项目名称（1-50字符）');
             if (!Security.validatePrice(price)) return alert('请填写有效价格（1-999999）');
-            
+
             window.saveToFirestore('projects', { name, category, price, notes });
             closeModal();
         }
-        
+
         function addBooking() {
             const project = document.getElementById('bookingProject').value;
             const date = document.getElementById('bookingDate').value;
             const time = document.getElementById('bookingTime').value;
             const location = Security.sanitizeInput(document.getElementById('bookingLocation').value);
-            
+
             if (!project || !date || !time || !location) return alert('请填写完整信息');
             if (!Security.validateLength(location, 1, 100)) return alert('地点最多100字符');
-            
+
             window.saveToFirestore('bookings', { project, date, time, location, status: 'pending' });
             closeModal();
         }
-        
+
         function addPhoto() {
             const project = document.getElementById('photoProject').value;
             const description = Security.sanitizeInput(document.getElementById('photoDesc').value);
-            
+
             if (!project) return alert('请选择项目');
-            
+
             window.saveToFirestore('photos', {
                 project,
                 description,
@@ -898,12 +962,12 @@
             afterData = '';
             closeModal();
         }
-        
+
         function addPost() {
             const content = Security.sanitizeInput(document.getElementById('postContent').value);
-            
+
             if (!content || !Security.validateLength(content, 1, 1000)) return alert('请填写内容（1-1000字符）');
-            
+
             window.saveToFirestore('posts', {
                 content,
                 images: postPhotosData,
@@ -912,6 +976,9 @@
             postPhotosData = [];
             closeModal();
         }
+
+        // 页面加载时初始化深色模式
+        initDarkMode();
     </script>
 </body>
 </html>
