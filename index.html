@@ -582,14 +582,31 @@
             const phone = document.getElementById('loginPhone').value.trim();
             const code = document.getElementById('loginCode').value.trim();
             
+            // 管理员手机号白名单
+            const adminPhones = ['17665124666', '13632736654'];
+            
             if (!phone || !code) return alert('请填写手机号和验证码');
+            if (!adminPhones.includes(phone)) return alert('此手机号不是管理员账号');
             
             const stored = verificationCodes[phone];
             if (!stored) return alert('请先获取验证码');
             if (Date.now() > stored.expires) return alert('验证码已过期，请重新获取');
             if (stored.code !== code) return alert('验证码错误');
             
-            // 登录成功，检查用户是否存在，不存在则创建
+            // 管理员登录成功
+            isLoggedIn = true;
+            localStorage.setItem('adminLoggedIn', 'true');
+            document.getElementById('loginPage').classList.remove('active');
+            document.getElementById('adminPage').classList.add('active');
+            renderAdminProjects();
+            renderAdminBookingCalendar();
+            document.getElementById('serviceHoursDisplay').textContent = `${bookingSettings.startTime}:00 - ${bookingSettings.endTime}:00`;
+            document.getElementById('serviceDurationDisplay').textContent = bookingSettings.duration;
+            renderAdminBookings();
+            renderRechargeList();
+            renderCouponList();
+            renderDiscountList();
+        };
             let user = users.find(u => u.phone === phone);
             if (!user) {
                 user = {
