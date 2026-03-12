@@ -117,6 +117,7 @@
         <div class="tab active" data-tab="projects">项目</div>
         <div class="tab" data-tab="booking">预约</div>
         <div class="tab" data-tab="timeline">记录</div>
+        <div class="tab" data-tab="profile">我的</div>
     </div>
     
     <div class="content" id="userContent">
@@ -127,6 +128,11 @@
             <div class="time-slots" id="timeSlots"></div>
         </div>
         <div class="page" id="timeline"><div class="timeline" id="timelineList"></div></div>
+        
+        <!-- 我的页面 -->
+        <div class="page" id="profile">
+            <div id="profileContent"></div>
+        </div>
     </div>
     
     <div class="detail-page" id="detailPage">
@@ -530,6 +536,7 @@
             
             alert('登录成功！');
             closeUserLogin();
+            renderProfile();
         };
         
         window.userLogout = function() {
@@ -537,6 +544,7 @@
             localStorage.removeItem('currentUser');
             document.getElementById('userLoginBtn').textContent = '登录';
             document.getElementById('userLoginBtn').onclick = openUserLogin;
+            renderProfile();
         };
         
         // 检查登录状态
@@ -675,6 +683,101 @@
         const timelineData = [ { dateText: '3月8日', projects: ['光子嫩肤', '小气泡清洁', '果酸换肤'], photos: ['https://images.unsplash.com/photo-1616394584738-fc6e612e71b9?w=200'] }, { dateText: '2月14日', projects: ['水光针'], photos: ['https://images.unsplash.com/photo-1512290923902-8a9f81dc236c?w=200'] } ];
         
         function renderTimeline() { const container = document.getElementById('timelineList'); container.innerHTML = timelineData.map(item => `<div class="timeline-item"><div class="timeline-date">${item.dateText}</div><div class="timeline-projects">${item.projects.map(p => `<span class="timeline-tag">${p}</span>`).join('')}</div><div class="timeline-photos">${item.photos.map(photo => `<img src="${photo}">`).join('')}</div></div>`).join(''); }
+        
+        // 我的页面 - 用户资料管理
+        function renderProfile() {
+            const container = document.getElementById('profileContent');
+            
+            if (!window.currentUser) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">👤</div>
+                        <p>请先登录</p>
+                        <button class="btn" style="margin-top:16px" onclick="openUserLogin()">立即登录</button>
+                    </div>
+                `;
+                return;
+            }
+            
+            const user = window.currentUser;
+            const myBookings = window.adminBookings.filter(b => b.phone === user.phone);
+            const totalSpent = myBookings.length * 500; // 估算
+            
+            container.innerHTML = `
+                <div class="admin-section">
+                    <h3>👤 个人资料</h3>
+                    <div style="padding:16px;background:var(--bg);border-radius:12px">
+                        <div class="form-group">
+                            <label>姓名</label>
+                            <input type="text" id="profileName" value="${user.name || ''}" placeholder="请输入姓名">
+                        </div>
+                        <div class="form-group">
+                            <label>手机号</label>
+                            <input type="tel" value="${user.phone || ''}" disabled style="background:#eee">
+                        </div>
+                        <button class="btn" onclick="saveProfile()">保存修改</button>
+                    </div>
+                </div>
+                
+                <div class="admin-section">
+                    <h3>💰 会员信息</h3>
+                    <div style="padding:16px;background:var(--bg);border-radius:12px">
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
+                            <div style="text-align:center;padding:12px;background:var(--card-bg);border-radius:12px">
+                                <div style="font-size:24px;font-weight:700;color:var(--primary)">¥${user.balance || 0}</div>
+                                <div style="font-size:12px;color:var(--text-light)">储值余额</div>
+                            </div>
+                            <div style="text-align:center;padding:12px;background:var(--card-bg);border-radius:12px">
+                                <div style="font-size:24px;font-weight:700;color:var(--primary)">¥${user.totalSpent || 0}</div>
+                                <div style="font-size:12px;color:var(--text-light)">累计消费</div>
+                            </div>
+                        </div>
+                        ${(user.tags || []).length > 0 ? `<p style="font-size:13px"><strong>标签：</strong>${user.tags.join(', ')}</p>` : ''}
+                    </div>
+                </div>
+                
+                <div class="admin-section">
+                    <h3>📅 我的预约</h3>
+                    <div id="myBookingsList"></div>
+                </div>
+                
+                <button class="btn" style="background:#f44336;margin-top:16px" onclick="userLogout()">退出登录</button>
+            `;
+            
+            // 渲染我的预约
+            const bookingsContainer = document.getElementById('myBookingsList');
+            if (myBookings.length === 0) {
+                bookingsContainer.innerHTML = '<p style="text-align:center;color:var(--text-light);padding:20px">暂无预约记录</p>';
+            } else {
+                bookingsContainer.innerHTML = myBookings.map(b => `
+                    <div class="admin-list-item">
+                        <div class="admin-item-info">
+                            <h4>${b.date} ${b.time}</h4>
+                            <p>${b.note || '无备注'}</p>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+        
+        window.saveProfile = function() {
+            const name = document.getElementById('profileName').value.trim();
+            if (!name) return alert('请输入姓名');
+            
+            // 更新用户信息
+            const userIndex = users.findIndex(u => u.phone === window.currentUser.phone);
+            if (userIndex !== -1) {
+                users[userIndex].name = name;
+                localStorage.setItem('users', JSON.stringify(users));
+                
+                window.currentUser.name = name;
+                localStorage.setItem('currentUser', JSON.stringify(window.currentUser));
+                
+                document.getElementById('userLoginBtn').textContent = name;
+                alert('保存成功！');
+                renderProfile();
+            }
+        };
         
         function openAdminLogin() { document.getElementById('loginPage').classList.add('active'); }
         
@@ -1069,6 +1172,7 @@
         renderBookingDates();
         renderTimeSlots();
         renderTimeline();
+        renderProfile();
     </script>
 </body>
 </html>
